@@ -17,22 +17,29 @@ export function ImageUploadField({
   const [url, setUrl] = useState(defaultUrl || "");
   const [uploading, setUploading] = useState(false);
   const [msg, setMsg] = useState("");
+  const [error, setError] = useState("");
 
   async function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
     setMsg("");
-    const fd = new FormData();
-    fd.set("file", file);
-    const res = await uploadMedia(fd);
-    setUploading(false);
-    if (!res.ok) {
-      setMsg(res.error || "Falha no upload");
-      return;
+    setError("");
+    try {
+      const fd = new FormData();
+      fd.set("file", file);
+      const res = await uploadMedia(fd);
+      if (!res.ok) {
+        setError(res.error || "Falha no upload");
+        return;
+      }
+      setUrl(res.url);
+      setMsg("Imagem carregada. Guarde o formulário para aplicar.");
+    } catch {
+      setError("Erro de rede ao carregar a imagem. Tente novamente.");
+    } finally {
+      setUploading(false);
     }
-    setUrl(res.url);
-    setMsg("Imagem carregada.");
   }
 
   return (
@@ -43,6 +50,7 @@ export function ImageUploadField({
       <input type="file" accept="image/*,.svg" onChange={onFileChange} disabled={uploading} />
       {uploading && <p className="mt-1 text-xs text-muted">A carregar…</p>}
       {msg && <p className="mt-1 text-xs text-primary">{msg}</p>}
+      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
       {url && (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={url} alt="" className="mt-2 max-h-20 w-auto object-contain" />

@@ -1,27 +1,18 @@
 "use server";
 
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { isCallOpen } from "@/lib/funding";
+import { storeUploadedFile } from "@/lib/upload";
 
-const MAX_BYTES = 12 * 1024 * 1024;
 const DOC_EXTS = ["pdf", "doc", "docx"];
 
 async function saveDocument(file: File) {
-  if (file.size > MAX_BYTES) {
-    return { ok: false as const, error: "Ficheiro demasiado grande (máx. 12 MB)." };
-  }
   const ext = (file.name.split(".").pop() || "pdf").toLowerCase().replace(/[^a-z0-9]/g, "");
   if (!DOC_EXTS.includes(ext)) {
     return { ok: false as const, error: "Formato inválido. Use PDF, DOC ou DOCX." };
   }
-  const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const dir = path.join(process.cwd(), "public", "uploads", "candidaturas");
-  await mkdir(dir, { recursive: true });
-  await writeFile(path.join(dir, name), Buffer.from(await file.arrayBuffer()));
-  return { ok: true as const, url: `/uploads/candidaturas/${name}` };
+  return storeUploadedFile(file);
 }
 
 export async function submitCallApplication(formData: FormData) {

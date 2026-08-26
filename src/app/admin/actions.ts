@@ -501,28 +501,20 @@ export async function deleteHeroSlide(formData: FormData) {
 }
 
 export async function uploadMedia(formData: FormData) {
-  await requireAdmin("documents.upload");
-  const file = formData.get("file");
-  if (!(file instanceof File) || file.size === 0) {
-    return { ok: false as const, error: "Ficheiro inválido" };
+  try {
+    await requireAdmin("documents.upload");
+    const file = formData.get("file");
+    if (!(file instanceof File)) {
+      return { ok: false as const, error: "Ficheiro inválido" };
+    }
+    const { storeUploadedFile } = await import("@/lib/upload");
+    return storeUploadedFile(file);
+  } catch (err) {
+    console.error("[uploadMedia]", err);
+    const message =
+      err instanceof Error ? err.message : "Falha no upload. Tente novamente.";
+    return { ok: false as const, error: message };
   }
-  if (file.size > 12 * 1024 * 1024) {
-    return { ok: false as const, error: "Ficheiro demasiado grande (máx. 12 MB)" };
-  }
-
-  const bytes = Buffer.from(await file.arrayBuffer());
-  const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
-  const allowed = ["jpg", "jpeg", "png", "webp", "gif", "svg", "pdf", "doc", "docx"];
-  const safeExt = allowed.includes(ext) ? ext : "jpg";
-  const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${safeExt}`;
-
-  const { writeFile, mkdir } = await import("fs/promises");
-  const path = await import("path");
-  const dir = path.join(process.cwd(), "public", "uploads");
-  await mkdir(dir, { recursive: true });
-  await writeFile(path.join(dir, name), bytes);
-
-  return { ok: true as const, url: `/uploads/${name}` };
 }
 
 export async function createUserAccount(formData: FormData) {

@@ -17,22 +17,29 @@ export function DocumentUploadField({
   const [url, setUrl] = useState(defaultUrl || "");
   const [uploading, setUploading] = useState(false);
   const [msg, setMsg] = useState("");
+  const [error, setError] = useState("");
 
   async function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
     setMsg("");
-    const fd = new FormData();
-    fd.set("file", file);
-    const res = await uploadMedia(fd);
-    setUploading(false);
-    if (!res.ok) {
-      setMsg(res.error || "Falha no upload");
-      return;
+    setError("");
+    try {
+      const fd = new FormData();
+      fd.set("file", file);
+      const res = await uploadMedia(fd);
+      if (!res.ok) {
+        setError(res.error || "Falha no upload");
+        return;
+      }
+      setUrl(res.url);
+      setMsg("Documento carregado.");
+    } catch {
+      setError("Erro de rede ao carregar o documento.");
+    } finally {
+      setUploading(false);
     }
-    setUrl(res.url);
-    setMsg("Documento carregado.");
   }
 
   return (
@@ -48,6 +55,7 @@ export function DocumentUploadField({
       />
       {uploading && <p className="mt-1 text-xs text-muted">A carregar…</p>}
       {msg && <p className="mt-1 text-xs text-primary">{msg}</p>}
+      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
       {url && (
         <a href={url} target="_blank" rel="noreferrer" className="mt-2 block text-sm font-semibold text-primary">
           Ver ficheiro →

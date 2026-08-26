@@ -13,16 +13,21 @@ export function ProjectGalleryForm({ projectId }: { projectId: string }) {
     if (!file) return;
     setUploading(true);
     setMsg("");
-    const fd = new FormData();
-    fd.set("file", file);
-    const res = await uploadMedia(fd);
-    setUploading(false);
-    if (!res.ok) {
-      setMsg(res.error || "Falha no upload");
-      return;
+    try {
+      const fd = new FormData();
+      fd.set("file", file);
+      const res = await uploadMedia(fd);
+      if (!res.ok) {
+        setMsg(res.error || "Falha no upload");
+        return;
+      }
+      setUrl(res.url);
+      setMsg("Imagem carregada. Clique em Adicionar à galeria.");
+    } catch {
+      setMsg("Erro de rede ao carregar a imagem.");
+    } finally {
+      setUploading(false);
     }
-    setUrl(res.url);
-    setMsg("Imagem carregada. Clique em Adicionar à galeria.");
   }
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
