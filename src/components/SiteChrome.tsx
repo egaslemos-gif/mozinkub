@@ -59,6 +59,14 @@ export function SiteFooter({
       <div className="brand-stripe" />
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:py-12 md:grid-cols-3 md:px-6">
         <div>
+          <div className="mb-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logos/unilicungo-oficial.png"
+              alt="Universidade Licungo"
+              className="h-14 w-14 rounded-full object-contain"
+            />
+          </div>
           <p className="font-display text-xl font-semibold">{brand}</p>
           <p className="mt-2 text-sm text-muted">{slogan}</p>
         </div>

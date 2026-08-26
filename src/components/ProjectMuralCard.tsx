@@ -34,7 +34,7 @@ export function ProjectMuralCard({ project }: { project: ProjectMuralItem }) {
           className="absolute inset-0 h-full w-full object-cover"
         />
       ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0f6b63] to-[#123047]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#3f7872] to-[#2a4650]" />
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-[#062428]/95 via-[#062428]/40 to-black/10" />
 

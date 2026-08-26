@@ -65,7 +65,18 @@ export async function AdminShell({
     <div className="min-h-screen bg-[#f3f7f4]">
       <div className="mx-auto grid max-w-6xl gap-4 px-3 py-4 sm:gap-6 sm:px-4 sm:py-6 md:grid-cols-[220px_1fr] md:px-6">
         <aside className="card-surface h-fit p-3 sm:p-4">
-          <p className="font-display text-lg font-semibold">IEUL Admin</p>
+          <div className="mb-3 flex items-center gap-2.5">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logos/unilicungo-oficial.png"
+              alt="Universidade Licungo"
+              className="h-10 w-10 rounded-full object-contain"
+            />
+            <div>
+              <p className="font-display text-lg font-semibold">IEUL Admin</p>
+              <p className="text-[10px] text-muted">UniLicungo · Beira</p>
+            </div>
+          </div>
           <p className="mt-1 truncate text-xs text-muted">{session.user?.email}</p>
           <p className="mt-0.5 text-[10px] font-semibold tracking-wide text-primary uppercase">
             {roleLabel}

@@ -167,7 +167,7 @@ export default async function ProjectoDetailPage({
                     href={wa}
                     target="_blank"
                     rel="noreferrer"
-                    className="btn-primary !bg-[#25D366] !py-2.5 text-center text-sm"
+                    className="btn-primary !bg-[color:var(--wa)] hover:!bg-[color:var(--wa-dark)] !py-2.5 text-center text-sm"
                   >
                     WhatsApp
                   </a>

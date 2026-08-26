@@ -9,7 +9,7 @@ const partners = [
     label: "MozInkub N+1",
   },
   {
-    src: "/logos/unilicungo.png",
+    src: "/logos/unilicungo-oficial.png",
     alt: "Universidade Licungo",
     label: "Universidade Licungo",
   },
@@ -83,20 +83,20 @@ export function PartnerLogos({
 
 export function BrandMark() {
   return (
-    <div className="flex min-w-0 items-center gap-2 sm:gap-2.5">
-      <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-xl border border-border bg-white sm:h-10 sm:w-10">
+    <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+      <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-white sm:h-12 sm:w-12">
         <Image
-          src="/logos/mozinkub.png"
-          alt="IEUL / MozInkub"
-          width={40}
-          height={40}
-          className="h-full w-full object-cover"
+          src="/logos/unilicungo-oficial.png"
+          alt="Universidade Licungo"
+          width={48}
+          height={48}
+          className="h-full w-full object-contain"
           unoptimized
           priority
         />
       </div>
       <div className="min-w-0">
-        <p className="font-display text-base leading-none font-semibold tracking-tight sm:text-lg">
+        <p className="font-display text-base leading-none font-semibold tracking-tight text-foreground sm:text-lg">
           IEUL
         </p>
         <p className="mt-0.5 truncate text-[10px] text-muted sm:text-[11px]">

@@ -1,26 +1,26 @@
 @import "tailwindcss";
 
-/* Paleta institucional:
-   UniLicungo — azul céu + castanho do livro
-   MozInkub — teal florestal
-   Embaixada de França — azul Marianne + vermelho (acento pontual)
+/* Paleta institucional suave (UniLicungo + MozInkub):
+   azul céu e castanho do brasão UL, teal desaturado da incubadora.
 */
 :root {
-  --background: #f5f8fb;
-  --foreground: #0f1a24;
-  --muted: #5a6b78;
+  --background: #f6f7f9;
+  --foreground: #1b2430;
+  --muted: #667280;
   --card: #ffffff;
-  --primary: #0f6b63;
-  --primary-dark: #0a4f4a;
-  --primary-soft: #e6f3f1;
-  --ul-blue: #1a8bc8;
-  --ul-blue-dark: #0e6fa3;
-  --ul-brown: #8a5a2b;
-  --fr-blue: #002654;
-  --fr-red: #e30613;
-  --accent: #9fd4c8;
-  --border: #d5e2ea;
-  --hero-glow: #cfe8f5;
+  --primary: #3f7872;
+  --primary-dark: #315f5a;
+  --primary-soft: #eef4f3;
+  --ul-blue: #4a8fb5;
+  --ul-blue-dark: #3a7394;
+  --ul-brown: #8c6a49;
+  --fr-blue: #243b55;
+  --fr-red: #b85c5c;
+  --accent: #b7cfc9;
+  --border: #e1e7ec;
+  --hero-glow: #e9eef3;
+  --wa: #4f9a6c;
+  --wa-dark: #3f7d58;
 }
 
 @theme inline {
@@ -74,20 +74,20 @@ a {
 .site-shell {
   background:
     radial-gradient(ellipse 70% 45% at 100% -5%, var(--hero-glow), transparent 55%),
-    radial-gradient(ellipse 55% 40% at 0% 15%, #e8f5f2, transparent 50%),
-    linear-gradient(180deg, #f7fafc 0%, var(--background) 40%);
+    radial-gradient(ellipse 55% 40% at 0% 15%, #eef3f2, transparent 50%),
+    linear-gradient(180deg, #f8f9fb 0%, var(--background) 42%);
   overflow-x: clip;
   max-width: 100%;
 }
 
 .brand-stripe {
-  height: 4px;
+  height: 3px;
   background: linear-gradient(
     90deg,
     var(--fr-blue) 0%,
     var(--fr-blue) 22%,
-    #ffffff 22%,
-    #ffffff 28%,
+    #f4f6f8 22%,
+    #f4f6f8 28%,
     var(--fr-red) 28%,
     var(--fr-red) 34%,
     var(--primary) 34%,
@@ -110,7 +110,8 @@ a {
   font-weight: 600;
   padding: 0.85rem 1.4rem;
   max-width: 100%;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 6px 16px rgba(63, 120, 114, 0.18);
 }
 
 .btn-primary:hover {
@@ -124,7 +125,7 @@ a {
   justify-content: center;
   border-radius: 999px;
   border: 1.5px solid var(--border);
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.85);
   color: var(--foreground);
   font-weight: 600;
   padding: 0.85rem 1.4rem;
@@ -141,7 +142,7 @@ a {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 1.25rem;
-  box-shadow: 0 10px 30px rgba(15, 40, 60, 0.05);
+  box-shadow: 0 8px 24px rgba(27, 36, 48, 0.04);
 }
 
 .fade-up {
@@ -227,7 +228,7 @@ a {
   border: 1px solid var(--border);
   border-radius: 1rem;
   background: #fff;
-  box-shadow: 0 4px 14px rgba(15, 40, 60, 0.04);
+  box-shadow: 0 4px 14px rgba(27, 36, 48, 0.03);
   transition:
     transform 0.25s ease,
     box-shadow 0.25s ease,
@@ -237,10 +238,10 @@ a {
 }
 
 .partner-marquee-item:hover {
-  transform: translateY(-4px) scale(1.06);
-  border-color: var(--primary);
+  transform: translateY(-3px) scale(1.03);
+  border-color: var(--border);
   background: var(--primary-soft);
-  box-shadow: 0 12px 28px rgba(15, 107, 99, 0.18);
+  box-shadow: 0 10px 22px rgba(63, 120, 114, 0.1);
   z-index: 2;
 }
 
@@ -263,7 +264,6 @@ a {
     transform: translateX(0);
   }
   to {
-    /* 50% = uma cópia completa (3 logos) */
     transform: translateX(-50%);
   }
 }
