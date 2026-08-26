@@ -256,62 +256,66 @@ export default async function HomePage() {
               email, telefone ou WhatsApp.
             </p>
 
-            <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
-              <aside className="border border-border bg-white p-5 sm:p-6">
+            <div className="mt-8 grid overflow-hidden border border-border bg-white md:grid-cols-2">
+              <aside className="border-b border-border p-5 sm:p-6 md:border-r md:border-b-0">
                 {config.campus && (
-                  <p className="border-b border-border pb-4 text-sm font-semibold text-ul-blue">
-                    {config.campus}
-                  </p>
+                  <p className="text-sm font-semibold text-ul-blue">{config.campus}</p>
                 )}
 
-                <ul className="mt-1 divide-y divide-border">
-                  <li className="py-4">
-                    <p className="text-[0.65rem] font-bold tracking-[0.14em] text-primary uppercase">
+                <dl className="mt-5 grid gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
+                  <div>
+                    <dt className="text-[0.65rem] font-bold tracking-[0.14em] text-primary uppercase">
                       Morada
-                    </p>
-                    <p className="mt-1.5 text-sm leading-relaxed text-foreground">{config.address}</p>
-                  </li>
-                  <li className="py-4">
-                    <p className="text-[0.65rem] font-bold tracking-[0.14em] text-primary uppercase">
+                    </dt>
+                    <dd className="mt-1 text-sm leading-relaxed text-foreground">{config.address}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[0.65rem] font-bold tracking-[0.14em] text-primary uppercase">
                       Telefone
-                    </p>
-                    <a
-                      href={`tel:${config.phone.replace(/[^\d+/]/g, "")}`}
-                      className="mt-1.5 inline-block text-sm font-medium text-foreground underline-offset-2 hover:text-primary hover:underline"
-                    >
-                      {config.phone}
-                    </a>
-                  </li>
-                  <li className="py-4">
-                    <p className="text-[0.65rem] font-bold tracking-[0.14em] text-primary uppercase">
-                      Email
-                    </p>
-                    <a
-                      href={`mailto:${config.email}`}
-                      className="mt-1.5 inline-block break-all text-sm font-medium text-foreground underline-offset-2 hover:text-primary hover:underline"
-                    >
-                      {config.email}
-                    </a>
-                  </li>
-                  {config.whatsapp && (
-                    <li className="py-4">
-                      <p className="text-[0.65rem] font-bold tracking-[0.14em] text-primary uppercase">
-                        WhatsApp
-                      </p>
+                    </dt>
+                    <dd className="mt-1">
                       <a
-                        href={whatsappHref(
-                          config.whatsapp,
-                          "Olá! Contacto a partir do site MozInkub / IEUL.",
-                        )}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="mt-1.5 inline-block text-sm font-medium text-foreground underline-offset-2 hover:text-primary hover:underline"
+                        href={`tel:${config.phone.replace(/[^\d+/]/g, "")}`}
+                        className="text-sm font-medium text-foreground underline-offset-2 hover:text-primary hover:underline"
                       >
-                        {config.whatsapp}
+                        {config.phone}
                       </a>
-                    </li>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[0.65rem] font-bold tracking-[0.14em] text-primary uppercase">
+                      Email
+                    </dt>
+                    <dd className="mt-1">
+                      <a
+                        href={`mailto:${config.email}`}
+                        className="break-all text-sm font-medium text-foreground underline-offset-2 hover:text-primary hover:underline"
+                      >
+                        {config.email}
+                      </a>
+                    </dd>
+                  </div>
+                  {config.whatsapp && (
+                    <div>
+                      <dt className="text-[0.65rem] font-bold tracking-[0.14em] text-primary uppercase">
+                        WhatsApp
+                      </dt>
+                      <dd className="mt-1">
+                        <a
+                          href={whatsappHref(
+                            config.whatsapp,
+                            "Olá! Contacto a partir do site MozInkub / IEUL.",
+                          )}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-sm font-medium text-foreground underline-offset-2 hover:text-primary hover:underline"
+                        >
+                          {config.whatsapp}
+                        </a>
+                      </dd>
+                    </div>
                   )}
-                </ul>
+                </dl>
 
                 {config.whatsapp && (
                   <a
@@ -321,14 +325,16 @@ export default async function HomePage() {
                     )}
                     target="_blank"
                     rel="noreferrer"
-                    className="btn-primary mt-2 inline-flex w-full justify-center"
+                    className="btn-primary mt-6 inline-flex w-full justify-center sm:w-auto"
                   >
                     Abrir WhatsApp
                   </a>
                 )}
               </aside>
 
-              <ContactForm />
+              <div className="min-w-0">
+                <ContactForm embedded />
+              </div>
             </div>
           </div>
         </section>

@@ -6,9 +6,12 @@ import { submitContactMessage } from "@/app/contact-actions";
 export function ContactForm({
   projectSlug,
   projectName,
+  embedded = false,
 }: {
   projectSlug?: string;
   projectName?: string;
+  /** Sem borda própria — usado dentro do painel unificado de contactos. */
+  embedded?: boolean;
 }) {
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
   const [error, setError] = useState("");
@@ -38,7 +41,11 @@ export function ContactForm({
   return (
     <form
       onSubmit={onSubmit}
-      className="border border-border bg-white p-5 sm:p-6"
+      className={
+        embedded
+          ? "h-full p-5 sm:p-6"
+          : "border border-border bg-white p-5 sm:p-6"
+      }
       aria-busy={status === "loading"}
     >
       <h3 className="font-display text-xl font-semibold text-foreground">
@@ -53,11 +60,11 @@ export function ContactForm({
       {projectSlug && <input type="hidden" name="projectSlug" value={projectSlug} />}
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
-        <div className="sm:col-span-1">
+        <div>
           <label className="admin-label">Nome completo</label>
           <input className="admin-input" name="name" placeholder="O seu nome" required />
         </div>
-        <div className="sm:col-span-1">
+        <div>
           <label className="admin-label">Email</label>
           <input
             className="admin-input"
@@ -67,11 +74,11 @@ export function ContactForm({
             required
           />
         </div>
-        <div className="sm:col-span-1">
+        <div>
           <label className="admin-label">Telefone / WhatsApp</label>
           <input className="admin-input" name="phone" placeholder="Opcional" />
         </div>
-        <div className="sm:col-span-1">
+        <div>
           <label className="admin-label">Assunto</label>
           <input
             className="admin-input"
@@ -84,7 +91,7 @@ export function ContactForm({
         <div className="sm:col-span-2">
           <label className="admin-label">Mensagem</label>
           <textarea
-            className="admin-input min-h-32"
+            className="admin-input min-h-28"
             name="message"
             placeholder={
               isProject
