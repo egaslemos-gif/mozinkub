@@ -189,25 +189,22 @@ export function MonthCalendar({ entries }: { entries: CalendarEntry[] }) {
 
   return (
     <div>
-      <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
         <div className="min-w-0">
-          <p className="text-xs font-bold tracking-[0.16em] text-primary uppercase">Calendário</p>
-          <h2 className="font-display mt-1 text-2xl font-semibold sm:text-3xl">
+          <p className="text-[10px] font-bold tracking-[0.14em] text-primary uppercase">Calendário</p>
+          <h2 className="font-display mt-0.5 text-xl font-semibold sm:text-2xl">
             {monthLabel(year, month)}
           </h2>
-          <p className="mt-1 text-xs text-muted">
-            Percorra meses anteriores (histórico) ou seguintes (agendas futuras).
-          </p>
         </div>
 
-        <div className="flex flex-col gap-2 sm:items-end">
-          <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-col gap-1.5 sm:items-end">
+          <div className="flex flex-wrap items-center gap-1.5">
             <label className="sr-only" htmlFor="cal-month">
               Mês
             </label>
             <select
               id="cal-month"
-              className="admin-input !w-auto !py-2 text-sm capitalize"
+              className="admin-input !w-auto !py-1.5 text-xs capitalize sm:text-sm"
               value={month}
               onChange={(e) => goToMonth(year, Number(e.target.value))}
             >
@@ -222,7 +219,7 @@ export function MonthCalendar({ entries }: { entries: CalendarEntry[] }) {
             </label>
             <select
               id="cal-year"
-              className="admin-input !w-auto !py-2 text-sm"
+              className="admin-input !w-auto !py-1.5 text-xs sm:text-sm"
               value={year}
               onChange={(e) => goToMonth(Number(e.target.value), month)}
             >
@@ -234,10 +231,10 @@ export function MonthCalendar({ entries }: { entries: CalendarEntry[] }) {
             </select>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5">
             <button
               type="button"
-              className="btn-ghost !px-3 !py-2 text-xs sm:text-sm"
+              className="btn-ghost !px-2.5 !py-1.5 text-[11px] sm:text-xs"
               onClick={prevMonth}
               title={monthLabel(prevMonthDate.getFullYear(), prevMonthDate.getMonth())}
             >
@@ -248,7 +245,7 @@ export function MonthCalendar({ entries }: { entries: CalendarEntry[] }) {
             </button>
             <button
               type="button"
-              className={`btn-ghost !px-3 !py-2 text-xs sm:text-sm ${
+              className={`btn-ghost !px-2.5 !py-1.5 text-[11px] sm:text-xs ${
                 isCurrentMonth ? "border-primary text-primary" : ""
               }`}
               onClick={goToday}
@@ -257,7 +254,7 @@ export function MonthCalendar({ entries }: { entries: CalendarEntry[] }) {
             </button>
             <button
               type="button"
-              className="btn-ghost !px-3 !py-2 text-xs sm:text-sm"
+              className="btn-ghost !px-2.5 !py-1.5 text-[11px] sm:text-xs"
               onClick={nextMonth}
               title={monthLabel(nextMonthDate.getFullYear(), nextMonthDate.getMonth())}
             >
@@ -270,17 +267,17 @@ export function MonthCalendar({ entries }: { entries: CalendarEntry[] }) {
         </div>
       </div>
 
-      <div className="mt-6 grid items-start gap-5 lg:grid-cols-[1.2fr_0.8fr] lg:gap-6">
-        {/* Grelha */}
-        <div className="card-surface overflow-hidden p-3 sm:p-4">
-          <div className="mb-2 grid grid-cols-7 gap-1 text-center text-[11px] font-semibold text-muted sm:text-xs">
+      <div className="mt-3 grid items-start gap-3 lg:grid-cols-[1.15fr_0.85fr] lg:gap-4">
+        {/* Grelha compacta — células com altura fixa (não aspect-square) */}
+        <div className="card-surface overflow-hidden p-2 sm:p-2.5">
+          <div className="mb-1 grid grid-cols-7 gap-0.5 text-center text-[10px] font-semibold text-muted">
             {WEEKDAYS_PT.map((d) => (
-              <div key={d} className="py-1.5">
+              <div key={d} className="py-0.5">
                 {d}
               </div>
             ))}
           </div>
-          <div className="grid grid-cols-7 gap-1">
+          <div className="grid grid-cols-7 gap-0.5">
             {cells.map((date) => {
               const inMonth = date.getMonth() === month;
               const key = dayKey(date);
@@ -300,29 +297,29 @@ export function MonthCalendar({ entries }: { entries: CalendarEntry[] }) {
                   <button
                     type="button"
                     onClick={() => onSelectDay(date)}
-                    className={`flex aspect-square w-full flex-col items-center rounded-lg border p-1 text-center transition sm:rounded-xl sm:p-1.5 ${
+                    className={`flex h-9 w-full flex-col items-center justify-center border px-0.5 text-center transition sm:h-10 ${
                       inMonth ? "bg-white" : "bg-transparent text-muted/40"
                     } ${
                       isSelected
-                        ? "border-primary bg-primary-soft shadow-sm"
+                        ? "border-primary bg-primary-soft"
                         : isToday
                           ? "border-primary/50"
-                          : "border-border/70"
+                          : "border-border/60"
                     } ${dayItems.length ? "hover:border-primary" : "hover:bg-[#f7fafc]"}`}
                   >
                     <span
-                      className={`text-xs font-semibold sm:text-sm ${
+                      className={`text-[11px] font-semibold leading-none sm:text-xs ${
                         isSelected || isToday ? "text-primary" : ""
                       }`}
                     >
                       {date.getDate()}
                     </span>
                     {dayItems.length > 0 && (
-                      <span className="mt-auto flex max-w-full flex-wrap justify-center gap-0.5 pb-0.5">
+                      <span className="mt-0.5 flex max-w-full justify-center gap-0.5">
                         {dayItems.slice(0, 3).map((item) => (
                           <span
                             key={item.id}
-                            className={`h-1.5 w-1.5 rounded-full ${
+                            className={`h-1 w-1 ${
                               item.kind === "EVENTO" ? "bg-primary" : "bg-ul-blue"
                             }`}
                           />
@@ -332,15 +329,7 @@ export function MonthCalendar({ entries }: { entries: CalendarEntry[] }) {
                   </button>
 
                   {showHover && primary && (
-                    <div className="pointer-events-none absolute top-full left-1/2 z-30 mt-1.5 hidden w-48 -translate-x-1/2 rounded-xl border border-border bg-white p-2 shadow-xl md:block">
-                      {primary.coverUrl && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={primary.coverUrl}
-                          alt=""
-                          className="mb-1.5 h-20 w-full rounded-lg object-cover"
-                        />
-                      )}
+                    <div className="pointer-events-none absolute top-full left-1/2 z-30 mt-1 hidden w-44 -translate-x-1/2 border border-border bg-white p-2 shadow-lg md:block">
                       <p className="text-[10px] font-bold text-primary uppercase">
                         {eventCategoryLabel(primary.category)}
                       </p>
@@ -352,16 +341,15 @@ export function MonthCalendar({ entries }: { entries: CalendarEntry[] }) {
               );
             })}
           </div>
-          <p className="mt-3 text-[11px] text-muted">
-            Clique num dia para filtrar o resumo ao lado. Pontos verdes = eventos · azuis =
-            actividades.
+          <p className="mt-2 text-[10px] text-muted">
+            Verde = eventos · azul = actividades. Clique no dia para filtrar o resumo.
           </p>
         </div>
 
         {/* Painel resumo */}
-        <aside className="card-surface sticky top-24 flex max-h-[min(70vh,36rem)] flex-col overflow-hidden lg:max-h-[32rem]">
-          <div className="border-b border-border p-3 sm:p-4">
-            <div className="flex gap-1 rounded-full bg-[#f3f7f4] p-1">
+        <aside className="card-surface sticky top-20 flex max-h-[min(52vh,22rem)] flex-col overflow-hidden lg:max-h-[22rem]">
+          <div className="border-b border-border p-2.5">
+            <div className="flex gap-1 bg-[#eef2f0] p-0.5">
               {(
                 [
                   { id: "month" as const, label: "Mês" },
@@ -379,9 +367,9 @@ export function MonthCalendar({ entries }: { entries: CalendarEntry[] }) {
                       setSelectedDayKey(dayKey(today));
                     }
                   }}
-                  className={`flex-1 rounded-full px-2 py-1.5 text-xs font-semibold transition ${
+                  className={`flex-1 px-2 py-1 text-[11px] font-semibold transition ${
                     focusMode === tab.id
-                      ? "bg-primary text-white shadow-sm"
+                      ? "bg-primary text-white"
                       : "text-muted hover:text-foreground"
                   }`}
                 >
@@ -389,19 +377,19 @@ export function MonthCalendar({ entries }: { entries: CalendarEntry[] }) {
                 </button>
               ))}
             </div>
-            <p className="mt-3 text-xs font-semibold text-primary capitalize">{panelTitle}</p>
-            <p className="mt-0.5 text-[11px] text-muted">
+            <p className="mt-2 text-[11px] font-semibold text-primary capitalize">{panelTitle}</p>
+            <p className="text-[10px] text-muted">
               {panelEntries.length}{" "}
               {panelEntries.length === 1 ? "registo" : "registos"} neste período
             </p>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-3 sm:p-4">
+          <div className="flex-1 overflow-y-auto p-2.5">
             {detail ? (
               <div>
                 <button
                   type="button"
-                  className="mb-3 text-xs font-semibold text-primary"
+                  className="mb-2 text-[11px] font-semibold text-primary"
                   onClick={() => setDetail(null)}
                 >
                   ← Voltar ao resumo
@@ -411,45 +399,44 @@ export function MonthCalendar({ entries }: { entries: CalendarEntry[] }) {
                   <img
                     src={detail.coverUrl}
                     alt=""
-                    className="mb-3 h-36 w-full rounded-xl object-cover"
+                    className="mb-2 h-24 w-full object-cover"
                   />
                 )}
                 <p className="text-[10px] font-bold tracking-wide text-primary uppercase">
                   {eventCategoryLabel(detail.category)} ·{" "}
                   {detail.kind === "EVENTO" ? "Evento" : "Actividade"}
                 </p>
-                <h3 className="font-display mt-1 text-xl font-semibold">{detail.title}</h3>
-                <p className="mt-2 text-xs text-muted">
+                <h3 className="font-display mt-0.5 text-lg font-semibold leading-snug">
+                  {detail.title}
+                </h3>
+                <p className="mt-1 text-[11px] text-muted">
                   {new Date(detail.startsAt).toLocaleString("pt-MZ", {
                     dateStyle: "medium",
                     timeStyle: "short",
                   })}
                   {detail.location ? ` · ${detail.location}` : ""}
                 </p>
-                <p className="mt-3 text-sm leading-relaxed text-muted">{detail.summary}</p>
-                {detail.details && (
-                  <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted">
-                    {detail.details}
-                  </p>
-                )}
-                <Link href={detail.href} className="btn-primary mt-4 inline-flex !py-2 text-sm">
+                <p className="mt-2 line-clamp-4 text-xs leading-relaxed text-muted">
+                  {detail.summary}
+                </p>
+                <Link href={detail.href} className="btn-primary mt-3 inline-flex !py-1.5 text-xs">
                   Página completa →
                 </Link>
               </div>
             ) : panelEntries.length === 0 ? (
-              <p className="text-sm text-muted">
-                Sem actividades ou eventos neste período. Seleccione outro dia ou mude o filtro.
+              <p className="text-xs text-muted">
+                Sem registos neste período. Seleccione outro dia ou mude o filtro.
               </p>
             ) : (
-              <ul className="space-y-2">
+              <ul className="space-y-1.5">
                 {panelEntries.map((item) => (
                   <li key={item.id}>
                     <button
                       type="button"
                       onClick={() => setDetail(item)}
-                      className="flex w-full gap-3 rounded-xl border border-border bg-white p-2.5 text-left transition hover:border-primary hover:bg-primary-soft/40"
+                      className="flex w-full gap-2 border border-border bg-white p-2 text-left transition hover:border-primary hover:bg-primary-soft/40"
                     >
-                      <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-primary-soft">
+                      <div className="h-9 w-9 shrink-0 overflow-hidden bg-primary-soft">
                         {item.coverUrl ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={item.coverUrl} alt="" className="h-full w-full object-cover" />
@@ -469,8 +456,8 @@ export function MonthCalendar({ entries }: { entries: CalendarEntry[] }) {
                           {" · "}
                           {eventCategoryLabel(item.category)}
                         </p>
-                        <p className="truncate text-sm font-semibold">{item.title}</p>
-                        <p className="mt-0.5 line-clamp-2 text-xs text-muted">{item.summary}</p>
+                        <p className="truncate text-xs font-semibold">{item.title}</p>
+                        <p className="mt-0.5 line-clamp-1 text-[11px] text-muted">{item.summary}</p>
                       </div>
                     </button>
                   </li>

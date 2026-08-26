@@ -39,12 +39,11 @@ export default async function ProjectosPage() {
   return (
     <div className="site-shell min-h-screen">
       <SiteHeader brand={config?.brandName || "IEUL"} />
-      <main className="mx-auto max-w-6xl px-4 py-12 md:px-6">
+      <main className="mx-auto max-w-6xl px-4 py-8 md:px-6">
         <p className="text-xs font-bold tracking-[0.16em] text-primary uppercase">Mural</p>
-        <h1 className="font-display mt-2 text-4xl font-semibold">Projectos incubados</h1>
-        <p className="mt-3 max-w-2xl text-muted">
-          Portefólio activo e histórico das coortes anteriores. Filtre por período ou edição de
-          financiamento.
+        <h1 className="font-display mt-1 text-2xl font-semibold sm:text-3xl">Projectos incubados</h1>
+        <p className="mt-2 max-w-2xl text-sm text-muted">
+          Portefólio activo e histórico das coortes. Filtre por período ou edição.
         </p>
 
         <Suspense fallback={<p className="mt-8 text-sm text-muted">A carregar mural…</p>}>

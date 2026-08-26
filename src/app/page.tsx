@@ -78,22 +78,22 @@ export default async function HomePage() {
       <SiteHeader brand={config.brandName} />
 
       <main>
-        <section className="mx-auto grid max-w-6xl items-center gap-8 px-4 pt-5 pb-12 sm:pt-6 sm:pb-14 md:grid-cols-2 md:gap-10 md:px-6 md:pt-8 md:pb-16">
+        <section className="mx-auto grid max-w-6xl items-center gap-5 px-4 pt-4 pb-8 sm:gap-6 sm:pt-5 sm:pb-10 md:grid-cols-2 md:gap-8 md:px-6 md:pt-6 md:pb-10">
           <div className="fade-up min-w-0">
-            <p className="mb-3 text-[10px] font-bold tracking-[0.12em] text-primary uppercase sm:text-xs sm:tracking-[0.18em]">
+            <p className="mb-2 text-[10px] font-bold tracking-[0.12em] text-primary uppercase sm:text-xs sm:tracking-[0.16em]">
               IEUL · UniLicungo · MozInkub N+1 · Embaixada de França
             </p>
-            <h1 className="font-display text-[1.85rem] leading-[1.15] font-semibold tracking-tight break-words sm:text-4xl md:text-5xl">
+            <h1 className="font-display text-[1.65rem] leading-[1.15] font-semibold tracking-tight break-words sm:text-3xl md:text-4xl">
               {config.heroTitle}
             </h1>
-            <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted sm:mt-5 sm:text-base md:text-lg">
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted sm:text-base">
               {config.heroSubtitle}
             </p>
-            <div className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap">
-              <Link href="/projectos" className="btn-primary w-full sm:w-auto">
+            <div className="mt-4 flex flex-col gap-2 sm:mt-5 sm:flex-row sm:flex-wrap">
+              <Link href="/projectos" className="btn-primary w-full !py-2.5 text-sm sm:w-auto">
                 Ver projectos incubados
               </Link>
-              <Link href="/#calendario" className="btn-ghost w-full sm:w-auto">
+              <Link href="/#calendario" className="btn-ghost w-full !py-2.5 text-sm sm:w-auto">
                 Ver calendário
               </Link>
             </div>
@@ -109,20 +109,22 @@ export default async function HomePage() {
           />
         </section>
 
-        <section className="border-y border-border bg-[#dde5ea] py-14 md:py-16">
+        <section className="border-y border-border bg-[#dde5ea] py-8 md:py-10">
           <div className="mx-auto max-w-6xl px-4 md:px-6">
-            <div className="mb-6 flex items-end justify-between gap-4">
+            <div className="mb-4 flex items-end justify-between gap-4">
               <div>
                 <p className="text-xs font-bold tracking-[0.16em] text-primary uppercase">
                   Destaques
                 </p>
-                <h2 className="font-display mt-2 text-3xl font-semibold">Projectos incubados</h2>
+                <h2 className="font-display mt-1 text-2xl font-semibold sm:text-3xl">
+                  Projectos incubados
+                </h2>
               </div>
               <Link href="/projectos" className="text-sm font-semibold text-primary">
                 Ver mural →
               </Link>
             </div>
-            <div className="grid gap-5 md:grid-cols-3">
+            <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
               {mural.map((p) => (
                 <ProjectMuralCard key={p.id} project={p} />
               ))}
@@ -130,21 +132,16 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section id="calendario" className="border-b border-border bg-white/80 py-14 md:py-16">
+        <section id="calendario" className="border-b border-border bg-white/80 py-8 md:py-10">
           <div className="mx-auto max-w-6xl px-4 md:px-6">
-            <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-              <div className="max-w-2xl">
+            <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+              <div className="max-w-xl">
                 <p className="text-xs font-bold tracking-[0.16em] text-primary uppercase">
                   Agenda pública
                 </p>
-                <h2 className="font-display mt-2 text-3xl font-semibold">
+                <h2 className="font-display mt-1 text-2xl font-semibold sm:text-3xl">
                   Calendário de actividades e eventos
                 </h2>
-                <p className="mt-2 text-sm text-muted">
-                  Calendário e resumo lado a lado: seleccione um dia, a semana ou o mês para ver as
-                  actividades correspondentes. Hover mostra pré-visualização; clique no resumo para
-                  detalhes.
-                </p>
               </div>
               <Link href="/calendario" className="text-sm font-semibold text-primary">
                 Abrir página completa →
