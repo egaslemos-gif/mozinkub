@@ -1,0 +1,348 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  /// Papel principal (legado + código normalizado). Preferir UserRole para multi-papel.
+  /// Valores legados: COORDENADOR → mapeado para INCUBATOR_COORDINATOR
+  role         String   @default("INCUBATOR_COORDINATOR")
+  /// ACTIVE | PENDING | SUSPENDED | DISABLED
+  status       String   @default("ACTIVE")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  userRoles             UserRole[]
+  projectMemberships    ProjectMember[]
+  projectCoachings      ProjectCoach[]   @relation("CoachAssignments")
+  coachesAssignedBy     ProjectCoach[]   @relation("CoachAssignedBy")
+  evaluationAssignments EvaluationAssignment[]
+  privateNotesAuthored  CoachPrivateNote[]
+  auditLogs             AuditLog[]
+}
+
+model Role {
+  id          String           @id @default(cuid())
+  code        String           @unique
+  name        String
+  description String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  permissions RolePermission[]
+  users       UserRole[]
+}
+
+model Permission {
+  id          String           @id @default(cuid())
+  code        String           @unique
+  resource    String
+  action      String
+  description String?
+  createdAt   DateTime         @default(now())
+  roles       RolePermission[]
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  /// GLOBAL | INCUBATOR | ASSIGNED | OWN | TEAM | PUBLIC
+  scope        String     @default("INCUBATOR")
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+model UserRole {
+  userId     String
+  roleId     String
+  assignedAt DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role       Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+}
+
+model ProjectMember {
+  id            String   @id @default(cuid())
+  projectId     String
+  userId        String
+  /// PROJECT_MANAGER | TEAM_MEMBER
+  roleInProject String
+  createdAt     DateTime @default(now())
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+}
+
+model ProjectCoach {
+  id         String   @id @default(cuid())
+  projectId  String
+  coachId    String
+  assignedAt DateTime @default(now())
+  assignedBy String?
+  status     String   @default("ACTIVE")
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  coach      User     @relation("CoachAssignments", fields: [coachId], references: [id], onDelete: Cascade)
+  assigner   User?    @relation("CoachAssignedBy", fields: [assignedBy], references: [id], onDelete: SetNull)
+
+  @@unique([projectId, coachId])
+}
+
+model EvaluationAssignment {
+  id                String           @id @default(cuid())
+  evaluatorId       String
+  callApplicationId String?
+  projectId         String?
+  status            String           @default("OPEN")
+  score             Float?
+  report            String?
+  submittedAt       DateTime?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  evaluator         User             @relation(fields: [evaluatorId], references: [id], onDelete: Cascade)
+  application       CallApplication? @relation(fields: [callApplicationId], references: [id], onDelete: Cascade)
+  project           Project?         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model CoachPrivateNote {
+  id        String   @id @default(cuid())
+  projectId String
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  userId       String?
+  action       String
+  resourceType String
+  resourceId   String?
+  ipAddress    String?
+  metadata     String?
+  createdAt    DateTime @default(now())
+  user         User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model SiteConfig {
+  id           String @id @default("main")
+  brandName    String
+  slogan       String
+  mission      String
+  vision       String
+  valuesJson   String
+  address      String
+  phone        String
+  whatsapp     String @default("84305623")
+  email        String
+  campus       String
+  aboutText    String
+  heroTitle    String
+  heroSubtitle String
+}
+
+model HeroSlide {
+  id          String   @id @default(cuid())
+  title       String
+  subtitle    String?
+  imageUrl    String
+  linkUrl     String?
+  order       Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ContactMessage {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  subject     String
+  message     String
+  projectSlug String?
+  createdAt   DateTime @default(now())
+  read        Boolean  @default(false)
+}
+
+model Project {
+  id               String   @id @default(cuid())
+  name             String
+  slug             String   @unique
+  area             String
+  tagline          String?
+  summary          String
+  description      String   @default("")
+  offer            String?
+  audience         String?
+  lookingFor       String?
+  city             String   @default("Beira")
+  leader           String
+  team             String?
+  contact          String?
+  email            String?
+  whatsapp         String?
+  website          String?
+  facebook         String?
+  instagram        String?
+  linkedin         String?
+  status           String   @default("EM_INCUBACAO")
+  maturity         String   @default("PROTOTIPO")
+  lifecycle        String   @default("ATIVO")
+  cohortYear       Int?
+  fundingEditionId String?
+  fundingEdition   FundingEdition? @relation(fields: [fundingEditionId], references: [id], onDelete: SetNull)
+  featured         Boolean  @default(false)
+  published        Boolean  @default(true)
+  logoUrl          String?
+  coverUrl         String?
+  order            Int      @default(0)
+  incubatedAt      DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  milestones       ProjectMilestone[]
+  gallery          ProjectMedia[]
+  members          ProjectMember[]
+  coaches          ProjectCoach[]
+  evaluations      EvaluationAssignment[]
+  privateNotes     CoachPrivateNote[]
+}
+
+model ProjectMilestone {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title       String
+  description String
+  date        DateTime
+  kind        String   @default("MARCO")
+  createdAt   DateTime @default(now())
+}
+
+model ProjectMedia {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title     String?
+  url       String
+  type      String   @default("IMAGE")
+  createdAt DateTime @default(now())
+}
+
+model Event {
+  id        String    @id @default(cuid())
+  title     String
+  slug      String    @unique
+  summary   String
+  details   String    @default("")
+  category  String    @default("EVENTO")
+  location  String?
+  startsAt  DateTime
+  endsAt    DateTime?
+  published Boolean   @default(true)
+  coverUrl  String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model FundingEdition {
+  id        String        @id @default(cuid())
+  name      String
+  slug      String        @unique
+  year      Int
+  funder    String?
+  summary   String
+  published Boolean       @default(true)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  calls     FundingCall[]
+  projects  Project[]
+}
+
+model FundingCall {
+  id                 String            @id @default(cuid())
+  editionId          String?
+  edition            FundingEdition?   @relation(fields: [editionId], references: [id], onDelete: SetNull)
+  title              String
+  slug               String            @unique
+  summary            String
+  description        String            @default("")
+  eligibility        String?
+  areas              String?
+  opensAt            DateTime?
+  deadline           DateTime?
+  status             String            @default("ABERTO")
+  documentUrl        String?
+  acceptApplications Boolean           @default(true)
+  published          Boolean           @default(true)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  applications       CallApplication[]
+}
+
+model CallApplication {
+  id           String      @id @default(cuid())
+  callId       String
+  call         FundingCall @relation(fields: [callId], references: [id], onDelete: Cascade)
+  projectTitle String
+  area         String
+  leaderName   String
+  email        String
+  phone        String?
+  team         String?
+  summary      String
+  documentUrl  String
+  status       String      @default("RECEBIDA")
+  adminNotes   String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  evaluations  EvaluationAssignment[]
+}
+
+model TimelineItem {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String
+  details     String   @default("")
+  date        DateTime
+  category    String   @default("ACTIVIDADE")
+  published   Boolean  @default(true)
+  mediaUrl    String?
+  mediaType   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model GalleryAlbum {
+  id          String         @id @default(cuid())
+  title       String
+  slug        String         @unique
+  description String?
+  published   Boolean        @default(true)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  media       GalleryMedia[]
+}
+
+model GalleryMedia {
+  id        String       @id @default(cuid())
+  albumId   String
+  album     GalleryAlbum @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  title     String?
+  url       String
+  type      String       @default("IMAGE")
+  createdAt DateTime     @default(now())
+}

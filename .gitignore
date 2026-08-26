@@ -32,6 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -39,3 +40,22 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/src/generated/prisma
+
+# uploads (candidaturas e media do CMS)
+/public/uploads
+
+# local SQLite runtime + backups (seeded DB can be generated in CI/build)
+/prisma/*.db
+/prisma/*.db-journal
+/prisma/*.db-wal
+/prisma/*.db-shm
+/backups/
+
+# editor/agent tooling (not part of the app)
+.agents/
+.claude/
+.windsurf/
+skills-lock.json
+scripts/detect-gdrive.ps1

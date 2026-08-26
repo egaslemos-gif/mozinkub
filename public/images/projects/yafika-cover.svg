@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" fill="none">
+  <defs>
+    <linearGradient id="yafikaCover" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0c3d52"/>
+      <stop offset="100%" stop-color="#1a8bc8"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="720" fill="url(#yafikaCover)"/>
+  <circle cx="220" cy="180" r="120" fill="#ffffff" fill-opacity="0.08"/>
+  <rect x="680" y="160" width="360" height="220" rx="24" fill="#ffffff" fill-opacity="0.1"/>
+  <circle cx="860" cy="270" r="36" fill="#f4c430" fill-opacity="0.85"/>
+  <path d="M0 520 Q300 460 600 530 T1200 500 V720 H0 Z" fill="#062428" fill-opacity="0.35"/>
+</svg>
