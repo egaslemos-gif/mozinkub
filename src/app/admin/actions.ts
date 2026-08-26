@@ -433,6 +433,9 @@ export async function updateFundingCall(formData: FormData) {
     const id = String(formData.get("id") || "");
     const deadlineRaw = String(formData.get("deadline") || "");
     const opensRaw = String(formData.get("opensAt") || "");
+    const existing = await prisma.fundingCall.findUnique({ where: { id } });
+    const documentUrl =
+      optionalField(formData, "documentUrl") || existing?.documentUrl || null;
     const updated = await prisma.fundingCall.update({
       where: { id },
       data: {
@@ -445,7 +448,7 @@ export async function updateFundingCall(formData: FormData) {
         status: String(formData.get("status") || "ABERTO"),
         deadline: deadlineRaw ? new Date(deadlineRaw) : null,
         opensAt: opensRaw ? new Date(opensRaw) : null,
-        documentUrl: optionalField(formData, "documentUrl"),
+        documentUrl,
         acceptApplications: formData.get("acceptApplications") === "on",
         published: formData.get("published") === "on",
       },

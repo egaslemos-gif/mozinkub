@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { CallApplicationForm } from "@/components/CallApplicationForm";
+import { OfficialCallDocument } from "@/components/OfficialCallDocument";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
 import {
   getFundingCallBySlug,
@@ -65,6 +66,12 @@ export default async function EditalDetailPage({
               )}
             </div>
 
+            {call.documentUrl && (
+              <div className="mt-8">
+                <OfficialCallDocument url={call.documentUrl} title={call.title} />
+              </div>
+            )}
+
             {call.description && (
               <div className="mt-8">
                 <h2 className="font-display text-2xl font-semibold">Informação do concurso</h2>
@@ -87,16 +94,6 @@ export default async function EditalDetailPage({
                 <p className="mt-2 text-sm text-muted">{call.areas}</p>
               </div>
             )}
-            {call.documentUrl && (
-              <a
-                href={call.documentUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="btn-ghost mt-8 inline-flex"
-              >
-                Descarregar PDF do edital
-              </a>
-            )}
           </div>
 
           <aside>
@@ -115,7 +112,7 @@ export default async function EditalDetailPage({
                     rel="noreferrer"
                     className="mt-4 inline-block text-sm font-semibold text-primary"
                   >
-                    Consultar documento →
+                    Consultar documento oficial →
                   </a>
                 )}
               </div>

@@ -43,12 +43,24 @@ export default async function EditaisPage() {
                 </div>
                 <h3 className="font-display mt-3 text-2xl font-semibold">{c.title}</h3>
                 <p className="mt-3 text-sm text-muted">{c.summary}</p>
-                <Link
-                  href={`/editais/${c.slug}`}
-                  className="btn-primary mt-5 inline-flex !py-2.5 text-sm"
-                >
-                  Ver edital e candidatar-se →
-                </Link>
+                <div className="mt-5 flex flex-wrap gap-3">
+                  <Link
+                    href={`/editais/${c.slug}`}
+                    className="btn-primary inline-flex !py-2.5 text-sm"
+                  >
+                    Ver edital e candidatar-se →
+                  </Link>
+                  {c.documentUrl && (
+                    <a
+                      href={c.documentUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn-ghost inline-flex !py-2.5 text-sm"
+                    >
+                      Documento oficial
+                    </a>
+                  )}
+                </div>
               </article>
             ))}
           </div>
@@ -68,12 +80,24 @@ export default async function EditaisPage() {
                   </div>
                   <h3 className="font-display mt-3 text-xl font-semibold">{c.title}</h3>
                   <p className="mt-2 text-sm text-muted">{c.summary}</p>
-                  <Link
-                    href={`/editais/${c.slug}`}
-                    className="mt-4 inline-block text-sm font-semibold text-primary"
-                  >
-                    Ver informação →
-                  </Link>
+                  <div className="mt-4 flex flex-wrap gap-4">
+                    <Link
+                      href={`/editais/${c.slug}`}
+                      className="text-sm font-semibold text-primary"
+                    >
+                      Ver informação →
+                    </Link>
+                    {c.documentUrl && (
+                      <a
+                        href={c.documentUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-sm font-semibold text-ul-blue"
+                      >
+                        Documento oficial →
+                      </a>
+                    )}
+                  </div>
                 </article>
               ))}
             </div>

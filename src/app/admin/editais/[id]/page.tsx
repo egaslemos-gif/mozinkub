@@ -87,7 +87,8 @@ export default async function AdminEditalDetailPage({
         <div className="md:col-span-2">
           <DocumentUploadField
             name="documentUrl"
-            label="PDF do edital"
+            label="Ficheiro oficial do concurso (PDF ou imagem)"
+            hint="PDF ou digitalização JPG/PNG do edital. Substitui o ficheiro anterior se carregar um novo."
             defaultUrl={call.documentUrl}
           />
         </div>

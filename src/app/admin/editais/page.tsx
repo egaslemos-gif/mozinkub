@@ -26,8 +26,8 @@ export default async function AdminEditaisPage() {
   return (
     <AdminShell title="Editais e financiamentos">
       <p className="mb-5 max-w-2xl text-sm text-muted">
-        Publique edições de financiamento e editais de concurso. Os candidatos submetem projectos em
-        PDF na página pública do edital.
+        Publique edições de financiamento e editais de concurso. Em cada edital pode anexar o
+        ficheiro oficial (PDF ou imagem digitalizada) para download na página pública.
       </p>
 
       <FormWithFeedback
@@ -74,7 +74,8 @@ export default async function AdminEditaisPage() {
       >
         <h2 className="font-display text-xl font-semibold md:col-span-2">Novo edital / concurso</h2>
         <p className="text-sm text-muted md:col-span-2">
-          Após criar, os candidatos podem submeter projectos em PDF na página pública do edital.
+          Anexe o edital oficial (PDF ou scan JPG/PNG). Depois de criar, os candidatos submetem o
+          projecto em PDF na página pública.
         </p>
         <input className="admin-input md:col-span-2" name="title" placeholder="Título do edital" required />
         <textarea className="admin-input md:col-span-2" name="summary" placeholder="Resumo" required />
@@ -111,8 +112,8 @@ export default async function AdminEditaisPage() {
         <div className="md:col-span-2">
           <DocumentUploadField
             name="documentUrl"
-            label="PDF do edital"
-            hint="Documento oficial para download público."
+            label="Ficheiro oficial do concurso (PDF ou imagem)"
+            hint="Ex.: Edital Nº 01/2024 em PDF ou digitalização JPG/PNG. Fica disponível na página pública."
           />
         </div>
         <label className="flex items-center gap-2 text-sm">
@@ -134,6 +135,18 @@ export default async function AdminEditaisPage() {
               </p>
               <p className="mt-1 font-semibold">{c.title}</p>
               <p className="mt-1 text-sm text-muted">{c.summary}</p>
+              {c.documentUrl ? (
+                <a
+                  href={c.documentUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-2 inline-block text-xs font-semibold text-primary"
+                >
+                  Ficheiro oficial anexado →
+                </a>
+              ) : (
+                <p className="mt-2 text-xs text-amber-700">Sem ficheiro oficial — anexe em Gerir.</p>
+              )}
             </div>
             <div className="flex shrink-0 gap-2">
               <Link href={`/admin/editais/${c.id}`} className="btn-primary !px-3 !py-2 text-sm">
