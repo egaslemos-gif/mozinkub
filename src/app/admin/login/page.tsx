@@ -1,6 +1,7 @@
 "use client";
 
 import { signIn } from "next-auth/react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import Image from "next/image";
@@ -34,20 +35,26 @@ export default function AdminLoginPage() {
       <form onSubmit={onSubmit} className="card-surface w-full max-w-md overflow-hidden">
         <div className="brand-stripe" />
         <div className="p-8">
-          <div className="mb-5 flex items-center justify-center gap-3">
-            <Image src="/logos/mozinkub.png" alt="MozInkub" width={48} height={48} unoptimized />
-            <Image src="/logos/unilicungo.png" alt="UniLicungo" width={56} height={56} unoptimized />
-            <Image
-              src="/logos/embaixada-franca.png"
-              alt="Embaixada de França"
-              width={72}
-              height={48}
-              unoptimized
-            />
-          </div>
-          <p className="text-center text-xs font-bold tracking-[0.16em] text-primary uppercase">
-            IEUL Admin
-          </p>
+          <Link
+            href="/"
+            className="mb-5 flex flex-col items-center gap-2 transition-opacity hover:opacity-80"
+            aria-label="Ir para a página principal"
+          >
+            <span className="flex items-center justify-center gap-3">
+              <Image src="/logos/mozinkub.png" alt="MozInkub" width={48} height={48} unoptimized />
+              <Image src="/logos/unilicungo.png" alt="UniLicungo" width={56} height={56} unoptimized />
+              <Image
+                src="/logos/embaixada-franca.png"
+                alt="Embaixada de França"
+                width={72}
+                height={48}
+                unoptimized
+              />
+            </span>
+            <span className="text-center text-xs font-bold tracking-[0.16em] text-primary uppercase">
+              IEUL Admin
+            </span>
+          </Link>
           <h1 className="font-display mt-2 text-center text-3xl font-semibold">
             Área da coordenação
           </h1>
