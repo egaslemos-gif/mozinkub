@@ -63,8 +63,8 @@ export async function AdminShell({
 
   return (
     <div className="min-h-screen bg-[#f3f7f4]">
-      <div className="mx-auto grid max-w-6xl gap-4 px-3 py-4 sm:gap-6 sm:px-4 sm:py-6 md:grid-cols-[220px_1fr] md:px-6">
-        <aside className="card-surface h-fit p-3 sm:p-4">
+      <div className="mx-auto grid max-w-6xl gap-4 px-3 py-4 sm:gap-6 sm:px-4 sm:py-6 md:grid-cols-[220px_1fr] md:items-start md:px-6">
+        <aside className="card-surface z-20 p-3 sm:p-4 md:sticky md:top-4 md:max-h-[calc(100vh-2rem)] md:overflow-y-auto">
           <div className="mb-3 flex items-center gap-2.5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -81,19 +81,19 @@ export async function AdminShell({
           <p className="mt-0.5 text-[10px] font-semibold tracking-wide text-primary uppercase">
             {roleLabel}
           </p>
-          <nav className="mt-4 -mx-1 flex gap-1 overflow-x-auto pb-1 text-sm md:mx-0 md:mt-5 md:block md:space-y-1 md:overflow-visible md:pb-0">
+          <nav className="mt-4 -mx-1 flex gap-1 overflow-x-auto pb-1 text-sm md:mx-0 md:mt-5 md:block md:max-h-none md:space-y-1 md:overflow-visible md:pb-0">
             {visibleNav.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="block shrink-0 rounded-lg px-3 py-2 whitespace-nowrap hover:bg-primary-soft hover:text-primary"
+                className="block shrink-0 px-3 py-2 whitespace-nowrap hover:bg-primary-soft hover:text-primary"
               >
                 {item.label}
               </Link>
             ))}
             <Link
               href="/"
-              className="block shrink-0 rounded-lg px-3 py-2 whitespace-nowrap text-muted hover:bg-white"
+              className="block shrink-0 px-3 py-2 whitespace-nowrap text-muted hover:bg-white"
             >
               Ver site público
             </Link>
@@ -108,17 +108,17 @@ export async function AdminShell({
             <button className="btn-ghost w-full !py-2 text-sm">Sair</button>
           </form>
           <div className="mt-5 hidden grid-cols-2 gap-2 text-center text-xs md:grid">
-            <div className="rounded-xl bg-primary-soft p-2">
+            <div className="bg-primary-soft p-2">
               <p className="font-display text-lg text-primary">{counts.projects}</p>
               Projectos
             </div>
-            <div className="rounded-xl bg-primary-soft p-2">
+            <div className="bg-primary-soft p-2">
               <p className="font-display text-lg text-primary">{counts.timeline}</p>
               Actividades
             </div>
           </div>
         </aside>
-        <section className="min-w-0">
+        <section className="min-w-0 pb-8">
           <h1 className="font-display text-2xl font-semibold break-words sm:text-3xl">{title}</h1>
           <div className="mt-4 sm:mt-5">{children}</div>
         </section>
