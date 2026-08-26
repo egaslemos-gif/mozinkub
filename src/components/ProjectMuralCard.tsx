@@ -25,9 +25,9 @@ export function ProjectMuralCard({ project }: { project: ProjectMuralItem }) {
   return (
     <Link
       href={`/projectos/${project.slug}`}
-      className="project-card group flex h-full flex-col bg-white text-foreground transition hover:border-primary"
+      className="project-card group flex h-full flex-col text-foreground transition"
     >
-      <div className="relative h-28 overflow-hidden bg-[#d9e2e0] sm:h-32">
+      <div className="relative h-36 overflow-hidden bg-primary-soft sm:h-40">
         {project.coverUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -36,39 +36,44 @@ export function ProjectMuralCard({ project }: { project: ProjectMuralItem }) {
             className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
           />
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-[#c5d4cf] via-[#d9e2e0] to-[#cfd7dc]" />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/25 to-primary/5" />
         )}
-        <div className="absolute inset-0 bg-[#1b2430]/10" />
+        <div className="absolute inset-0 bg-[#1b2430]/15" />
         {project.logoUrl && (
-          <div className="absolute right-2.5 bottom-2.5 z-[1] bg-white/90 p-1">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={project.logoUrl} alt="" className="h-8 w-8 object-contain" />
-          </div>
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={project.logoUrl}
+            alt=""
+            className="absolute right-3 bottom-3 z-[1] h-10 w-10 object-contain"
+          />
         )}
       </div>
 
-      <div className="flex flex-1 flex-col px-3.5 py-3">
-        <p className="text-[10px] font-bold tracking-[0.12em] text-primary uppercase">
+      <div className="flex flex-1 flex-col gap-2 p-4">
+        <p className="text-[11px] font-bold tracking-[0.12em] text-primary uppercase">
           {project.area}
           {project.cohortYear ? ` · ${project.cohortYear}` : ""}
         </p>
-        <h3 className="font-display mt-1 line-clamp-2 text-base font-semibold leading-snug text-foreground sm:text-lg">
+        <h3 className="font-display line-clamp-2 text-lg font-semibold leading-snug">
           {project.name}
         </h3>
-        <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-muted">{pitch}</p>
-        <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-3 text-[10px] font-semibold">
-          <span className="border border-[#d0d8de] bg-[#eef3f1] px-2 py-0.5 text-primary">
+        <p className="line-clamp-2 text-sm leading-relaxed text-muted">{pitch}</p>
+        {project.fundingEdition && (
+          <p className="text-xs text-muted">{project.fundingEdition.name}</p>
+        )}
+        <div className="mt-auto flex flex-wrap items-center gap-2 pt-2 text-[11px] font-semibold">
+          <span className="border border-border bg-primary-soft px-2 py-1 text-primary">
             {statusLabel(project.status)}
           </span>
-          <span className="border border-[#d0d8de] bg-[#eef2f5] px-2 py-0.5 text-ul-blue">
+          <span className="border border-border bg-[#f0f4f7] px-2 py-1 text-ul-blue">
             {maturityLabel(project.maturity)}
           </span>
           {project.lifecycle === "ALUMNI" && (
-            <span className="border border-[#d0d8de] bg-[#f3f0ec] px-2 py-0.5 text-ul-brown">
+            <span className="border border-border bg-[#f4f1ee] px-2 py-1 text-ul-brown">
               Alumni
             </span>
           )}
-          <span className="ml-auto text-xs font-semibold text-primary">Ver →</span>
+          <span className="ml-auto text-sm font-semibold text-primary">Ver ficha →</span>
         </div>
       </div>
     </Link>

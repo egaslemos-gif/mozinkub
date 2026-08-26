@@ -11,17 +11,16 @@ export default async function CalendarioPage() {
   return (
     <div className="site-shell min-h-screen">
       <SiteHeader brand={config?.brandName || "IEUL"} />
-      <main className="mx-auto max-w-6xl px-4 py-6 sm:py-8 md:px-6">
-        <p className="text-xs font-bold tracking-[0.16em] text-primary uppercase">Agenda IEUL</p>
-        <h1 className="font-display mt-1 text-2xl font-semibold sm:text-3xl">
-          Calendário de actividades e eventos
-        </h1>
-        <p className="mt-2 max-w-2xl text-sm text-muted">
-          Filtre por mês, semana ou dia; clique num registo no painel para detalhes.
-        </p>
-
-        <div className="mt-4">
-          <MonthCalendar entries={entries} />
+      <main className="section">
+        <div className="section-inner">
+          <p className="section-kicker">Agenda IEUL</p>
+          <h1 className="section-title">Calendário de actividades e eventos</h1>
+          <p className="section-lead">
+            Filtre por mês, semana ou dia; clique num registo no painel para detalhes.
+          </p>
+          <div className="mt-6">
+            <MonthCalendar entries={entries} />
+          </div>
         </div>
       </main>
       {config && (

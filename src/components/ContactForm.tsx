@@ -36,14 +36,14 @@ export function ContactForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="card-surface grid gap-3 p-6">
-      <h3 className="font-display text-xl font-semibold">
+    <form onSubmit={onSubmit} className="card-surface grid gap-3 p-5">
+      <h3 className="font-display text-lg font-semibold">
         {isProject ? `Contactar ${projectName}` : "Enviar mensagem"}
       </h3>
       <p className="text-sm text-muted">
         {isProject
           ? "A coordenação da Antena da Beira encaminha o seu interesse para a equipa do projecto."
-          : "Preencha o formulário e a coordenação da Antena da Beira entrará em contacto."}
+          : "Preencha o formulário e a coordenação entrará em contacto."}
       </p>
       {projectSlug && <input type="hidden" name="projectSlug" value={projectSlug} />}
       <input className="admin-input" name="name" placeholder="Nome completo" required />

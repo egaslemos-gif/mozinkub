@@ -34,8 +34,8 @@ export function HeroSlider({
 
   return (
     <div className="fade-up relative" style={{ animationDelay: "0.12s" }}>
-      <div className="card-surface relative overflow-hidden shadow-md">
-        <div className="relative min-h-[200px] bg-[#2f4248] sm:min-h-[240px] md:min-h-[280px]">
+      <div className="card-surface relative overflow-hidden">
+        <div className="relative min-h-[260px] bg-[#2f4248] sm:min-h-[300px]">
           {current ? (
             <>
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -46,35 +46,37 @@ export function HeroSlider({
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#1a262b]/92 via-[#2f4248]/45 to-[#2f4248]/12" />
 
-              <div className="relative z-[1] flex min-h-[200px] flex-col justify-end p-3 sm:min-h-[240px] sm:p-4 md:min-h-[280px] md:p-5">
+              <div className="relative z-[1] flex min-h-[260px] flex-col justify-end p-5 sm:min-h-[300px] sm:p-6">
                 {current.logoUrl && (
-                  <div className="mb-2 grid h-9 w-9 place-items-center border border-white/40 bg-white p-1 sm:h-10 sm:w-10">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={current.logoUrl} alt="" className="max-h-7 max-w-7 object-contain sm:max-h-8 sm:max-w-8" />
-                  </div>
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={current.logoUrl}
+                    alt=""
+                    className="mb-3 h-10 w-10 object-contain"
+                  />
                 )}
-                <p className="text-[10px] font-bold tracking-[0.14em] text-[#c5d9d4] uppercase sm:text-[11px]">
+                <p className="text-[11px] font-bold tracking-[0.14em] text-[#c5d9d4] uppercase">
                   {current.kicker || "Actualidades · Antena da Beira"}
                 </p>
-                <h2 className="font-display mt-1.5 max-w-lg text-lg font-semibold leading-tight break-words text-white sm:text-xl md:text-2xl">
+                <h2 className="font-display mt-2 max-w-lg text-xl font-semibold leading-tight break-words text-white sm:text-2xl">
                   {current.title}
                 </h2>
                 {current.subtitle && (
-                  <p className="mt-1.5 max-w-md line-clamp-2 text-sm leading-relaxed text-white/88">
+                  <p className="mt-2 max-w-md line-clamp-2 text-sm leading-relaxed text-white/88">
                     {current.subtitle}
                   </p>
                 )}
                 {current.linkUrl && (
                   <Link
                     href={current.linkUrl}
-                    className="mt-3 inline-flex w-fit max-w-full items-center bg-[color:var(--primary)] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[color:var(--primary-dark)]"
+                    className="mt-4 inline-flex w-fit items-center bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark"
                   >
                     Saber mais →
                   </Link>
                 )}
 
                 {slides.length > 1 && (
-                  <div className="mt-3 flex items-center gap-1.5">
+                  <div className="mt-4 flex items-center gap-1.5">
                     {slides.map((s, i) => (
                       <button
                         key={s.id}
@@ -114,24 +116,30 @@ export function HeroSlider({
               )}
             </>
           ) : (
-            <div className="flex min-h-[200px] items-center justify-center p-4 text-center text-sm text-white/80">
+            <div className="flex min-h-[260px] items-center justify-center p-6 text-center text-sm text-white/80">
               Ainda sem slides. O coordenador pode carregar fotos em Admin → Destaques.
             </div>
           )}
         </div>
 
-        <div className="grid grid-cols-3 gap-px border-t border-border bg-border">
-          <div className="bg-[#f3f6f5] p-2.5 text-center sm:p-3">
-            <p className="font-display text-lg font-semibold text-primary sm:text-xl">{stats.projects}</p>
-            <p className="text-[10px] text-muted">Projectos</p>
+        <div className="grid grid-cols-3 border-t border-border bg-primary-soft">
+          <div className="border-r border-border p-3 text-center sm:p-4">
+            <p className="font-display text-xl font-semibold text-primary sm:text-2xl">
+              {stats.projects}
+            </p>
+            <p className="text-xs text-muted">Projectos</p>
           </div>
-          <div className="bg-[#f3f5f7] p-2.5 text-center sm:p-3">
-            <p className="font-display text-lg font-semibold text-ul-blue sm:text-xl">{stats.activities}</p>
-            <p className="text-[10px] text-muted">Actividades</p>
+          <div className="border-r border-border p-3 text-center sm:p-4">
+            <p className="font-display text-xl font-semibold text-primary sm:text-2xl">
+              {stats.activities}
+            </p>
+            <p className="text-xs text-muted">Actividades</p>
           </div>
-          <div className="bg-[#f5f4f2] p-2.5 text-center sm:p-3">
-            <p className="font-display text-lg font-semibold text-ul-brown sm:text-xl">{stats.events}</p>
-            <p className="text-[10px] text-muted">Eventos</p>
+          <div className="p-3 text-center sm:p-4">
+            <p className="font-display text-xl font-semibold text-primary sm:text-2xl">
+              {stats.events}
+            </p>
+            <p className="text-xs text-muted">Eventos</p>
           </div>
         </div>
       </div>

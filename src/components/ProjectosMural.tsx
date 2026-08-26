@@ -114,7 +114,7 @@ export function ProjectosMural({
         </div>
       )}
 
-      <div className="mt-8 grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {filtered.length === 0 && (
           <p className="text-sm text-muted md:col-span-3">
             Nenhum projecto encontrado com estes filtros.

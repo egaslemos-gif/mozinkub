@@ -297,7 +297,7 @@ export function MonthCalendar({ entries }: { entries: CalendarEntry[] }) {
                   <button
                     type="button"
                     onClick={() => onSelectDay(date)}
-                    className={`flex h-9 w-full flex-col items-center justify-center border px-0.5 text-center transition sm:h-10 ${
+                    className={`flex h-11 w-full flex-col items-center justify-center border px-0.5 text-center transition sm:h-12 ${
                       inMonth ? "bg-white" : "bg-transparent text-muted/40"
                     } ${
                       isSelected
@@ -308,7 +308,7 @@ export function MonthCalendar({ entries }: { entries: CalendarEntry[] }) {
                     } ${dayItems.length ? "hover:border-primary" : "hover:bg-[#f7fafc]"}`}
                   >
                     <span
-                      className={`text-[11px] font-semibold leading-none sm:text-xs ${
+                      className={`text-xs font-semibold leading-none ${
                         isSelected || isToday ? "text-primary" : ""
                       }`}
                     >
@@ -347,7 +347,7 @@ export function MonthCalendar({ entries }: { entries: CalendarEntry[] }) {
         </div>
 
         {/* Painel resumo */}
-        <aside className="card-surface sticky top-20 flex max-h-[min(52vh,22rem)] flex-col overflow-hidden lg:max-h-[22rem]">
+        <aside className="card-surface sticky top-20 flex max-h-[min(58vh,26rem)] flex-col overflow-hidden lg:max-h-[26rem]">
           <div className="border-b border-border p-2.5">
             <div className="flex gap-1 bg-[#eef2f0] p-0.5">
               {(

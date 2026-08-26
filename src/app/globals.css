@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
-/* Paleta institucional suave + geometria recta (mais profissional). */
+/* Sistema visual único IEUL — tamanhos confortáveis, paleta institucional. */
 :root {
-  --background: #e9eef1;
+  --background: #f2f4f6;
   --foreground: #1b2430;
-  --muted: #5c6b78;
+  --muted: #5a6876;
   --card: #ffffff;
   --primary: #3f7872;
   --primary-dark: #315f5a;
@@ -15,8 +15,8 @@
   --fr-blue: #243b55;
   --fr-red: #b85c5c;
   --accent: #b7cfc9;
-  --border: #c5d0d8;
-  --hero-glow: #e9eef3;
+  --border: #d0d8de;
+  --section-alt: #e8eef1;
   --wa: #4f9a6c;
   --wa-dark: #3f7d58;
   --radius: 0px;
@@ -37,6 +37,7 @@
   --color-fr-red: var(--fr-red);
   --color-accent: var(--accent);
   --color-border: var(--border);
+  --color-section-alt: var(--section-alt);
   --radius-sm: 0px;
   --radius-md: 0px;
   --radius-lg: 0px;
@@ -78,9 +79,82 @@ a {
 }
 
 .site-shell {
-  background: linear-gradient(180deg, #eef2f5 0%, var(--background) 42%);
+  background: var(--background);
   overflow-x: clip;
   max-width: 100%;
+}
+
+/* Ritmo de secções padronizado */
+.section {
+  padding: 3rem 0;
+}
+
+@media (min-width: 768px) {
+  .section {
+    padding: 3.5rem 0;
+  }
+}
+
+.section-inner {
+  margin-inline: auto;
+  max-width: 72rem;
+  padding-inline: 1rem;
+}
+
+@media (min-width: 768px) {
+  .section-inner {
+    padding-inline: 1.5rem;
+  }
+}
+
+.section-kicker {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.section-title {
+  margin-top: 0.4rem;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 1.65rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--foreground);
+}
+
+@media (min-width: 640px) {
+  .section-title {
+    font-size: 1.85rem;
+  }
+}
+
+.section-lead {
+  margin-top: 0.5rem;
+  max-width: 36rem;
+  font-size: 0.925rem;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.section-link {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.section-link:hover {
+  color: var(--primary-dark);
 }
 
 .brand-stripe {
@@ -111,7 +185,8 @@ a {
   background: var(--primary);
   color: white;
   font-weight: 600;
-  padding: 0.85rem 1.4rem;
+  font-size: 0.925rem;
+  padding: 0.75rem 1.25rem;
   max-width: 100%;
   transition: background 0.2s ease;
 }
@@ -129,7 +204,8 @@ a {
   background: #fff;
   color: var(--foreground);
   font-weight: 600;
-  padding: 0.85rem 1.4rem;
+  font-size: 0.925rem;
+  padding: 0.75rem 1.25rem;
   max-width: 100%;
   transition: border-color 0.2s ease, background 0.2s ease;
 }
@@ -147,16 +223,14 @@ a {
 }
 
 .project-card {
-  border: 1px solid #b8c4cc;
+  border: 1px solid var(--border);
   border-radius: 0;
   overflow: hidden;
-  background: #fff;
-  box-shadow: 0 1px 0 rgba(27, 36, 48, 0.04);
+  background: var(--card);
 }
 
 .project-card:hover {
   border-color: var(--primary);
-  background: #fff;
 }
 
 .fade-up {
@@ -181,6 +255,7 @@ a {
   padding: 0.7rem 0.9rem;
   background: white;
   color: var(--foreground);
+  font-size: 0.925rem;
 }
 
 .admin-label {
@@ -290,7 +365,6 @@ a {
   }
 }
 
-/* Neutraliza cantos arredondados utilitários do Tailwind no site */
 .rounded,
 .rounded-sm,
 .rounded-md,
