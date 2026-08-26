@@ -106,8 +106,9 @@ schtasks /Run /TN "\IEUL-SQLite-Daily-Backup"
 Na Vercel o filesystem é efémero. Para o MVP de testes:
 
 1. **Vercel Blob** (`BLOB_READ_WRITE_TOKEN`) — armazena ficheiros (logos, capas, PDFs) e um snapshot SQLite em `durable/ieul.db`.
-2. Em cada cold start a app restaura a base a partir do Blob (se existir); após escritas admin, o snapshot é reenviado.
-3. O seed **não sobrescreve** `logoUrl` / `coverUrl` nem apaga galeria/media já existentes.
+2. Em cada cold start a app restaura a base a partir do Blob (lock + retries); se o Blob existir mas falhar o download, **não** cai no seed (evita apagar dados).
+3. Após escritas admin, o snapshot é reenviado ao Blob. **Durante `next build` o persist está desligado** — um deploy não sobrescreve a base de produção com o seed.
+4. O seed é **idempotente**: não apaga galeria, slides, timeline, nem sobrescreve `logoUrl` / `coverUrl` já existentes.
 
 Isto cobre a fase de aprovação com gestores. A migração definitiva para **Postgres (Neon)** continua recomendada.
 

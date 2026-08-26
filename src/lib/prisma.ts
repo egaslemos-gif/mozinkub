@@ -10,7 +10,7 @@ import {
  * SQLite MVP:
  * - Local: DATABASE_URL=file:./dev.db
  * - Vercel: restore durable snapshot from Blob into /tmp (writable), else seed from build.
- *   Writes are persisted back to Blob so cold starts keep admin edits (images, ficha, etc.).
+ *   Writes are persisted back to Blob (never during `next build`) so deploys keep admin edits.
  */
 await ensureDurableSqlite();
 

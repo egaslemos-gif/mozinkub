@@ -630,42 +630,45 @@ async function main() {
     },
   ];
 
-  await prisma.timelineItem.deleteMany({});
-  for (const item of timeline) {
-    await prisma.timelineItem.create({ data: { ...item, published: true } });
+  // Never wipe admin-managed content on re-seed (Vercel builds run seed every deploy).
+  if ((await prisma.timelineItem.count()) === 0) {
+    for (const item of timeline) {
+      await prisma.timelineItem.create({ data: { ...item, published: true } });
+    }
   }
 
-  await prisma.heroSlide.deleteMany({});
-  await prisma.heroSlide.createMany({
-    data: [
-      {
-        title: "Campus da Ponta-Gêa, Beira — Moçambique",
-        subtitle:
-          "Antena da Beira da Incubadora de Empresas da Universidade Licungo (IEUL).",
-        imageUrl: "/images/hero-campus.svg",
-        linkUrl: "/#sobre",
-        order: 1,
-        published: true,
-      },
-      {
-        title: "Projecto MozInkub N+1 em acção",
-        subtitle:
-          "Acompanhamento de start-ups nas áreas de Tecnologia Digital e Ambiente.",
-        imageUrl: "/images/hero-mozinkub.svg",
-        linkUrl: "/projectos",
-        order: 2,
-        published: true,
-      },
-      {
-        title: "Actividades e evidências de Julho 2026",
-        subtitle: "Coaching, reuniões e preparação institucional para a FACIM.",
-        imageUrl: "/images/hero-actividades.svg",
-        linkUrl: "/actividades",
-        order: 3,
-        published: true,
-      },
-    ],
-  });
+  if ((await prisma.heroSlide.count()) === 0) {
+    await prisma.heroSlide.createMany({
+      data: [
+        {
+          title: "Campus da Ponta-Gêa, Beira — Moçambique",
+          subtitle:
+            "Antena da Beira da Incubadora de Empresas da Universidade Licungo (IEUL).",
+          imageUrl: "/images/hero-campus.svg",
+          linkUrl: "/#sobre",
+          order: 1,
+          published: true,
+        },
+        {
+          title: "Projecto MozInkub N+1 em acção",
+          subtitle:
+            "Acompanhamento de start-ups nas áreas de Tecnologia Digital e Ambiente.",
+          imageUrl: "/images/hero-mozinkub.svg",
+          linkUrl: "/projectos",
+          order: 2,
+          published: true,
+        },
+        {
+          title: "Actividades e evidências de Julho 2026",
+          subtitle: "Coaching, reuniões e preparação institucional para a FACIM.",
+          imageUrl: "/images/hero-actividades.svg",
+          linkUrl: "/actividades",
+          order: 3,
+          published: true,
+        },
+      ],
+    });
+  }
 
   const album = await prisma.galleryAlbum.upsert({
     where: { slug: "julho-2026" },
@@ -682,15 +685,19 @@ async function main() {
     },
   });
 
-  await prisma.galleryMedia.deleteMany({ where: { albumId: album.id } });
-  await prisma.galleryMedia.create({
-    data: {
-      albumId: album.id,
-      title: "Ekapacita Working Meeting — 24/07/2026",
-      url: "/images/placeholder-meeting.svg",
-      type: "IMAGE",
-    },
+  const galleryCount = await prisma.galleryMedia.count({
+    where: { albumId: album.id },
   });
+  if (galleryCount === 0) {
+    await prisma.galleryMedia.create({
+      data: {
+        albumId: album.id,
+        title: "Ekapacita Working Meeting — 24/07/2026",
+        url: "/images/placeholder-meeting.svg",
+        type: "IMAGE",
+      },
+    });
+  }
 
   // Atribuições demo para testes de escopo RBAC
   const coach = await prisma.user.findUnique({ where: { email: "coach@ieul.ul.ac.mz" } });
@@ -743,16 +750,18 @@ async function main() {
     });
   }
   if (avaliador && firstProject) {
-    await prisma.evaluationAssignment.deleteMany({
-      where: { evaluatorId: avaliador.id },
+    const existingEval = await prisma.evaluationAssignment.findFirst({
+      where: { evaluatorId: avaliador.id, projectId: firstProject.id },
     });
-    await prisma.evaluationAssignment.create({
-      data: {
-        evaluatorId: avaliador.id,
-        projectId: firstProject.id,
-        status: "OPEN",
-      },
-    });
+    if (!existingEval) {
+      await prisma.evaluationAssignment.create({
+        data: {
+          evaluatorId: avaliador.id,
+          projectId: firstProject.id,
+          status: "OPEN",
+        },
+      });
+    }
   }
 
   console.log("Seed OK");
