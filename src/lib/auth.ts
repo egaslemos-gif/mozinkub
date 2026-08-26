@@ -1,10 +1,12 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import { authConfig } from "@/lib/auth.config";
 import { prisma } from "@/lib/prisma";
 import { normalizeRole } from "@/lib/rbac/roles";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  ...authConfig,
   providers: [
     Credentials({
       credentials: {
@@ -33,27 +35,4 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
-  pages: {
-    signIn: "/admin/login",
-  },
-  session: { strategy: "jwt" },
-  callbacks: {
-    async jwt({ token, user }) {
-      // Não consultar Prisma aqui — o middleware Auth.js pode correr em Edge.
-      if (user) {
-        token.role = normalizeRole((user as { role?: string }).role);
-        token.status = (user as { status?: string }).status || "ACTIVE";
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.sub!;
-        session.user.role = normalizeRole(token.role as string);
-        session.user.status = (token.status as string) || "ACTIVE";
-      }
-      return session;
-    },
-  },
-  trustHost: true,
 });
