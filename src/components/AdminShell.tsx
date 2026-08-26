@@ -62,52 +62,49 @@ export async function AdminShell({
   };
 
   return (
-    <div className="min-h-screen bg-[#f3f7f4]">
-      <div className="mx-auto grid max-w-6xl gap-4 px-3 py-4 sm:gap-6 sm:px-4 sm:py-6 md:grid-cols-[220px_1fr] md:items-start md:px-6">
-        <aside className="card-surface z-20 p-3 sm:p-4 md:sticky md:top-4 md:max-h-[calc(100vh-2rem)] md:overflow-y-auto">
-          <div className="mb-3 flex items-center gap-2.5">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/logos/mozinkub.png"
-              alt="MozInkub"
-              className="h-10 w-10 object-contain"
-            />
-            <div>
-              <p className="font-display text-lg font-semibold">IEUL Admin</p>
-              <p className="text-[10px] text-muted">MozInkub · UniLicungo</p>
-            </div>
+    <div className="flex h-dvh flex-col overflow-hidden bg-[#f3f7f4] md:flex-row">
+      {/* Sidebar fixa — só o conteúdo principal faz scroll */}
+      <aside className="z-30 shrink-0 border-b border-border bg-white md:flex md:h-dvh md:w-[240px] md:flex-col md:border-r md:border-b-0">
+        <div className="flex items-center gap-2.5 border-b border-border px-4 py-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logos/mozinkub.png"
+            alt="MozInkub"
+            className="h-9 w-9 object-contain"
+          />
+          <div className="min-w-0">
+            <p className="font-display text-base font-semibold leading-tight">IEUL Admin</p>
+            <p className="truncate text-[10px] text-muted">MozInkub · UniLicungo</p>
           </div>
-          <p className="mt-1 truncate text-xs text-muted">{session.user?.email}</p>
+        </div>
+
+        <div className="hidden border-b border-border px-4 py-2.5 md:block">
+          <p className="truncate text-xs text-muted">{session.user?.email}</p>
           <p className="mt-0.5 text-[10px] font-semibold tracking-wide text-primary uppercase">
             {roleLabel}
           </p>
-          <nav className="mt-4 -mx-1 flex gap-1 overflow-x-auto pb-1 text-sm md:mx-0 md:mt-5 md:block md:max-h-none md:space-y-1 md:overflow-visible md:pb-0">
-            {visibleNav.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="block shrink-0 px-3 py-2 whitespace-nowrap hover:bg-primary-soft hover:text-primary"
-              >
-                {item.label}
-              </Link>
-            ))}
+        </div>
+
+        <nav className="flex gap-1 overflow-x-auto px-2 py-2 text-sm md:flex-1 md:flex-col md:gap-0.5 md:overflow-y-auto md:px-2 md:py-3">
+          {visibleNav.map((item) => (
             <Link
-              href="/"
-              className="block shrink-0 px-3 py-2 whitespace-nowrap text-muted hover:bg-white"
+              key={item.href}
+              href={item.href}
+              className="block shrink-0 px-3 py-2 whitespace-nowrap hover:bg-primary-soft hover:text-primary"
             >
-              Ver site público
+              {item.label}
             </Link>
-          </nav>
-          <form
-            className="mt-4"
-            action={async () => {
-              "use server";
-              await signOut({ redirectTo: "/admin/login" });
-            }}
+          ))}
+          <Link
+            href="/"
+            className="block shrink-0 px-3 py-2 whitespace-nowrap text-muted hover:bg-primary-soft hover:text-primary"
           >
-            <button className="btn-ghost w-full !py-2 text-sm">Sair</button>
-          </form>
-          <div className="mt-5 hidden grid-cols-2 gap-2 text-center text-xs md:grid">
+            Ver site público
+          </Link>
+        </nav>
+
+        <div className="hidden border-t border-border p-3 md:block">
+          <div className="mb-3 grid grid-cols-2 gap-2 text-center text-xs">
             <div className="bg-primary-soft p-2">
               <p className="font-display text-lg text-primary">{counts.projects}</p>
               Projectos
@@ -117,11 +114,36 @@ export async function AdminShell({
               Actividades
             </div>
           </div>
-        </aside>
-        <section className="min-w-0 pb-8">
-          <h1 className="font-display text-2xl font-semibold break-words sm:text-3xl">{title}</h1>
-          <div className="mt-4 sm:mt-5">{children}</div>
-        </section>
+          <form
+            action={async () => {
+              "use server";
+              await signOut({ redirectTo: "/admin/login" });
+            }}
+          >
+            <button className="btn-ghost w-full !py-2 text-sm">Sair</button>
+          </form>
+        </div>
+
+        <div className="border-t border-border px-3 py-2 md:hidden">
+          <form
+            action={async () => {
+              "use server";
+              await signOut({ redirectTo: "/admin/login" });
+            }}
+          >
+            <button className="btn-ghost w-full !py-1.5 text-xs">Sair</button>
+          </form>
+        </div>
+      </aside>
+
+      {/* Coluna principal: cabeçalho fixo + área com scroll */}
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <header className="z-20 shrink-0 border-b border-border bg-white/95 px-4 py-3 backdrop-blur sm:px-6">
+          <h1 className="font-display text-xl font-semibold break-words sm:text-2xl">{title}</h1>
+        </header>
+        <main className="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6">
+          <div className="mx-auto max-w-5xl pb-10">{children}</div>
+        </main>
       </div>
     </div>
   );
