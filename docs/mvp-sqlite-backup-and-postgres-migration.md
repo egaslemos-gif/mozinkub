@@ -109,9 +109,9 @@ Na Vercel o filesystem é efémero. Para o MVP de testes:
 2. Em cada cold start a app restaura a base a partir do Blob (se existir); após escritas admin, o snapshot é reenviado.
 3. O seed **não sobrescreve** `logoUrl` / `coverUrl` nem apaga galeria/media já existentes.
 
-Isto cobre a fase de aprovação com gestores. A migração definitiva para **Postgres (Neon)** continua recomendada (secção seguinte / plano original).
+Isto cobre a fase de aprovação com gestores. A migração definitiva para **Postgres (Neon)** continua recomendada.
 
- (checklist)
+### Migração futura para Postgres (checklist)
 
 Quando decidirem mover para produção em Vercel:
 
