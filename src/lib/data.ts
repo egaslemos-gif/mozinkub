@@ -216,7 +216,7 @@ export async function getPublishedHeroSlides() {
 export async function getPublishedAlbums() {
   return prisma.galleryAlbum.findMany({
     where: { published: true },
-    include: { media: true },
+    include: { media: { orderBy: { createdAt: "asc" } } },
     orderBy: { createdAt: "desc" },
   });
 }

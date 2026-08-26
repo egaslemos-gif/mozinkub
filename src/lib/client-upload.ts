@@ -2,7 +2,7 @@
 
 import { upload } from "@vercel/blob/client";
 
-const MAX_BYTES = 10 * 1024 * 1024;
+const MAX_BYTES = 12 * 1024 * 1024;
 
 /**
  * Upload directo browser → Vercel Blob (sem passar pelo body da Serverless Function).
@@ -17,7 +17,7 @@ export async function uploadAdminFile(
   if (file.size > MAX_BYTES) {
     return {
       ok: false,
-      error: "Ficheiro demasiado grande (máx. 10 MB). Comprima e tente novamente.",
+      error: "Ficheiro demasiado grande (máx. 12 MB). Comprima e tente novamente.",
     };
   }
 

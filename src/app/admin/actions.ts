@@ -622,23 +622,61 @@ export async function createGalleryMedia(formData: FormData) {
     await requireAdmin("documents.upload");
     const albumId = String(formData.get("albumId") || "");
     const url = String(formData.get("url") || "").trim();
-    if (!url) return { ok: false as const, error: "Imagem obrigatória." };
+    if (!url) return { ok: false as const, error: "Ficheiro obrigatório." };
+    const title = optionalField(formData, "title");
+    if (!title) return { ok: false as const, error: "Indique uma legenda para a foto/vídeo." };
+    const typeRaw = String(formData.get("type") || "IMAGE").toUpperCase();
+    const type = typeRaw === "VIDEO" ? "VIDEO" : "IMAGE";
     await prisma.galleryMedia.create({
       data: {
         albumId,
         url,
-        title: optionalField(formData, "title"),
-        type: "IMAGE",
+        title,
+        description: optionalField(formData, "description"),
+        type,
       },
     });
     revalidatePath("/galeria");
     revalidatePath("/admin/galeria");
-    return { ok: true as const, message: "Fotografia adicionada." };
+    return { ok: true as const, message: "Média adicionada à galeria." };
   } catch (err) {
     console.error("[createGalleryMedia]", err);
     return {
       ok: false as const,
       error: err instanceof Error ? err.message : "Não foi possível adicionar.",
+    };
+  }
+}
+
+export async function updateGalleryMedia(formData: FormData) {
+  try {
+    await requireAdmin("documents.upload");
+    const id = String(formData.get("id") || "");
+    if (!id) return { ok: false as const, error: "Média inválida." };
+    const title = optionalField(formData, "title");
+    if (!title) return { ok: false as const, error: "A legenda é obrigatória." };
+    const existing = await prisma.galleryMedia.findUnique({ where: { id } });
+    if (!existing) return { ok: false as const, error: "Média não encontrada." };
+    await prisma.galleryMedia.update({
+      where: { id },
+      data: {
+        title,
+        description: optionalField(formData, "description"),
+        url: optionalField(formData, "url") || existing.url,
+        type:
+          String(formData.get("type") || existing.type).toUpperCase() === "VIDEO"
+            ? "VIDEO"
+            : "IMAGE",
+      },
+    });
+    revalidatePath("/galeria");
+    revalidatePath("/admin/galeria");
+    return { ok: true as const, message: "Legendas actualizadas." };
+  } catch (err) {
+    console.error("[updateGalleryMedia]", err);
+    return {
+      ok: false as const,
+      error: err instanceof Error ? err.message : "Não foi possível actualizar.",
     };
   }
 }
@@ -649,7 +687,7 @@ export async function deleteGalleryMedia(formData: FormData) {
     await prisma.galleryMedia.delete({ where: { id: String(formData.get("id") || "") } });
     revalidatePath("/galeria");
     revalidatePath("/admin/galeria");
-    return { ok: true as const, message: "Fotografia removida." };
+    return { ok: true as const, message: "Média removida." };
   } catch (err) {
     console.error("[deleteGalleryMedia]", err);
     return {

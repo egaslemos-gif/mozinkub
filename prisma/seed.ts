@@ -693,6 +693,8 @@ async function main() {
       data: {
         albumId: album.id,
         title: "Ekapacita Working Meeting — 24/07/2026",
+        description:
+          "Sessão de trabalho e coaching com incubados — Campus Ponta-Gêa, Beira.",
         url: "/images/placeholder-meeting.svg",
         type: "IMAGE",
       },

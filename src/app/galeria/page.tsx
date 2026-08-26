@@ -1,5 +1,5 @@
-import Image from "next/image";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
+import { GalleryMediaCard } from "@/components/GalleryMediaCard";
 import { getPublishedAlbums, getSiteConfig } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
@@ -13,10 +13,14 @@ export default async function GaleriaPage() {
       <main className="mx-auto max-w-6xl px-4 py-12 md:px-6">
         <p className="text-xs font-bold tracking-[0.16em] text-primary uppercase">Memória visual</p>
         <h1 className="font-display mt-2 text-4xl font-semibold">Galeria</h1>
+        <p className="mt-3 max-w-2xl text-sm text-muted">
+          Fotografias e vídeos das actividades da incubadora. Passe o cursor sobre cada item para
+          ver mais informação.
+        </p>
         <div className="mt-8 space-y-10">
           {albums.length === 0 && (
             <p className="text-sm text-muted">
-              Ainda sem álbuns publicados. A coordenação pode carregar fotografias em Admin → Galeria.
+              Ainda sem álbuns publicados. A coordenação pode carregar conteúdos em Admin → Galeria.
             </p>
           )}
           {albums.map((album) => (
@@ -27,20 +31,14 @@ export default async function GaleriaPage() {
               )}
               <div className="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
                 {album.media.map((m) => (
-                  <figure key={m.id} className="card-surface overflow-hidden">
-                    <div className="relative aspect-[4/3] bg-primary-soft">
-                      <Image
-                        src={m.url}
-                        alt={m.title || album.title}
-                        fill
-                        className="object-cover"
-                        unoptimized
-                      />
-                    </div>
-                    {m.title && (
-                      <figcaption className="p-3 text-sm text-muted">{m.title}</figcaption>
-                    )}
-                  </figure>
+                  <GalleryMediaCard
+                    key={m.id}
+                    url={m.url}
+                    type={m.type}
+                    title={m.title}
+                    description={m.description}
+                    albumTitle={album.title}
+                  />
                 ))}
               </div>
             </section>

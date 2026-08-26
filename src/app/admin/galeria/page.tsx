@@ -1,11 +1,8 @@
 import { AdminShell } from "@/components/AdminShell";
+import { AdminGalleryMediaItem } from "@/components/AdminGalleryMediaItem";
 import { FormWithFeedback } from "@/components/FormWithFeedback";
 import { GalleryMediaForm } from "@/components/GalleryMediaForm";
-import {
-  createGalleryAlbum,
-  deleteGalleryAlbum,
-  deleteGalleryMedia,
-} from "@/app/admin/actions";
+import { createGalleryAlbum, deleteGalleryAlbum } from "@/app/admin/actions";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -19,7 +16,8 @@ export default async function AdminGaleriaPage() {
   return (
     <AdminShell title="Galeria">
       <p className="mb-5 max-w-2xl text-sm text-muted">
-        Crie álbuns e carregue fotografias para a página pública /galeria.
+        Crie álbuns e carregue fotografias ou vídeos com legenda e informação de contexto (visível
+        ao passar o cursor na página pública /galeria).
       </p>
 
       <FormWithFeedback
@@ -48,7 +46,7 @@ export default async function AdminGaleriaPage() {
                 <p className="font-semibold">{album.title}</p>
                 <p className="text-sm text-muted">{album.description || "Sem descrição"}</p>
                 <p className="mt-1 text-xs text-ul-blue">
-                  {album.media.length} foto(s) · /galeria
+                  {album.media.length} item(ns) · /galeria
                 </p>
               </div>
               <FormWithFeedback action={deleteGalleryAlbum} successMessage="Álbum removido.">
@@ -59,17 +57,17 @@ export default async function AdminGaleriaPage() {
 
             <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
               {album.media.map((m) => (
-                <div key={m.id} className="overflow-hidden rounded-xl border border-border">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={m.url} alt={m.title || ""} className="h-24 w-full object-cover" />
-                  <div className="flex items-center justify-between gap-1 p-2">
-                    <p className="truncate text-[10px] text-muted">{m.title || "Foto"}</p>
-                    <FormWithFeedback action={deleteGalleryMedia} successMessage="Foto removida.">
-                      <input type="hidden" name="id" value={m.id} />
-                      <button className="text-[10px] font-semibold text-red-700">X</button>
-                    </FormWithFeedback>
-                  </div>
-                </div>
+                <AdminGalleryMediaItem
+                  key={m.id}
+                  albumId={album.id}
+                  media={{
+                    id: m.id,
+                    title: m.title,
+                    description: m.description,
+                    url: m.url,
+                    type: m.type,
+                  }}
+                />
               ))}
             </div>
 

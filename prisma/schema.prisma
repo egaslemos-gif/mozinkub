@@ -338,11 +338,15 @@ model GalleryAlbum {
 }
 
 model GalleryMedia {
-  id        String       @id @default(cuid())
-  albumId   String
-  album     GalleryAlbum @relation(fields: [albumId], references: [id], onDelete: Cascade)
-  title     String?
-  url       String
-  type      String       @default("IMAGE")
-  createdAt DateTime     @default(now())
+  id          String       @id @default(cuid())
+  albumId     String
+  album       GalleryAlbum @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  /// Legenda curta visível sob a média
+  title       String?
+  /// Texto adicional ao passar o cursor / detalhes
+  description String?
+  url         String
+  /// IMAGE | VIDEO
+  type        String       @default("IMAGE")
+  createdAt   DateTime     @default(now())
 }

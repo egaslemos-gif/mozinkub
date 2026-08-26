@@ -11,6 +11,9 @@ const ALLOWED = new Set([
   "pdf",
   "doc",
   "docx",
+  "mp4",
+  "webm",
+  "mov",
 ]);
 
 function safeExt(fileName: string) {
@@ -27,6 +30,9 @@ function mimeFor(ext: string) {
     gif: "image/gif",
     svg: "image/svg+xml",
     pdf: "application/pdf",
+    mp4: "video/mp4",
+    webm: "video/webm",
+    mov: "video/quicktime",
   };
   return map[ext] || "application/octet-stream";
 }
