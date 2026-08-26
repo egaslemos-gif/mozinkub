@@ -23,11 +23,16 @@ export async function GET(
   }
 
   try {
-    let result = await get(pathname, { access: "public", token }).catch(() => null);
-    if (!result?.stream) {
-      result = await get(pathname, { access: "private", token }).catch(() => null);
+    let result: Awaited<ReturnType<typeof get>> = null;
+    for (const access of ["public", "private"] as const) {
+      try {
+        result = await get(pathname, { access, token, useCache: true });
+        if (result?.stream) break;
+      } catch {
+        result = null;
+      }
     }
-    if (!result || !result.stream) {
+    if (!result?.stream) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 

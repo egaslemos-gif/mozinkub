@@ -62,37 +62,59 @@ async function streamToBuffer(stream: ReadableStream<Uint8Array>): Promise<Buffe
   return Buffer.from(await new Response(stream).arrayBuffer());
 }
 
-/** Download blob bytes via authenticated SDK (CDN URLs often 403). */
+/** Download blob bytes via authenticated SDK/fetch (CDN URLs often 403 without token). */
 async function downloadBlobBytes(
   pathname: string,
   fallbackUrl?: string,
 ): Promise<Buffer | null> {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
-  for (const access of ["public", "private"] as const) {
-    try {
-      const result = await get(pathname, {
-        access,
-        useCache: false,
-        ...(token ? { token } : {}),
-      });
-      if (result?.stream) {
-        const buf = await streamToBuffer(result.stream);
-        if (buf.length > 0) return buf;
+  if (!token) return null;
+
+  const targets = [pathname, fallbackUrl].filter(
+    (v, i, arr): v is string => Boolean(v) && arr.indexOf(v) === i,
+  );
+
+  for (const target of targets) {
+    for (const access of ["public", "private"] as const) {
+      try {
+        const result = await get(target, {
+          access,
+          useCache: false,
+          token,
+        });
+        if (result?.stream) {
+          const buf = await streamToBuffer(result.stream);
+          if (buf.length > 0) return buf;
+        }
+      } catch (err) {
+        console.warn(
+          "[durable-db] get failed",
+          access,
+          target.slice(0, 80),
+          err instanceof Error ? err.message : err,
+        );
       }
-    } catch {
-      /* try next access mode */
     }
   }
 
-  if (fallbackUrl) {
+  // Direct authenticated fetch (same pattern as @vercel/blob get).
+  for (const url of [fallbackUrl].filter(Boolean) as string[]) {
     try {
-      const res = await fetch(fallbackUrl, { cache: "no-store" });
+      const res = await fetch(url, {
+        cache: "no-store",
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (res.ok) {
         const buf = Buffer.from(await res.arrayBuffer());
         if (buf.length > 0) return buf;
+      } else {
+        console.warn("[durable-db] auth fetch failed", res.status, url.slice(0, 80));
       }
-    } catch {
-      /* ignore */
+    } catch (err) {
+      console.warn(
+        "[durable-db] auth fetch error",
+        err instanceof Error ? err.message : err,
+      );
     }
   }
 
@@ -133,7 +155,10 @@ async function restoreFromBlob(dest: string): Promise<"ok" | "missing" | "error"
       const hit = blobs.find((b) => b.pathname === DURABLE_DB_PATHNAME) || blobs[0];
       if (!hit) return "missing";
 
-      const buf = await downloadBlobBytes(hit.pathname || DURABLE_DB_PATHNAME, hit.url);
+      const buf = await downloadBlobBytes(
+        hit.pathname || DURABLE_DB_PATHNAME,
+        hit.downloadUrl || hit.url,
+      );
       if (!buf) {
         lastErr = new Error("download empty/failed");
         await sleep(200 * attempt);
@@ -189,17 +214,24 @@ export async function ensureDurableSqlite(): Promise<string> {
       const status = await restoreFromBlob(dest);
       if (status === "ok") return dest;
 
-      // Blob exists but download failed — do NOT overwrite with seed.
+      // During `next build`, allow seed so page collection can finish.
+      // Runtime still refuses seed overwrite when Blob restore fails.
       if (status === "error") {
-        console.error(
-          "[durable-db] refusing seed fallback while Blob restore is failing",
-        );
-        throw new Error(
-          "Não foi possível restaurar a base de dados persistente (Vercel Blob).",
-        );
+        if (isProductionBuild()) {
+          console.warn(
+            "[durable-db] Blob restore failed during build — using seed for compile only",
+          );
+        } else {
+          console.error(
+            "[durable-db] refusing seed fallback while Blob restore is failing",
+          );
+          throw new Error(
+            "Não foi possível restaurar a base de dados persistente (Vercel Blob).",
+          );
+        }
       }
 
-      // Blob truly missing: first boot → copy build seed (never persist during build).
+      // Blob truly missing (or build-time download failure): seed from build artifact.
       for (const src of seedCandidates()) {
         if (fs.existsSync(/*turbopackIgnore: true*/ src)) {
           unlinkSqliteSidecars(dest);
@@ -259,7 +291,10 @@ async function readWriteLock(): Promise<{ owner: string; until: number } | null>
     });
     const hit = blobs.find((b) => b.pathname === WRITE_LOCK_PATHNAME) || blobs[0];
     if (!hit) return null;
-    const buf = await downloadBlobBytes(hit.pathname || WRITE_LOCK_PATHNAME, hit.url);
+    const buf = await downloadBlobBytes(
+      hit.pathname || WRITE_LOCK_PATHNAME,
+      hit.downloadUrl || hit.url,
+    );
     if (!buf) return null;
     const data = JSON.parse(buf.toString("utf8")) as { owner?: string; until?: number };
     if (!data.owner || typeof data.until !== "number") return null;
