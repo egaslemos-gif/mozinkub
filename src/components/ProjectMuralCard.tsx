@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { maturityLabel } from "@/lib/projects";
-import { statusLabel } from "@/lib/data";
+import { statusLabel } from "@/lib/labels";
 
 export type ProjectMuralItem = {
   id?: string;

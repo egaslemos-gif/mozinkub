@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
+import "server-only";
 
+export { statusLabel } from "@/lib/labels";
 export async function getSiteConfig() {
   return prisma.siteConfig.findUnique({ where: { id: "main" } });
 }
@@ -226,24 +228,4 @@ export function parseValues(valuesJson: string): string[] {
   } catch {
     return [];
   }
-}
-
-export function statusLabel(status: string) {
-  const map: Record<string, string> = {
-    EM_INCUBACAO: "Em incubação",
-    PRE_OPERACIONAL: "Pré-operacional",
-    OPERACIONAL: "Operacional",
-    ABERTO: "Aberto",
-    EM_AVALIACAO: "Em avaliação",
-    ENCERRADO: "Encerrado",
-    RESULTADOS: "Resultados",
-    RECEBIDA: "Recebida",
-    EM_ANALISE: "Em análise",
-    ACEITE: "Aceite",
-    REJEITADA: "Não seleccionada",
-    ATIVO: "Activo",
-    ALUMNI: "Alumni",
-    ARQUIVADO: "Arquivado",
-  };
-  return map[status] || status;
 }
