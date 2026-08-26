@@ -10,6 +10,7 @@ import {
   statusLabel,
 } from "@/lib/data";
 import { isCallOpen } from "@/lib/funding";
+import { toAppMediaUrl } from "@/lib/media-url";
 
 export const dynamic = "force-dynamic";
 
@@ -107,7 +108,7 @@ export default async function EditalDetailPage({
                 </p>
                 {call.documentUrl && (
                   <a
-                    href={call.documentUrl}
+                    href={toAppMediaUrl(call.documentUrl) || call.documentUrl}
                     target="_blank"
                     rel="noreferrer"
                     className="mt-4 inline-block text-sm font-semibold text-primary"

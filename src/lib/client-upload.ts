@@ -1,12 +1,19 @@
 "use client";
 
 import { upload } from "@vercel/blob/client";
+import { toAppMediaUrl } from "@/lib/media-url";
 
 const MAX_BYTES = 12 * 1024 * 1024;
+
+function safeFileName(name: string) {
+  const base = name.replace(/[^a-zA-Z0-9._-]+/g, "-").replace(/-+/g, "-");
+  return base.slice(0, 80) || "file";
+}
 
 /**
  * Upload directo browser → Vercel Blob (sem passar pelo body da Serverless Function).
  * Fallback para /api/admin/upload em desenvolvimento sem Blob.
+ * URLs devolvidas passam pelo proxy /api/media para evitar 403 no site público.
  */
 export async function uploadAdminFile(
   file: File,
@@ -21,15 +28,25 @@ export async function uploadAdminFile(
     };
   }
 
+  const pathname = `ieul/${Date.now()}-${safeFileName(file.name)}`;
+
   try {
-    const blob = await upload(`ieul/${Date.now()}-${file.name}`, file, {
-      access: "public",
-      handleUploadUrl: "/api/admin/blob",
-      contentType: file.type || undefined,
-    });
-    return { ok: true, url: blob.url };
+    let blob;
+    try {
+      blob = await upload(pathname, file, {
+        access: "public",
+        handleUploadUrl: "/api/admin/blob",
+        contentType: file.type || undefined,
+      });
+    } catch {
+      blob = await upload(pathname, file, {
+        access: "private",
+        handleUploadUrl: "/api/admin/blob",
+        contentType: file.type || undefined,
+      });
+    }
+    return { ok: true, url: toAppMediaUrl(blob.url) };
   } catch (err) {
-    // Sem token Blob (dev local): usar rota server-side
     try {
       const fd = new FormData();
       fd.set("file", file);
@@ -42,7 +59,9 @@ export async function uploadAdminFile(
         | { ok: true; url: string }
         | { ok: false; error: string }
         | null;
-      if (res.ok && data && data.ok) return data;
+      if (res.ok && data && data.ok) {
+        return { ok: true, url: toAppMediaUrl(data.url) };
+      }
       return {
         ok: false,
         error:

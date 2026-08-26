@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createHeroSlide, updateHeroSlide } from "@/app/admin/actions";
 import { isActionResult } from "@/lib/action-result";
 import { uploadAdminFile } from "@/lib/client-upload";
+import { toAppMediaUrl } from "@/lib/media-url";
 
 type SlideFields = {
   id?: string;
@@ -25,7 +26,7 @@ export function SlideUploadForm({
 }) {
   const router = useRouter();
   const editing = Boolean(slide?.id);
-  const [imageUrl, setImageUrl] = useState(slide?.imageUrl || "");
+  const [imageUrl, setImageUrl] = useState(toAppMediaUrl(slide?.imageUrl) || slide?.imageUrl || "");
   const [uploading, setUploading] = useState(false);
   const [status, setStatus] = useState<"idle" | "ok" | "error">("idle");
   const [msg, setMsg] = useState("");
@@ -148,7 +149,11 @@ export function SlideUploadForm({
         <input type="file" accept="image/*" onChange={onFileChange} disabled={uploading} />
         {imageUrl && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={imageUrl} alt="" className="mt-2 max-h-24 w-auto object-cover" />
+          <img
+            src={toAppMediaUrl(imageUrl) || imageUrl}
+            alt=""
+            className="mt-2 max-h-24 w-auto object-cover"
+          />
         )}
       </div>
       <label className="flex items-center gap-2 text-sm">

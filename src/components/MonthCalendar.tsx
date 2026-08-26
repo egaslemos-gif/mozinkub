@@ -9,6 +9,7 @@ import {
   WEEKDAYS_PT,
   type CalendarEntry,
 } from "@/lib/calendar";
+import { toAppMediaUrl } from "@/lib/media-url";
 
 function startOfMonthGrid(year: number, monthIndex: number) {
   const first = new Date(year, monthIndex, 1);
@@ -397,7 +398,7 @@ export function MonthCalendar({ entries }: { entries: CalendarEntry[] }) {
                 {detail.coverUrl && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={detail.coverUrl}
+                    src={toAppMediaUrl(detail.coverUrl)}
                     alt=""
                     className="mb-2 h-24 w-full object-cover"
                   />
@@ -439,7 +440,11 @@ export function MonthCalendar({ entries }: { entries: CalendarEntry[] }) {
                       <div className="h-9 w-9 shrink-0 overflow-hidden bg-primary-soft">
                         {item.coverUrl ? (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={item.coverUrl} alt="" className="h-full w-full object-cover" />
+                          <img
+                            src={toAppMediaUrl(item.coverUrl)}
+                            alt=""
+                            className="h-full w-full object-cover"
+                          />
                         ) : (
                           <div className="grid h-full place-items-center text-[10px] font-bold text-primary">
                             {new Date(item.startsAt).getDate()}

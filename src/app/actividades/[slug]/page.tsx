@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
 import { getSiteConfig, getTimelineBySlug } from "@/lib/data";
+import { toAppMediaUrl } from "@/lib/media-url";
 
 export const dynamic = "force-dynamic";
 
@@ -47,7 +48,7 @@ export default async function ActividadeDetailPage({
           <div className="card-surface mt-6 overflow-hidden">
             <div className="relative aspect-[16/10] bg-primary-soft">
               <Image
-                src={item.mediaUrl}
+                src={toAppMediaUrl(item.mediaUrl) || item.mediaUrl}
                 alt={item.title}
                 fill
                 className="object-cover"

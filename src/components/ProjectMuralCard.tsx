@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { maturityLabel } from "@/lib/projects";
 import { statusLabel } from "@/lib/labels";
+import { toAppMediaUrl } from "@/lib/media-url";
 
 export type ProjectMuralItem = {
   id?: string;
@@ -21,6 +22,8 @@ export type ProjectMuralItem = {
 
 export function ProjectMuralCard({ project }: { project: ProjectMuralItem }) {
   const pitch = project.tagline || project.summary;
+  const coverSrc = toAppMediaUrl(project.coverUrl);
+  const logoSrc = toAppMediaUrl(project.logoUrl);
 
   return (
     <Link
@@ -28,10 +31,10 @@ export function ProjectMuralCard({ project }: { project: ProjectMuralItem }) {
       className="project-card group flex h-full flex-col text-foreground transition"
     >
       <div className="relative h-36 overflow-hidden bg-primary-soft sm:h-40">
-        {project.coverUrl ? (
+        {coverSrc ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={project.coverUrl}
+            src={coverSrc}
             alt=""
             className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
           />
@@ -39,10 +42,10 @@ export function ProjectMuralCard({ project }: { project: ProjectMuralItem }) {
           <div className="absolute inset-0 bg-gradient-to-br from-primary/25 to-primary/5" />
         )}
         <div className="absolute inset-0 bg-[#1b2430]/15" />
-        {project.logoUrl && (
+        {logoSrc && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={project.logoUrl}
+            src={logoSrc}
             alt=""
             className="absolute right-3 bottom-3 z-[1] h-10 w-10 object-contain"
           />

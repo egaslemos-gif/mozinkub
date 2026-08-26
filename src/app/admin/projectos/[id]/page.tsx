@@ -17,6 +17,7 @@ import { auth } from "@/lib/auth";
 import { can, sessionToAuthUser } from "@/lib/rbac";
 import { prisma } from "@/lib/prisma";
 import { milestoneKindLabel } from "@/lib/projects";
+import { toAppMediaUrl } from "@/lib/media-url";
 
 export const dynamic = "force-dynamic";
 
@@ -301,7 +302,11 @@ export default async function AdminProjectoEditPage({
             {project.gallery.map((g) => (
               <div key={g.id} className="card-surface overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={g.url} alt={g.title || ""} className="h-28 w-full object-cover" />
+                <img
+                  src={toAppMediaUrl(g.url)}
+                  alt={g.title || ""}
+                  className="h-28 w-full object-cover"
+                />
                 <div className="flex items-center justify-between gap-2 p-3">
                   <p className="truncate text-xs text-muted">{g.title || "Fotografia"}</p>
                   {canUpdate && (

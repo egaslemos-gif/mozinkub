@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { uploadAdminFile } from "@/lib/client-upload";
+import { toAppMediaUrl } from "@/lib/media-url";
 
 export function ImageUploadField({
   name,
@@ -14,13 +15,13 @@ export function ImageUploadField({
   defaultUrl?: string | null;
   hint?: string;
 }) {
-  const [url, setUrl] = useState(defaultUrl || "");
+  const [url, setUrl] = useState(toAppMediaUrl(defaultUrl) || defaultUrl || "");
   const [uploading, setUploading] = useState(false);
   const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
-    setUrl(defaultUrl || "");
+    setUrl(toAppMediaUrl(defaultUrl) || defaultUrl || "");
   }, [defaultUrl]);
 
   async function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {

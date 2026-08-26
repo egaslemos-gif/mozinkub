@@ -1,6 +1,7 @@
 "use client";
 
 import { isGalleryVideo } from "@/lib/gallery";
+import { toAppMediaUrl } from "@/lib/media-url";
 
 type Props = {
   url: string;
@@ -12,7 +13,8 @@ type Props = {
 
 /** Cartão público: legenda sempre visível + info ao hover/focus. */
 export function GalleryMediaCard({ url, type, title, description, albumTitle }: Props) {
-  const video = isGalleryVideo(url, type);
+  const mediaSrc = toAppMediaUrl(url);
+  const video = isGalleryVideo(mediaSrc || url, type);
   const caption = title?.trim() || null;
   const detail = description?.trim() || null;
   const hoverText = detail || caption || albumTitle || "Registo da incubadora";
@@ -22,7 +24,7 @@ export function GalleryMediaCard({ url, type, title, description, albumTitle }: 
       <div className="relative aspect-[4/3] overflow-hidden bg-[#e8f0ea]">
         {video ? (
           <video
-            src={url}
+            src={mediaSrc}
             className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
             muted
             playsInline
@@ -32,7 +34,7 @@ export function GalleryMediaCard({ url, type, title, description, albumTitle }: 
         ) : (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={url}
+            src={mediaSrc}
             alt={caption || albumTitle || "Fotografia da galeria"}
             className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
           />

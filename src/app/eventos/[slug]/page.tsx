@@ -7,6 +7,7 @@ import {
   getSiteConfig,
 } from "@/lib/data";
 import { eventCategoryLabel } from "@/lib/calendar";
+import { toAppMediaUrl } from "@/lib/media-url";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +30,11 @@ export default async function EventoDetailPage({
         {event.coverUrl && (
           <div className="mt-6 overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={event.coverUrl} alt="" className="max-h-[360px] w-full object-cover" />
+            <img
+              src={toAppMediaUrl(event.coverUrl)}
+              alt=""
+              className="max-h-[360px] w-full object-cover"
+            />
           </div>
         )}
         <p className="mt-6 text-xs font-semibold tracking-wide text-primary uppercase">

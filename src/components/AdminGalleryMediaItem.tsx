@@ -5,6 +5,7 @@ import { FormWithFeedback } from "@/components/FormWithFeedback";
 import { GalleryMediaForm } from "@/components/GalleryMediaForm";
 import { deleteGalleryMedia } from "@/app/admin/actions";
 import { isGalleryVideo } from "@/lib/gallery";
+import { toAppMediaUrl } from "@/lib/media-url";
 
 type Media = {
   id: string;
@@ -22,15 +23,16 @@ export function AdminGalleryMediaItem({
   media: Media;
 }) {
   const [editing, setEditing] = useState(false);
-  const video = isGalleryVideo(media.url, media.type);
+  const src = toAppMediaUrl(media.url) || media.url;
+  const video = isGalleryVideo(src, media.type);
 
   return (
     <div className="overflow-hidden rounded-xl border border-border">
       {video ? (
-        <video src={media.url} className="h-28 w-full object-cover" muted playsInline preload="metadata" />
+        <video src={src} className="h-28 w-full object-cover" muted playsInline preload="metadata" />
       ) : (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={media.url} alt={media.title || ""} className="h-28 w-full object-cover" />
+        <img src={src} alt={media.title || ""} className="h-28 w-full object-cover" />
       )}
       <div className="space-y-1 p-2">
         <p className="text-[11px] font-semibold leading-snug text-[#1a2e22]">

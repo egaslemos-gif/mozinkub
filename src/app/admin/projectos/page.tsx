@@ -12,6 +12,7 @@ import {
 } from "@/lib/rbac";
 import { prisma } from "@/lib/prisma";
 import { statusLabel } from "@/lib/data";
+import { toAppMediaUrl } from "@/lib/media-url";
 
 export const dynamic = "force-dynamic";
 
@@ -56,7 +57,11 @@ export default async function AdminProjectosPage() {
             <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-primary-soft">
               {p.logoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={p.logoUrl} alt="" className="h-12 w-12 object-contain" />
+                <img
+                  src={toAppMediaUrl(p.logoUrl)}
+                  alt=""
+                  className="h-12 w-12 object-contain"
+                />
               ) : (
                 <span className="text-xs font-bold text-primary">{p.name.slice(0, 2)}</span>
               )}

@@ -91,6 +91,7 @@ export async function AdminShell({
           <Link
             href="/"
             className="block shrink-0 px-3 py-2 whitespace-nowrap text-muted hover:bg-primary-soft hover:text-primary"
+            title="Abrir a página pública do site"
           >
             Ver site público
           </Link>
@@ -110,7 +111,7 @@ export async function AdminShell({
           <form
             action={async () => {
               "use server";
-              await signOut({ redirectTo: "/admin/login" });
+              await signOut({ redirectTo: "/" });
             }}
           >
             <button className="btn-ghost w-full !py-2 text-sm">Sair</button>
@@ -121,7 +122,7 @@ export async function AdminShell({
           <form
             action={async () => {
               "use server";
-              await signOut({ redirectTo: "/admin/login" });
+              await signOut({ redirectTo: "/" });
             }}
           >
             <button className="btn-ghost w-full !py-1.5 text-xs">Sair</button>

@@ -1,5 +1,6 @@
 import "server-only";
 import { put } from "@vercel/blob";
+import { toAppMediaUrl } from "@/lib/media-url";
 
 const ALLOWED = new Set([
   "jpg",
@@ -41,6 +42,7 @@ function mimeFor(ext: string) {
  * Upload persistente:
  * 1) Vercel Blob (BLOB_READ_WRITE_TOKEN) — obrigatório em produção Vercel
  * 2) Disco local public/uploads — desenvolvimento
+ * URLs públicas passam por /api/media (evita 403 do CDN Blob).
  */
 export async function storeUploadedFile(file: File): Promise<
   { ok: true; url: string } | { ok: false; error: string }
@@ -55,15 +57,26 @@ export async function storeUploadedFile(file: File): Promise<
   const ext = safeExt(file.name);
   const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
   const bytes = Buffer.from(await file.arrayBuffer());
+  const contentType = file.type || mimeFor(ext);
 
   if (process.env.BLOB_READ_WRITE_TOKEN) {
     try {
-      const blob = await put(`ieul/${name}`, bytes, {
-        access: "public",
-        contentType: file.type || mimeFor(ext),
-        addRandomSuffix: false,
-      });
-      return { ok: true, url: blob.url };
+      let blob;
+      try {
+        blob = await put(`ieul/${name}`, bytes, {
+          access: "public",
+          contentType,
+          addRandomSuffix: false,
+        });
+      } catch (publicErr) {
+        console.warn("[upload] public put failed, trying private:", publicErr);
+        blob = await put(`ieul/${name}`, bytes, {
+          access: "private",
+          contentType,
+          addRandomSuffix: false,
+        });
+      }
+      return { ok: true, url: toAppMediaUrl(blob.url) };
     } catch (err) {
       console.error("[upload] Vercel Blob failed:", err);
       if (process.env.VERCEL) {
@@ -72,7 +85,6 @@ export async function storeUploadedFile(file: File): Promise<
           error: "Falha no armazenamento de imagens (Vercel Blob). Tente novamente.",
         };
       }
-      // local: continua para disco
     }
   }
 

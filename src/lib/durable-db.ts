@@ -1,5 +1,5 @@
 import "server-only";
-import { put, list, del } from "@vercel/blob";
+import { put, list, del, get } from "@vercel/blob";
 import fs from "fs";
 import path from "path";
 
@@ -58,6 +58,67 @@ function writeDbBytes(dest: string, buf: Buffer) {
   fs.renameSync(/*turbopackIgnore: true*/ partial, /*turbopackIgnore: true*/ dest);
 }
 
+async function streamToBuffer(stream: ReadableStream<Uint8Array>): Promise<Buffer> {
+  return Buffer.from(await new Response(stream).arrayBuffer());
+}
+
+/** Download blob bytes via authenticated SDK (CDN URLs often 403). */
+async function downloadBlobBytes(
+  pathname: string,
+  fallbackUrl?: string,
+): Promise<Buffer | null> {
+  const token = process.env.BLOB_READ_WRITE_TOKEN;
+  for (const access of ["public", "private"] as const) {
+    try {
+      const result = await get(pathname, {
+        access,
+        useCache: false,
+        ...(token ? { token } : {}),
+      });
+      if (result?.stream) {
+        const buf = await streamToBuffer(result.stream);
+        if (buf.length > 0) return buf;
+      }
+    } catch {
+      /* try next access mode */
+    }
+  }
+
+  if (fallbackUrl) {
+    try {
+      const res = await fetch(fallbackUrl, { cache: "no-store" });
+      if (res.ok) {
+        const buf = Buffer.from(await res.arrayBuffer());
+        if (buf.length > 0) return buf;
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
+  return null;
+}
+
+async function putBlobFlexible(
+  pathname: string,
+  body: string | Buffer,
+  contentType: string,
+): Promise<void> {
+  const token = process.env.BLOB_READ_WRITE_TOKEN!;
+  const base = {
+    contentType,
+    addRandomSuffix: false as const,
+    allowOverwrite: true as const,
+    token,
+  };
+  try {
+    await put(pathname, body, { ...base, access: "public" });
+  } catch (publicErr) {
+    console.warn("[durable-db] public put failed, trying private:", publicErr);
+    await put(pathname, body, { ...base, access: "private" });
+  }
+}
+
 async function restoreFromBlob(dest: string): Promise<"ok" | "missing" | "error"> {
   if (!process.env.BLOB_READ_WRITE_TOKEN) return "missing";
 
@@ -70,17 +131,11 @@ async function restoreFromBlob(dest: string): Promise<"ok" | "missing" | "error"
         token: process.env.BLOB_READ_WRITE_TOKEN,
       });
       const hit = blobs.find((b) => b.pathname === DURABLE_DB_PATHNAME) || blobs[0];
-      if (!hit?.url) return "missing";
+      if (!hit) return "missing";
 
-      const res = await fetch(hit.url, { cache: "no-store" });
-      if (!res.ok) {
-        lastErr = new Error(`HTTP ${res.status}`);
-        await sleep(200 * attempt);
-        continue;
-      }
-      const buf = Buffer.from(await res.arrayBuffer());
-      if (buf.length === 0) {
-        lastErr = new Error("empty blob");
+      const buf = await downloadBlobBytes(hit.pathname || DURABLE_DB_PATHNAME, hit.url);
+      if (!buf) {
+        lastErr = new Error("download empty/failed");
         await sleep(200 * attempt);
         continue;
       }
@@ -203,10 +258,10 @@ async function readWriteLock(): Promise<{ owner: string; until: number } | null>
       token: process.env.BLOB_READ_WRITE_TOKEN,
     });
     const hit = blobs.find((b) => b.pathname === WRITE_LOCK_PATHNAME) || blobs[0];
-    if (!hit?.url) return null;
-    const res = await fetch(hit.url, { cache: "no-store" });
-    if (!res.ok) return null;
-    const data = (await res.json()) as { owner?: string; until?: number };
+    if (!hit) return null;
+    const buf = await downloadBlobBytes(hit.pathname || WRITE_LOCK_PATHNAME, hit.url);
+    if (!buf) return null;
+    const data = JSON.parse(buf.toString("utf8")) as { owner?: string; until?: number };
     if (!data.owner || typeof data.until !== "number") return null;
     return { owner: data.owner, until: data.until };
   } catch {
@@ -230,16 +285,10 @@ export async function acquireDurableWriteLock(): Promise<void> {
     }
 
     const until = Date.now() + 20_000;
-    await put(
+    await putBlobFlexible(
       WRITE_LOCK_PATHNAME,
       JSON.stringify({ owner: lockOwner, until }),
-      {
-        access: "public",
-        contentType: "application/json",
-        addRandomSuffix: false,
-        allowOverwrite: true,
-        token: process.env.BLOB_READ_WRITE_TOKEN,
-      },
+      "application/json",
     );
     await sleep(60);
     const check = await readWriteLock();
@@ -283,13 +332,7 @@ export async function persistDurableSqlite(): Promise<void> {
     if (!fs.existsSync(/*turbopackIgnore: true*/ dest)) return;
     const bytes = fs.readFileSync(/*turbopackIgnore: true*/ dest);
     if (bytes.length === 0) return;
-    await put(DURABLE_DB_PATHNAME, bytes, {
-      access: "public",
-      contentType: "application/x-sqlite3",
-      addRandomSuffix: false,
-      allowOverwrite: true,
-      token: process.env.BLOB_READ_WRITE_TOKEN,
-    });
+    await putBlobFlexible(DURABLE_DB_PATHNAME, bytes, "application/x-sqlite3");
     console.info("[durable-db] persisted to Blob", bytes.length, "bytes");
   };
 

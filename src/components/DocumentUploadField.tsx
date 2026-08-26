@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { uploadAdminFile } from "@/lib/client-upload";
+import { toAppMediaUrl } from "@/lib/media-url";
 
 function isImageUrl(url: string) {
   return /\.(png|jpe?g|gif|webp|svg)(\?|$)/i.test(url);
@@ -18,13 +19,13 @@ export function DocumentUploadField({
   defaultUrl?: string | null;
   hint?: string;
 }) {
-  const [url, setUrl] = useState(defaultUrl || "");
+  const [url, setUrl] = useState(toAppMediaUrl(defaultUrl) || defaultUrl || "");
   const [uploading, setUploading] = useState(false);
   const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
-    setUrl(defaultUrl || "");
+    setUrl(toAppMediaUrl(defaultUrl) || defaultUrl || "");
   }, [defaultUrl]);
 
   async function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -49,6 +50,8 @@ export function DocumentUploadField({
     }
   }
 
+  const preview = toAppMediaUrl(url) || url;
+
   return (
     <div className="rounded-xl border border-dashed border-border bg-[#f7faf8] p-4">
       <label className="admin-label">{label}</label>
@@ -67,16 +70,16 @@ export function DocumentUploadField({
       {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
       {url && (
         <div className="mt-3 space-y-2">
-          {isImageUrl(url) ? (
+          {isImageUrl(url) || isImageUrl(preview) ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={url}
+              src={preview}
               alt="Pré-visualização do edital"
               className="max-h-40 w-auto rounded-lg border border-border object-contain"
             />
           ) : null}
           <a
-            href={url}
+            href={preview}
             target="_blank"
             rel="noreferrer"
             className="inline-block text-sm font-semibold text-primary"

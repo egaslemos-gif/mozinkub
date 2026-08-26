@@ -1,3 +1,5 @@
+import { toAppMediaUrl } from "@/lib/media-url";
+
 function isImageUrl(url: string) {
   return /\.(png|jpe?g|gif|webp|svg)(\?|$)/i.test(url);
 }
@@ -14,8 +16,9 @@ export function OfficialCallDocument({
   url: string;
   title?: string;
 }) {
-  const image = isImageUrl(url);
-  const pdf = isPdfUrl(url);
+  const href = toAppMediaUrl(url) || url;
+  const image = isImageUrl(url) || isImageUrl(href);
+  const pdf = isPdfUrl(url) || isPdfUrl(href);
 
   return (
     <div className="card-surface overflow-hidden">
@@ -36,18 +39,18 @@ export function OfficialCallDocument({
         <div className="bg-[#f4f7f5] p-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={url}
+            src={href}
             alt={title}
             className="mx-auto max-h-[480px] w-full object-contain"
           />
         </div>
       )}
       <div className="flex flex-wrap gap-3 px-5 py-4">
-        <a href={url} target="_blank" rel="noreferrer" className="btn-primary !py-2.5 text-sm">
+        <a href={href} target="_blank" rel="noreferrer" className="btn-primary !py-2.5 text-sm">
           {pdf ? "Abrir PDF" : image ? "Abrir imagem" : "Abrir documento"}
         </a>
         <a
-          href={url}
+          href={href}
           download
           target="_blank"
           rel="noreferrer"

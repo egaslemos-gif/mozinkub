@@ -5,6 +5,7 @@ import Image from "next/image";
 import { FormWithFeedback } from "@/components/FormWithFeedback";
 import { SlideUploadForm } from "@/components/SlideUploadForm";
 import { deleteHeroSlide } from "@/app/admin/actions";
+import { toAppMediaUrl } from "@/lib/media-url";
 
 type Slide = {
   id: string;
@@ -23,7 +24,13 @@ export function DestaqueSlideCard({ slide }: { slide: Slide }) {
     <div className="card-surface p-4">
       <div className="flex gap-4">
         <div className="relative h-20 w-28 shrink-0 overflow-hidden rounded-xl bg-primary-soft">
-          <Image src={slide.imageUrl} alt={slide.title} fill className="object-cover" unoptimized />
+          <Image
+            src={toAppMediaUrl(slide.imageUrl) || slide.imageUrl}
+            alt={slide.title}
+            fill
+            className="object-cover"
+            unoptimized
+          />
         </div>
         <div className="min-w-0 flex-1">
           <p className="font-semibold">{slide.title}</p>

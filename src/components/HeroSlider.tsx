@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { toAppMediaUrl } from "@/lib/media-url";
 
 export type SlideItem = {
   id: string;
@@ -23,6 +24,8 @@ export function HeroSlider({
   const [index, setIndex] = useState(0);
   const hasSlides = slides.length > 0;
   const current = hasSlides ? slides[index] : null;
+  const imageSrc = current ? toAppMediaUrl(current.imageUrl) : "";
+  const logoSrc = current?.logoUrl ? toAppMediaUrl(current.logoUrl) : "";
 
   useEffect(() => {
     if (slides.length <= 1) return;
@@ -40,17 +43,17 @@ export function HeroSlider({
             <>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={current.imageUrl}
+                src={imageSrc}
                 alt={current.title}
                 className="absolute inset-0 h-full w-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#1a262b]/92 via-[#2f4248]/45 to-[#2f4248]/12" />
 
               <div className="relative z-[1] flex min-h-[260px] flex-col justify-end p-5 sm:min-h-[300px] sm:p-6">
-                {current.logoUrl && (
+                {logoSrc && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={current.logoUrl}
+                    src={logoSrc}
                     alt=""
                     className="mb-3 h-10 w-10 object-contain"
                   />

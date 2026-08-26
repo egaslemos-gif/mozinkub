@@ -3,6 +3,7 @@ import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
 import { getPublishedFundingCalls, getSiteConfig, statusLabel } from "@/lib/data";
 import { isCallOpen } from "@/lib/funding";
+import { toAppMediaUrl } from "@/lib/media-url";
 
 export const dynamic = "force-dynamic";
 
@@ -52,7 +53,7 @@ export default async function EditaisPage() {
                   </Link>
                   {c.documentUrl && (
                     <a
-                      href={c.documentUrl}
+                      href={toAppMediaUrl(c.documentUrl) || c.documentUrl}
                       target="_blank"
                       rel="noreferrer"
                       className="btn-ghost inline-flex !py-2.5 text-sm"
@@ -89,7 +90,7 @@ export default async function EditaisPage() {
                     </Link>
                     {c.documentUrl && (
                       <a
-                        href={c.documentUrl}
+                        href={toAppMediaUrl(c.documentUrl) || c.documentUrl}
                         target="_blank"
                         rel="noreferrer"
                         className="text-sm font-semibold text-ul-blue"

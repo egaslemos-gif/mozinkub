@@ -5,6 +5,7 @@ import { ContactForm } from "@/components/ContactForm";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
 import { getProjectBySlug, getSiteConfig, statusLabel } from "@/lib/data";
 import { maturityLabel, milestoneKindLabel, whatsappHref } from "@/lib/projects";
+import { toAppMediaUrl } from "@/lib/media-url";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +31,7 @@ export default async function ProjectoDetailPage({
           {project.coverUrl && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={project.coverUrl}
+              src={toAppMediaUrl(project.coverUrl)}
               alt=""
               className="absolute inset-0 h-full w-full object-cover"
             />
@@ -44,7 +45,11 @@ export default async function ProjectoDetailPage({
               {project.logoUrl && (
                 <div className="grid h-16 w-16 shrink-0 place-items-center border border-white/30 bg-white p-1.5">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={project.logoUrl} alt="" className="max-h-12 max-w-12 object-contain" />
+                  <img
+                    src={toAppMediaUrl(project.logoUrl)}
+                    alt=""
+                    className="max-h-12 max-w-12 object-contain"
+                  />
                 </div>
               )}
               <div>
@@ -138,7 +143,11 @@ export default async function ProjectoDetailPage({
                   {project.gallery.map((g) => (
                     <figure key={g.id} className="overflow-hidden border border-border bg-[#2f4248]">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={g.url} alt={g.title || project.name} className="h-48 w-full object-cover" />
+                      <img
+                        src={toAppMediaUrl(g.url)}
+                        alt={g.title || project.name}
+                        className="h-48 w-full object-cover"
+                      />
                       {g.title && (
                         <figcaption className="px-3 py-2 text-xs text-white/80">{g.title}</figcaption>
                       )}

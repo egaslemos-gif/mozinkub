@@ -94,7 +94,7 @@ export default async function HomePage() {
                 <Link href="/projectos" className="btn-primary w-full sm:w-auto">
                   Ver projectos incubados
                 </Link>
-                <Link href="/#calendario" className="btn-ghost w-full sm:w-auto">
+                <Link href="/calendario" className="btn-ghost w-full sm:w-auto">
                   Ver calendário
                 </Link>
               </div>
