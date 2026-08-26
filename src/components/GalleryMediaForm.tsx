@@ -2,8 +2,9 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createGalleryMedia, uploadMedia } from "@/app/admin/actions";
+import { createGalleryMedia } from "@/app/admin/actions";
 import { isActionResult } from "@/lib/action-result";
+import { uploadAdminFile } from "@/lib/client-upload";
 
 export function GalleryMediaForm({ albumId }: { albumId: string }) {
   const router = useRouter();
@@ -19,12 +20,10 @@ export function GalleryMediaForm({ albumId }: { albumId: string }) {
     setStatus("idle");
     setMsg("");
     try {
-      const fd = new FormData();
-      fd.set("file", file);
-      const res = await uploadMedia(fd);
+      const res = await uploadAdminFile(file);
       if (!res.ok) {
         setStatus("error");
-        setMsg(res.error || "Falha no upload");
+        setMsg(res.error);
         return;
       }
       setUrl(res.url);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { uploadMedia } from "@/app/admin/actions";
+import { uploadAdminFile } from "@/lib/client-upload";
 
 export function DocumentUploadField({
   name,
@@ -30,11 +30,10 @@ export function DocumentUploadField({
     setMsg("");
     setError("");
     try {
-      const fd = new FormData();
-      fd.set("file", file);
-      const res = await uploadMedia(fd);
+      const res = await uploadAdminFile(file);
       if (!res.ok) {
-        setError(res.error || "Falha no upload");
+        setError(res.error);
+        e.target.value = "";
         return;
       }
       setUrl(res.url);

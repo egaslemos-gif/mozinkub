@@ -8,6 +8,7 @@ export type AuthUser = {
   id: string;
   role: string;
   status?: string;
+  email?: string;
 };
 
 export type PermissionGrant = {
@@ -187,18 +188,34 @@ export async function requirePermission(
 ): Promise<AuthUser> {
   if (!user?.id) throw new AuthorizationError("Não autenticado");
 
-  // Revalidar estado na BD (Node) — JWT pode estar desactualizado após suspender conta
-  const dbUser = await prisma.user.findUnique({
+  // Revalidar estado na BD. Após redeploy/reseed o JWT.id pode não coincidir —
+  // resolver também por email para a sessão continuar válida.
+  let dbUser = await prisma.user.findUnique({
     where: { id: user.id },
-    select: { role: true, status: true },
+    select: { id: true, role: true, status: true, email: true },
   });
-  if (!dbUser || dbUser.status !== "ACTIVE") {
+
+  if (!dbUser && user.email) {
+    dbUser = await prisma.user.findUnique({
+      where: { email: user.email.toLowerCase().trim() },
+      select: { id: true, role: true, status: true, email: true },
+    });
+  }
+
+  if (!dbUser) {
+    throw new AuthorizationError(
+      "Sessão desactualizada. Termine a sessão e entre novamente.",
+    );
+  }
+  if (dbUser.status !== "ACTIVE") {
     throw new AuthorizationError("Conta inactiva ou suspensa");
   }
+
   const fresh: AuthUser = {
-    id: user.id,
+    id: dbUser.id,
     role: normalizeRole(dbUser.role),
     status: dbUser.status,
+    email: dbUser.email,
   };
 
   const allowed = await can(fresh, permission, ctx);
@@ -257,13 +274,14 @@ export async function getAccessibleProjectIds(
 }
 
 export function sessionToAuthUser(session: {
-  user?: { id?: string; role?: string; status?: string } | null;
+  user?: { id?: string; role?: string; status?: string; email?: string | null } | null;
 } | null): AuthUser | null {
   if (!session?.user?.id) return null;
   return {
     id: session.user.id,
     role: normalizeRole(session.user.role),
     status: session.user.status || "ACTIVE",
+    email: session.user.email || undefined,
   };
 }
 

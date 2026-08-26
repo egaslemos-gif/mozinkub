@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { uploadMedia } from "@/app/admin/actions";
+import { uploadAdminFile } from "@/lib/client-upload";
 
 export function ImageUploadField({
   name,
@@ -30,11 +30,10 @@ export function ImageUploadField({
     setMsg("");
     setError("");
     try {
-      const fd = new FormData();
-      fd.set("file", file);
-      const res = await uploadMedia(fd);
+      const res = await uploadAdminFile(file);
       if (!res.ok) {
-        setError(res.error || "Falha no upload");
+        setError(res.error);
+        e.target.value = "";
         return;
       }
       setUrl(res.url);
@@ -50,6 +49,7 @@ export function ImageUploadField({
     <div>
       <label className="admin-label">{label}</label>
       {hint && <p className="mb-2 text-xs text-muted">{hint}</p>}
+      <p className="mb-2 text-xs text-muted">Formatos: JPG, PNG, WEBP, SVG · máx. 10 MB</p>
       <input type="hidden" name={name} value={url} />
       <input type="file" accept="image/*,.svg" onChange={onFileChange} disabled={uploading} />
       {uploading && <p className="mt-1 text-xs text-muted">A carregar…</p>}
