@@ -59,3 +59,6 @@ next-env.d.ts
 .windsurf/
 skills-lock.json
 scripts/detect-gdrive.ps1
+
+.vercel
+.env*

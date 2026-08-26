@@ -17,7 +17,8 @@ import {
   parseValues,
 } from "@/lib/data";
 
-export const dynamic = "force-dynamic";
+// MVP on Vercel+SQLite: render no build para evitar leitura de DB em runtime.
+export const dynamic = "force-static";
 
 export default async function HomePage() {
   const [config, projects, events, funding, timeline, slides, calendarEntries, highlightEvent] =
