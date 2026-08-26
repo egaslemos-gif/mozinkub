@@ -10,18 +10,14 @@ const TMP_DB = "/tmp/ieul.db";
 
 export function getRuntimeDbPath(): string {
   if (process.env.VERCEL) return TMP_DB;
-  const configured = process.env.DATABASE_URL || "file:./dev.db";
-  if (configured.startsWith("file:")) {
-    const rel = configured.replace(/^file:/, "");
-    return path.isAbsolute(rel) ? rel : path.join(process.cwd(), rel);
-  }
-  return TMP_DB;
+  // Local: keep SQLite under prisma/ (scoped path for Turbopack tracing).
+  return path.join(/*turbopackIgnore: true*/ process.cwd(), "prisma", "dev.db");
 }
 
 function seedCandidates(): string[] {
   return [
-    path.join(process.cwd(), "prisma", "dev.db"),
-    path.join(process.cwd(), "dev.db"),
+    path.join(/*turbopackIgnore: true*/ process.cwd(), "prisma", "dev.db"),
+    path.join(/*turbopackIgnore: true*/ process.cwd(), "dev.db"),
   ];
 }
 
@@ -35,7 +31,7 @@ export async function ensureDurableSqlite(): Promise<string> {
     return dest;
   }
 
-  if (fs.existsSync(dest) && fs.statSync(dest).size > 0) {
+  if (fs.existsSync(/*turbopackIgnore: true*/ dest) && fs.statSync(/*turbopackIgnore: true*/ dest).size > 0) {
     return dest;
   }
 
@@ -52,7 +48,7 @@ export async function ensureDurableSqlite(): Promise<string> {
         if (res.ok) {
           const buf = Buffer.from(await res.arrayBuffer());
           if (buf.length > 0) {
-            fs.writeFileSync(dest, buf);
+            fs.writeFileSync(/*turbopackIgnore: true*/ dest, buf);
             console.info("[durable-db] restored from Blob", buf.length, "bytes");
             return dest;
           }
@@ -65,8 +61,8 @@ export async function ensureDurableSqlite(): Promise<string> {
 
   // 2) Fall back to build-time seed copy
   for (const src of seedCandidates()) {
-    if (fs.existsSync(src)) {
-      fs.copyFileSync(src, dest);
+    if (fs.existsSync(/*turbopackIgnore: true*/ src)) {
+      fs.copyFileSync(/*turbopackIgnore: true*/ src, /*turbopackIgnore: true*/ dest);
       console.info("[durable-db] seeded from build artifact", src);
       return dest;
     }
@@ -86,8 +82,8 @@ export async function persistDurableSqlite(): Promise<void> {
 
   const run = async () => {
     const dest = getRuntimeDbPath();
-    if (!fs.existsSync(dest)) return;
-    const bytes = fs.readFileSync(dest);
+    if (!fs.existsSync(/*turbopackIgnore: true*/ dest)) return;
+    const bytes = fs.readFileSync(/*turbopackIgnore: true*/ dest);
     await put(DURABLE_DB_PATHNAME, bytes, {
       access: "public",
       contentType: "application/x-sqlite3",
