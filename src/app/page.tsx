@@ -121,7 +121,7 @@ export default async function HomePage() {
               Ver mural →
             </Link>
           </div>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-5 md:grid-cols-3">
             {mural.map((p) => (
               <ProjectMuralCard key={p.id} project={p} />
             ))}

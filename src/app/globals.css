@@ -1,10 +1,8 @@
 @import "tailwindcss";
 
-/* Paleta institucional suave (UniLicungo + MozInkub):
-   azul céu e castanho do brasão UL, teal desaturado da incubadora.
-*/
+/* Paleta institucional suave + geometria recta (mais profissional). */
 :root {
-  --background: #f6f7f9;
+  --background: #f4f5f7;
   --foreground: #1b2430;
   --muted: #667280;
   --card: #ffffff;
@@ -17,10 +15,11 @@
   --fr-blue: #243b55;
   --fr-red: #b85c5c;
   --accent: #b7cfc9;
-  --border: #e1e7ec;
+  --border: #dce3e8;
   --hero-glow: #e9eef3;
   --wa: #4f9a6c;
   --wa-dark: #3f7d58;
+  --radius: 0px;
 }
 
 @theme inline {
@@ -38,6 +37,13 @@
   --color-fr-red: var(--fr-red);
   --color-accent: var(--accent);
   --color-border: var(--border);
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-full: 0px;
   --font-sans: var(--font-manrope);
   --font-display: var(--font-fraunces);
 }
@@ -72,10 +78,7 @@ a {
 }
 
 .site-shell {
-  background:
-    radial-gradient(ellipse 70% 45% at 100% -5%, var(--hero-glow), transparent 55%),
-    radial-gradient(ellipse 55% 40% at 0% 15%, #eef3f2, transparent 50%),
-    linear-gradient(180deg, #f8f9fb 0%, var(--background) 42%);
+  background: linear-gradient(180deg, #f7f8fa 0%, var(--background) 48%);
   overflow-x: clip;
   max-width: 100%;
 }
@@ -104,28 +107,26 @@ a {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 999px;
+  border-radius: var(--radius);
   background: var(--primary);
   color: white;
   font-weight: 600;
   padding: 0.85rem 1.4rem;
   max-width: 100%;
-  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 6px 16px rgba(63, 120, 114, 0.18);
+  transition: background 0.2s ease;
 }
 
 .btn-primary:hover {
   background: var(--primary-dark);
-  transform: translateY(-1px);
 }
 
 .btn-ghost {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
-  border: 1.5px solid var(--border);
-  background: rgba(255, 255, 255, 0.85);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: #fff;
   color: var(--foreground);
   font-weight: 600;
   padding: 0.85rem 1.4rem;
@@ -134,15 +135,25 @@ a {
 }
 
 .btn-ghost:hover {
-  border-color: var(--ul-blue);
-  background: white;
+  border-color: var(--primary);
+  background: var(--primary-soft);
 }
 
 .card-surface {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 1.25rem;
-  box-shadow: 0 8px 24px rgba(27, 36, 48, 0.04);
+  border-radius: var(--radius);
+  box-shadow: none;
+}
+
+.project-card {
+  border-radius: 0;
+  overflow: visible;
+  box-shadow: none;
+}
+
+.project-card:hover {
+  background: #fbfcfc;
 }
 
 .fade-up {
@@ -152,7 +163,7 @@ a {
 @keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -163,7 +174,7 @@ a {
 .admin-input {
   width: 100%;
   border: 1px solid var(--border);
-  border-radius: 0.75rem;
+  border-radius: var(--radius);
   padding: 0.7rem 0.9rem;
   background: white;
   color: var(--foreground);
@@ -226,22 +237,15 @@ a {
   width: 8.25rem;
   padding: 0.65rem 0.85rem;
   border: 1px solid var(--border);
-  border-radius: 1rem;
+  border-radius: var(--radius);
   background: #fff;
-  box-shadow: 0 4px 14px rgba(27, 36, 48, 0.03);
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease,
-    border-color 0.25s ease,
-    background 0.25s ease;
+  transition: border-color 0.2s ease, background 0.2s ease;
   cursor: default;
 }
 
 .partner-marquee-item:hover {
-  transform: translateY(-3px) scale(1.03);
-  border-color: var(--border);
+  border-color: var(--primary);
   background: var(--primary-soft);
-  box-shadow: 0 10px 22px rgba(63, 120, 114, 0.1);
   z-index: 2;
 }
 
@@ -280,4 +284,16 @@ a {
   .partner-marquee-item[aria-hidden="true"] {
     display: none;
   }
+}
+
+/* Neutraliza cantos arredondados utilitários do Tailwind no site */
+.rounded,
+.rounded-sm,
+.rounded-md,
+.rounded-lg,
+.rounded-xl,
+.rounded-2xl,
+.rounded-3xl,
+.rounded-full {
+  border-radius: 0 !important;
 }

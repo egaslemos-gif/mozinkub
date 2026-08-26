@@ -28,7 +28,7 @@ export function MobileNav() {
     <div className="relative xl:hidden">
       <button
         type="button"
-        className="grid h-10 w-10 place-items-center rounded-full border border-border bg-white text-foreground"
+        className="grid h-10 w-10 place-items-center border border-border bg-white text-foreground"
         aria-expanded={open}
         aria-controls="mobile-menu"
         aria-label={open ? "Fechar menu" : "Abrir menu"}
@@ -63,14 +63,14 @@ export function MobileNav() {
           />
           <nav
             id="mobile-menu"
-            className="absolute top-full right-0 z-50 mt-2 w-[min(calc(100vw-1.5rem),18rem)] max-h-[min(70vh,28rem)] overflow-y-auto rounded-2xl border border-border bg-white p-3 shadow-xl"
+            className="absolute top-full right-0 z-50 mt-2 w-[min(calc(100vw-1.5rem),18rem)] max-h-[min(70vh,28rem)] overflow-y-auto border border-border bg-white p-3 shadow-xl"
           >
             <ul className="space-y-1">
               {siteNavLinks.map((l) => (
                 <li key={l.href}>
                   <Link
                     href={l.href}
-                    className="block rounded-xl px-4 py-3 text-sm font-semibold text-foreground hover:bg-primary-soft hover:text-primary"
+                    className="block px-4 py-3 text-sm font-semibold text-foreground hover:bg-primary-soft hover:text-primary"
                     onClick={() => setOpen(false)}
                   >
                     {l.label}

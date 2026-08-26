@@ -68,13 +68,13 @@ export async function AdminShell({
           <div className="mb-3 flex items-center gap-2.5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/logos/unilicungo-oficial.png"
-              alt="Universidade Licungo"
-              className="h-10 w-10 rounded-full object-contain"
+              src="/logos/mozinkub.png"
+              alt="MozInkub"
+              className="h-10 w-10 object-contain"
             />
             <div>
               <p className="font-display text-lg font-semibold">IEUL Admin</p>
-              <p className="text-[10px] text-muted">UniLicungo · Beira</p>
+              <p className="text-[10px] text-muted">MozInkub · UniLicungo</p>
             </div>
           </div>
           <p className="mt-1 truncate text-xs text-muted">{session.user?.email}</p>

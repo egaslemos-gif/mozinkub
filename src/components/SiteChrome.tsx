@@ -62,9 +62,9 @@ export function SiteFooter({
           <div className="mb-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/logos/unilicungo-oficial.png"
-              alt="Universidade Licungo"
-              className="h-14 w-14 rounded-full object-contain"
+              src="/logos/mozinkub.png"
+              alt="MozInkub"
+              className="h-14 w-14 object-contain"
             />
           </div>
           <p className="font-display text-xl font-semibold">{brand}</p>

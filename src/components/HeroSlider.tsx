@@ -35,7 +35,7 @@ export function HeroSlider({
   return (
     <div className="fade-up relative" style={{ animationDelay: "0.12s" }}>
       <div className="card-surface relative overflow-hidden shadow-md">
-        <div className="relative min-h-[260px] bg-[#2a4650] sm:min-h-[300px] md:min-h-[340px]">
+        <div className="relative min-h-[260px] bg-[#2f4248] sm:min-h-[300px] md:min-h-[340px]">
           {current ? (
             <>
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -44,11 +44,11 @@ export function HeroSlider({
                 alt={current.title}
                 className="absolute inset-0 h-full w-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#1b2f36]/92 via-[#2a4650]/50 to-[#2a4650]/15" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#1a262b]/92 via-[#2f4248]/45 to-[#2f4248]/12" />
 
               <div className="relative z-[1] flex min-h-[260px] flex-col justify-end p-4 sm:min-h-[300px] sm:p-5 md:min-h-[340px] md:p-6">
                 {current.logoUrl && (
-                  <div className="mb-3 grid h-11 w-11 place-items-center rounded-xl bg-white p-1 sm:h-12 sm:w-12">
+                  <div className="mb-3 grid h-11 w-11 place-items-center border border-white/40 bg-white p-1 sm:h-12 sm:w-12">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={current.logoUrl} alt="" className="max-h-9 max-w-9 object-contain sm:max-h-10 sm:max-w-10" />
                   </div>
@@ -67,7 +67,7 @@ export function HeroSlider({
                 {current.linkUrl && (
                   <Link
                     href={current.linkUrl}
-                    className="mt-4 inline-flex w-fit max-w-full items-center rounded-full bg-[color:var(--primary)] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[color:var(--primary-dark)] sm:mt-5 sm:px-5"
+                    className="mt-4 inline-flex w-fit max-w-full items-center bg-[color:var(--primary)] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[color:var(--primary-dark)] sm:mt-5 sm:px-5"
                   >
                     Saber mais →
                   </Link>
@@ -80,7 +80,7 @@ export function HeroSlider({
                         key={s.id}
                         type="button"
                         aria-label={`Slide ${i + 1}`}
-                        className={`h-2.5 rounded-full border border-white/35 ${
+                        className={`h-2 border border-white/35 ${
                           i === index ? "w-7 bg-white" : "w-2.5 bg-white/30"
                         }`}
                         onClick={() => setIndex(i)}
@@ -95,7 +95,7 @@ export function HeroSlider({
                   <button
                     type="button"
                     aria-label="Anterior"
-                    className="grid h-9 w-9 place-items-center rounded-full border border-white/25 bg-[#2a4650]/70 text-lg font-bold text-white"
+                    className="grid h-9 w-9 place-items-center border border-white/25 bg-[#1a262b]/70 text-lg font-bold text-white"
                     onClick={() =>
                       setIndex((i) => (i - 1 + slides.length) % slides.length)
                     }
@@ -105,7 +105,7 @@ export function HeroSlider({
                   <button
                     type="button"
                     aria-label="Seguinte"
-                    className="grid h-9 w-9 place-items-center rounded-full border border-white/25 bg-[#2a4650]/70 text-lg font-bold text-white"
+                    className="grid h-9 w-9 place-items-center border border-white/25 bg-[#1a262b]/70 text-lg font-bold text-white"
                     onClick={() => setIndex((i) => (i + 1) % slides.length)}
                   >
                     ›
@@ -120,16 +120,16 @@ export function HeroSlider({
           )}
         </div>
 
-        <div className="grid grid-cols-3 gap-2 border-t border-border bg-white p-3 sm:gap-3 sm:p-4">
-          <div className="rounded-xl bg-primary-soft p-2 text-center sm:rounded-2xl sm:p-3">
+        <div className="grid grid-cols-3 gap-px border-t border-border bg-border">
+          <div className="bg-[#f3f6f5] p-3 text-center sm:p-4">
             <p className="font-display text-xl font-semibold text-primary sm:text-2xl">{stats.projects}</p>
             <p className="text-[10px] text-muted sm:text-xs">Projectos</p>
           </div>
-          <div className="rounded-xl bg-[#e8f4fb] p-2 text-center sm:rounded-2xl sm:p-3">
+          <div className="bg-[#f3f5f7] p-3 text-center sm:p-4">
             <p className="font-display text-xl font-semibold text-ul-blue sm:text-2xl">{stats.activities}</p>
             <p className="text-[10px] text-muted sm:text-xs">Actividades</p>
           </div>
-          <div className="rounded-xl bg-[#f4eee6] p-2 text-center sm:rounded-2xl sm:p-3">
+          <div className="bg-[#f5f4f2] p-3 text-center sm:p-4">
             <p className="font-display text-xl font-semibold text-ul-brown sm:text-2xl">{stats.events}</p>
             <p className="text-[10px] text-muted sm:text-xs">Eventos</p>
           </div>

@@ -26,7 +26,7 @@ export default async function ProjectoDetailPage({
     <div className="site-shell min-h-screen">
       <SiteHeader brand={config?.brandName || "IEUL"} />
       <main>
-        <section className="relative min-h-[340px] overflow-hidden bg-[#0f3d45] text-white">
+        <section className="relative min-h-[340px] overflow-hidden bg-[#2f4248] text-white">
           {project.coverUrl && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -35,20 +35,20 @@ export default async function ProjectoDetailPage({
               className="absolute inset-0 h-full w-full object-cover"
             />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#062428] via-[#062428]/70 to-[#062428]/25" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#1a262b] via-[#1a262b]/70 to-[#1a262b]/20" />
           <div className="relative z-[1] mx-auto flex min-h-[340px] max-w-6xl flex-col justify-end px-4 py-10 md:px-6">
-            <Link href="/projectos" className="text-sm font-semibold text-[#9fd4c8]">
+            <Link href="/projectos" className="text-sm font-semibold text-[#c5d4cf]">
               ← Mural de projectos
             </Link>
             <div className="mt-6 flex items-end gap-4">
               {project.logoUrl && (
-                <div className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-white p-1.5">
+                <div className="grid h-16 w-16 shrink-0 place-items-center border border-white/30 bg-white p-1.5">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={project.logoUrl} alt="" className="max-h-12 max-w-12 object-contain" />
                 </div>
               )}
               <div>
-                <p className="text-[11px] font-bold tracking-[0.16em] text-[#9fd4c8] uppercase">
+                <p className="text-[11px] font-bold tracking-[0.16em] text-[#c5d4cf] uppercase">
                   {project.area} · {project.city}
                 </p>
                 <h1 className="font-display mt-1 text-4xl font-semibold md:text-5xl">{project.name}</h1>
@@ -61,19 +61,19 @@ export default async function ProjectoDetailPage({
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 md:grid-cols-[1.15fr_0.85fr] md:px-6">
           <div>
             <div className="flex flex-wrap gap-2 text-sm">
-              <span className="rounded-full bg-primary-soft px-3 py-1 text-primary">
+              <span className="border border-border bg-[#f3f6f5] px-3 py-1 text-primary">
                 {statusLabel(project.status)}
               </span>
-              <span className="rounded-full bg-[#e8f4fb] px-3 py-1 text-ul-blue">
+              <span className="border border-border bg-[#f3f5f7] px-3 py-1 text-ul-blue">
                 {maturityLabel(project.maturity)}
               </span>
               {project.cohortYear && (
-                <span className="rounded-full bg-[#f4eee6] px-3 py-1 text-ul-brown">
+                <span className="border border-border bg-[#f5f4f2] px-3 py-1 text-ul-brown">
                   Coorte {project.cohortYear}
                 </span>
               )}
               {project.lifecycle === "ALUMNI" && (
-                <span className="rounded-full bg-black/5 px-3 py-1 text-muted">Alumni</span>
+                <span className="border border-border bg-white px-3 py-1 text-muted">Alumni</span>
               )}
             </div>
             {project.fundingEdition && (
@@ -136,7 +136,7 @@ export default async function ProjectoDetailPage({
                 <h2 className="font-display mt-2 text-2xl font-semibold">Evidências do percurso</h2>
                 <div className="mt-5 grid gap-3 sm:grid-cols-2">
                   {project.gallery.map((g) => (
-                    <figure key={g.id} className="overflow-hidden rounded-2xl bg-[#0f3d45]">
+                    <figure key={g.id} className="overflow-hidden border border-border bg-[#2f4248]">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={g.url} alt={g.title || project.name} className="h-48 w-full object-cover" />
                       {g.title && (

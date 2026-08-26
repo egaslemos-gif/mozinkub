@@ -20,7 +20,7 @@ const partners = [
   },
 ] as const;
 
-/** No header: só UniLicungo + França (MozInkub já está na marca IEUL) — sem efeitos */
+/** No header compacto: UniLicungo + França (MozInkub fica no BrandMark principal). */
 const headerPartners = partners.filter((p) => p.src !== "/logos/mozinkub.png");
 
 export function PartnerMarquee({ className = "" }: { className?: string }) {
@@ -81,16 +81,17 @@ export function PartnerLogos({
   );
 }
 
+/** Marca principal do menu: MozInkub primeiro + IEUL + brasão UniLicungo. */
 export function BrandMark() {
   return (
     <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
-      <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-white sm:h-12 sm:w-12">
+      <div className="relative h-11 w-11 shrink-0 overflow-hidden border border-border bg-white sm:h-12 sm:w-12">
         <Image
-          src="/logos/unilicungo-oficial.png"
-          alt="Universidade Licungo"
+          src="/logos/mozinkub.png"
+          alt="MozInkub"
           width={48}
           height={48}
-          className="h-full w-full object-contain"
+          className="h-full w-full object-contain p-0.5"
           unoptimized
           priority
         />
@@ -102,6 +103,17 @@ export function BrandMark() {
         <p className="mt-0.5 truncate text-[10px] text-muted sm:text-[11px]">
           Incubadora · UniLicungo · Beira
         </p>
+      </div>
+      <div className="relative hidden h-10 w-10 shrink-0 overflow-hidden border border-border bg-white sm:block">
+        <Image
+          src="/logos/unilicungo-oficial.png"
+          alt="Universidade Licungo"
+          width={40}
+          height={40}
+          className="h-full w-full object-contain"
+          unoptimized
+          priority
+        />
       </div>
     </div>
   );

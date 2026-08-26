@@ -17,9 +17,9 @@ export function WhatsAppFab({ phone }: { phone: string }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Contactar via WhatsApp"
-      className="fixed right-4 bottom-5 z-50 flex items-center gap-2 rounded-full bg-[color:var(--wa)] px-4 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-[color:var(--wa-dark)] md:right-6 md:bottom-6"
+      className="fixed right-4 bottom-5 z-50 flex items-center gap-2 border border-[color:var(--wa-dark)] bg-[color:var(--wa)] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[color:var(--wa-dark)] md:right-6 md:bottom-6"
     >
-      <span className="grid h-7 w-7 place-items-center rounded-full bg-white/20 text-base">
+      <span className="grid h-7 w-7 place-items-center bg-white/20 text-base">
         ✆
       </span>
       <span className="hidden sm:inline">WhatsApp</span>
