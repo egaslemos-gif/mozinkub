@@ -14,9 +14,29 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "IEUL — Incubadora de Empresas da Universidade Licungo",
+  title: {
+    default: "MozInkub — IEUL | Universidade Licungo",
+    template: "%s · MozInkub",
+  },
   description:
-    "Site institucional da Incubadora IEUL / Projecto MozInkub N+1 — Antena da Beira.",
+    "Incubadora de Empresas da Universidade Licungo (IEUL) — Projecto MozInkub N+1, Antena da Beira.",
+  applicationName: "MozInkub",
+  openGraph: {
+    title: "MozInkub — IEUL | Universidade Licungo",
+    description:
+      "Incubadora de Empresas da Universidade Licungo (IEUL) — Projecto MozInkub N+1, Antena da Beira.",
+    siteName: "MozInkub",
+    images: [{ url: "/logos/mozinkub.png", alt: "MozInkub" }],
+    locale: "pt_MZ",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "MozInkub — IEUL",
+    description:
+      "Incubadora de Empresas da Universidade Licungo — Projecto MozInkub N+1.",
+    images: ["/logos/mozinkub.png"],
+  },
 };
 
 export const viewport: Viewport = {
