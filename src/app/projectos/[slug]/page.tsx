@@ -3,16 +3,11 @@ import { notFound } from "next/navigation";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { ContactForm } from "@/components/ContactForm";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
-import { getProjectBySlug, getPublishedProjectSlugs, getSiteConfig, statusLabel } from "@/lib/data";
+import { getProjectBySlug, getSiteConfig, statusLabel } from "@/lib/data";
 import { maturityLabel, milestoneKindLabel, whatsappHref } from "@/lib/projects";
 
-export const dynamic = "force-static";
-export const dynamicParams = false;
+export const dynamic = "force-dynamic";
 
-export async function generateStaticParams() {
-  const slugs = await getPublishedProjectSlugs();
-  return slugs.map((slug) => ({ slug }));
-}
 export default async function ProjectoDetailPage({
   params,
 }: {

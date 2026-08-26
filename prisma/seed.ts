@@ -108,8 +108,7 @@ async function main() {
     },
   });
 
-  await prisma.projectMilestone.deleteMany({});
-  await prisma.projectMedia.deleteMany({});
+  // Do not wipe milestones/media on re-seed — preserves admin uploads and edits.
 
   const editions = [
     {
@@ -324,9 +323,11 @@ async function main() {
   ];
 
   for (const p of projects) {
+    const { logoUrl, coverUrl, ...rest } = p;
     await prisma.project.upsert({
       where: { slug: p.slug },
-      update: p,
+      // Preserve media URLs if the project already exists (admin may have replaced them).
+      update: rest,
       create: p,
     });
   }
@@ -405,6 +406,10 @@ async function main() {
   for (const m of milestones) {
     const project = bySlug[m.slug];
     if (!project) continue;
+    const existing = await prisma.projectMilestone.findFirst({
+      where: { projectId: project.id, title: m.title },
+    });
+    if (existing) continue;
     await prisma.projectMilestone.create({
       data: {
         projectId: project.id,
@@ -444,6 +449,10 @@ async function main() {
   for (const g of gallerySeed) {
     const project = bySlug[g.slug];
     if (!project) continue;
+    const existing = await prisma.projectMedia.findFirst({
+      where: { projectId: project.id, url: g.url },
+    });
+    if (existing) continue;
     await prisma.projectMedia.create({
       data: {
         projectId: project.id,
@@ -513,9 +522,10 @@ async function main() {
   ];
 
   for (const ev of calendarEvents) {
+    const { coverUrl, ...rest } = ev;
     await prisma.event.upsert({
       where: { slug: ev.slug },
-      update: ev,
+      update: rest,
       create: ev,
     });
   }

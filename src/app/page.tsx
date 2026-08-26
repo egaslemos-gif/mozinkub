@@ -17,7 +17,7 @@ import {
   parseValues,
 } from "@/lib/data";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const [config, projects, events, funding, timeline, slides, calendarEntries, highlightEvent] =

@@ -8,7 +8,7 @@ import {
   getSiteConfig,
 } from "@/lib/data";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 export default async function ProjectosPage() {
   const [config, projects, filters] = await Promise.all([

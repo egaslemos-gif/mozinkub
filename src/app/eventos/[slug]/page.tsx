@@ -4,18 +4,11 @@ import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
 import {
   getEventBySlug,
-  getPublishedEventSlugs,
   getSiteConfig,
 } from "@/lib/data";
 import { eventCategoryLabel } from "@/lib/calendar";
 
-export const dynamic = "force-static";
-export const dynamicParams = false;
-
-export async function generateStaticParams() {
-  const slugs = await getPublishedEventSlugs();
-  return slugs.map((slug) => ({ slug }));
-}
+export const dynamic = "force-dynamic";
 
 export default async function EventoDetailPage({
   params,

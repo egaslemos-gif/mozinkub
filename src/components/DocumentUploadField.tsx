@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { uploadMedia } from "@/app/admin/actions";
 
 export function DocumentUploadField({
@@ -18,6 +18,10 @@ export function DocumentUploadField({
   const [uploading, setUploading] = useState(false);
   const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    setUrl(defaultUrl || "");
+  }, [defaultUrl]);
 
   async function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];

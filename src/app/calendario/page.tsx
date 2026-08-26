@@ -3,7 +3,7 @@ import { MonthCalendar } from "@/components/MonthCalendar";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
 import { getCalendarEntries, getSiteConfig } from "@/lib/data";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 export default async function CalendarioPage() {
   const [config, entries] = await Promise.all([getSiteConfig(), getCalendarEntries()]);

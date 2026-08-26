@@ -101,7 +101,17 @@ schtasks /Run /TN "\IEUL-SQLite-Daily-Backup"
 5. Registrar backup (data/hora/responsável) numa planilha operacional.
 6. Verificar log da execução em `backups/logs/`.
 
-## 6) Migração futura para Postgres (checklist)
+## 6) Persistência na Vercel (imagens e dados admin)
+
+Na Vercel o filesystem é efémero. Para o MVP de testes:
+
+1. **Vercel Blob** (`BLOB_READ_WRITE_TOKEN`) — armazena ficheiros (logos, capas, PDFs) e um snapshot SQLite em `durable/ieul.db`.
+2. Em cada cold start a app restaura a base a partir do Blob (se existir); após escritas admin, o snapshot é reenviado.
+3. O seed **não sobrescreve** `logoUrl` / `coverUrl` nem apaga galeria/media já existentes.
+
+Isto cobre a fase de aprovação com gestores. A migração definitiva para **Postgres (Neon)** continua recomendada (secção seguinte / plano original).
+
+ (checklist)
 
 Quando decidirem mover para produção em Vercel:
 
