@@ -3,6 +3,10 @@ import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
+function storeIdFromEnvOrPath(): string | undefined {
+  return process.env.BLOB_STORE_ID || undefined;
+}
+
 /**
  * Serve Blob media through the app so private/public store access works in <img>/<video>.
  * Direct Blob CDN URLs were returning 403 for visitor traffic.
@@ -18,20 +22,30 @@ export async function GET(
   }
 
   const token = process.env.BLOB_READ_WRITE_TOKEN;
-  if (!token) {
-    return NextResponse.json({ error: "Media unavailable" }, { status: 503 });
-  }
+  const storeId = storeIdFromEnvOrPath();
 
   try {
     let result: Awaited<ReturnType<typeof get>> = null;
-    for (const access of ["public", "private"] as const) {
+    const attempts: Array<{ access: "public" | "private"; token?: string; storeId?: string }> = [
+      ...(token
+        ? ([
+            { access: "public" as const, token },
+            { access: "private" as const, token },
+          ] as const)
+        : []),
+      { access: "public", ...(storeId ? { storeId } : {}) },
+      { access: "private", ...(storeId ? { storeId } : {}) },
+    ];
+
+    for (const opts of attempts) {
       try {
-        result = await get(pathname, { access, token, useCache: true });
+        result = await get(pathname, { ...opts, useCache: true });
         if (result?.stream) break;
       } catch {
         result = null;
       }
     }
+
     if (!result?.stream) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }

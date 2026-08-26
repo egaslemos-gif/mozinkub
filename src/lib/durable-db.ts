@@ -62,57 +62,147 @@ async function streamToBuffer(stream: ReadableStream<Uint8Array>): Promise<Buffe
   return Buffer.from(await new Response(stream).arrayBuffer());
 }
 
+/** Set when Blob exists but cannot be downloaded — never persist seed over it. */
+let blobDownloadBroken = false;
+
+export function isDurableBlobDownloadBroken(): boolean {
+  return blobDownloadBroken;
+}
+
+function storeIdFromBlobUrl(url?: string): string | undefined {
+  if (!url) return undefined;
+  try {
+    const host = new URL(url).hostname;
+    const m = host.match(/^([a-z0-9]+)\.(public|private)\.blob\.vercel-storage\.com$/i);
+    return m?.[1];
+  } catch {
+    return undefined;
+  }
+}
+
+function stripDownloadParam(url: string): string {
+  try {
+    const u = new URL(url);
+    u.searchParams.delete("download");
+    return u.toString();
+  } catch {
+    return url;
+  }
+}
+
+async function tryGetBlob(
+  target: string,
+  access: "public" | "private",
+  opts: { token?: string; storeId?: string } = {},
+): Promise<Buffer | null> {
+  try {
+    const result = await get(target, {
+      access,
+      useCache: false,
+      ...(opts.token ? { token: opts.token } : {}),
+      ...(opts.storeId ? { storeId: opts.storeId } : {}),
+    });
+    if (result?.stream) {
+      const buf = await streamToBuffer(result.stream);
+      if (buf.length > 0) return buf;
+    }
+  } catch (err) {
+    console.warn(
+      "[durable-db] get failed",
+      access,
+      target.slice(0, 90),
+      err instanceof Error ? err.message : err,
+    );
+  }
+  return null;
+}
+
 /** Download blob bytes via authenticated SDK/fetch (CDN URLs often 403 without token). */
 async function downloadBlobBytes(
   pathname: string,
   fallbackUrl?: string,
 ): Promise<Buffer | null> {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
-  if (!token) return null;
+  const storeId =
+    process.env.BLOB_STORE_ID ||
+    storeIdFromBlobUrl(fallbackUrl) ||
+    undefined;
+  const urls = fallbackUrl
+    ? [stripDownloadParam(fallbackUrl), fallbackUrl].filter(
+        (v, i, arr) => arr.indexOf(v) === i,
+      )
+    : [];
 
-  const targets = [pathname, fallbackUrl].filter(
-    (v, i, arr): v is string => Boolean(v) && arr.indexOf(v) === i,
-  );
-
-  for (const target of targets) {
+  // 1) Pathname + RW token (classic)
+  if (token) {
     for (const access of ["public", "private"] as const) {
+      const buf = await tryGetBlob(pathname, access, { token });
+      if (buf) return buf;
+    }
+  }
+
+  // 2) OIDC / env defaults (no explicit token) — preferred on Vercel for private stores
+  for (const access of ["public", "private"] as const) {
+    const buf = await tryGetBlob(pathname, access, storeId ? { storeId } : {});
+    if (buf) return buf;
+  }
+
+  // 3) Full CDN URLs with RW token
+  if (token) {
+    for (const url of urls) {
+      for (const access of ["public", "private"] as const) {
+        const buf = await tryGetBlob(url, access, { token });
+        if (buf) return buf;
+      }
+    }
+  }
+
+  // 4) Raw fetch with Bearer (RW token then OIDC)
+  const bearers = [
+    token,
+    process.env.VERCEL_OIDC_TOKEN,
+  ].filter(Boolean) as string[];
+
+  for (const url of urls) {
+    for (const bearer of bearers) {
       try {
-        const result = await get(target, {
-          access,
-          useCache: false,
-          token,
+        const res = await fetch(url, {
+          cache: "no-store",
+          headers: { Authorization: `Bearer ${bearer}` },
         });
-        if (result?.stream) {
-          const buf = await streamToBuffer(result.stream);
+        if (res.ok) {
+          const buf = Buffer.from(await res.arrayBuffer());
           if (buf.length > 0) return buf;
+        } else {
+          console.warn(
+            "[durable-db] auth fetch failed",
+            res.status,
+            bearer === token ? "rw" : "oidc",
+            url.slice(0, 80),
+          );
         }
       } catch (err) {
         console.warn(
-          "[durable-db] get failed",
-          access,
-          target.slice(0, 80),
+          "[durable-db] auth fetch error",
           err instanceof Error ? err.message : err,
         );
       }
     }
   }
 
-  // Direct authenticated fetch (same pattern as @vercel/blob get).
-  for (const url of [fallbackUrl].filter(Boolean) as string[]) {
+  // 5) Anonymous public CDN (legacy public stores)
+  for (const url of urls) {
     try {
-      const res = await fetch(url, {
-        cache: "no-store",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(url, { cache: "no-store" });
       if (res.ok) {
         const buf = Buffer.from(await res.arrayBuffer());
         if (buf.length > 0) return buf;
       } else {
-        console.warn("[durable-db] auth fetch failed", res.status, url.slice(0, 80));
+        console.warn("[durable-db] public fetch failed", res.status, url.slice(0, 80));
       }
     } catch (err) {
       console.warn(
-        "[durable-db] auth fetch error",
+        "[durable-db] public fetch error",
         err instanceof Error ? err.message : err,
       );
     }
@@ -212,26 +302,20 @@ export async function ensureDurableSqlite(): Promise<string> {
       if (dbReady(dest)) return dest;
 
       const status = await restoreFromBlob(dest);
-      if (status === "ok") return dest;
-
-      // During `next build`, allow seed so page collection can finish.
-      // Runtime still refuses seed overwrite when Blob restore fails.
-      if (status === "error") {
-        if (isProductionBuild()) {
-          console.warn(
-            "[durable-db] Blob restore failed during build — using seed for compile only",
-          );
-        } else {
-          console.error(
-            "[durable-db] refusing seed fallback while Blob restore is failing",
-          );
-          throw new Error(
-            "Não foi possível restaurar a base de dados persistente (Vercel Blob).",
-          );
-        }
+      if (status === "ok") {
+        blobDownloadBroken = false;
+        return dest;
       }
 
-      // Blob truly missing (or build-time download failure): seed from build artifact.
+      // Blob listed but not downloadable (CDN 403). Keep site up with seed,
+      // but never persist — that would wipe the durable snapshot.
+      if (status === "error") {
+        blobDownloadBroken = true;
+        console.error(
+          "[durable-db] Blob download broken (CDN 403). Serving seed; persist disabled.",
+        );
+      }
+
       for (const src of seedCandidates()) {
         if (fs.existsSync(/*turbopackIgnore: true*/ src)) {
           unlinkSqliteSidecars(dest);
@@ -359,6 +443,12 @@ export async function persistDurableSqlite(): Promise<void> {
   if (!process.env.VERCEL || !process.env.BLOB_READ_WRITE_TOKEN) return;
   if (isProductionBuild()) {
     console.info("[durable-db] skip persist during production build");
+    return;
+  }
+  if (blobDownloadBroken) {
+    console.error(
+      "[durable-db] skip persist — Blob CDN download is broken; refusing to overwrite durable DB",
+    );
     return;
   }
 
