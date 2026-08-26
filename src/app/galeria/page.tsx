@@ -2,7 +2,7 @@ import Image from "next/image";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { getPublishedAlbums, getSiteConfig } from "@/lib/data";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
 
 export default async function GaleriaPage() {
   const [config, albums] = await Promise.all([getSiteConfig(), getPublishedAlbums()]);

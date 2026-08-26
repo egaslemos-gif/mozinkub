@@ -85,17 +85,15 @@ export function PartnerLogos({
 export function BrandMark() {
   return (
     <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
-      <div className="relative h-11 w-11 shrink-0 overflow-hidden border border-border bg-white sm:h-12 sm:w-12">
-        <Image
-          src="/logos/mozinkub.png"
-          alt="MozInkub"
-          width={48}
-          height={48}
-          className="h-full w-full object-contain p-0.5"
-          unoptimized
-          priority
-        />
-      </div>
+      <Image
+        src="/logos/mozinkub.png"
+        alt="MozInkub"
+        width={48}
+        height={48}
+        className="h-11 w-11 shrink-0 object-contain sm:h-12 sm:w-12"
+        unoptimized
+        priority
+      />
       <div className="min-w-0">
         <p className="font-display text-base leading-none font-semibold tracking-tight text-foreground sm:text-lg">
           IEUL
@@ -104,17 +102,15 @@ export function BrandMark() {
           Incubadora · UniLicungo · Beira
         </p>
       </div>
-      <div className="relative hidden h-10 w-10 shrink-0 overflow-hidden border border-border bg-white sm:block">
-        <Image
-          src="/logos/unilicungo-oficial.png"
-          alt="Universidade Licungo"
-          width={40}
-          height={40}
-          className="h-full w-full object-contain"
-          unoptimized
-          priority
-        />
-      </div>
+      <Image
+        src="/logos/unilicungo-oficial.png"
+        alt="Universidade Licungo"
+        width={40}
+        height={40}
+        className="hidden h-10 w-10 shrink-0 object-contain sm:block"
+        unoptimized
+        priority
+      />
     </div>
   );
 }

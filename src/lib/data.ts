@@ -84,6 +84,38 @@ export async function getEventBySlug(slug: string) {
   });
 }
 
+export async function getPublishedProjectSlugs() {
+  const rows = await prisma.project.findMany({
+    where: { published: true },
+    select: { slug: true },
+  });
+  return rows.map((r) => r.slug);
+}
+
+export async function getPublishedEventSlugs() {
+  const rows = await prisma.event.findMany({
+    where: { published: true },
+    select: { slug: true },
+  });
+  return rows.map((r) => r.slug);
+}
+
+export async function getPublishedTimelineSlugs() {
+  const rows = await prisma.timelineItem.findMany({
+    where: { published: true },
+    select: { slug: true },
+  });
+  return rows.map((r) => r.slug);
+}
+
+export async function getPublishedFundingCallSlugs() {
+  const rows = await prisma.fundingCall.findMany({
+    where: { published: true },
+    select: { slug: true },
+  });
+  return rows.map((r) => r.slug);
+}
+
 export async function getCalendarEntries() {
   const [events, activities] = await Promise.all([
     prisma.event.findMany({

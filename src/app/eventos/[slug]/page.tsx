@@ -2,10 +2,20 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
-import { getEventBySlug, getSiteConfig } from "@/lib/data";
+import {
+  getEventBySlug,
+  getPublishedEventSlugs,
+  getSiteConfig,
+} from "@/lib/data";
 import { eventCategoryLabel } from "@/lib/calendar";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
+export const dynamicParams = false;
+
+export async function generateStaticParams() {
+  const slugs = await getPublishedEventSlugs();
+  return slugs.map((slug) => ({ slug }));
+}
 
 export default async function EventoDetailPage({
   params,
@@ -24,7 +34,7 @@ export default async function EventoDetailPage({
           ← Voltar ao calendário
         </Link>
         {event.coverUrl && (
-          <div className="mt-6 overflow-hidden rounded-2xl">
+          <div className="mt-6 overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={event.coverUrl} alt="" className="max-h-[360px] w-full object-cover" />
           </div>

@@ -2,20 +2,20 @@
 
 /* Paleta institucional suave + geometria recta (mais profissional). */
 :root {
-  --background: #f4f5f7;
+  --background: #e9eef1;
   --foreground: #1b2430;
-  --muted: #667280;
+  --muted: #5c6b78;
   --card: #ffffff;
   --primary: #3f7872;
   --primary-dark: #315f5a;
-  --primary-soft: #eef4f3;
+  --primary-soft: #e8f0ee;
   --ul-blue: #4a8fb5;
   --ul-blue-dark: #3a7394;
   --ul-brown: #8c6a49;
   --fr-blue: #243b55;
   --fr-red: #b85c5c;
   --accent: #b7cfc9;
-  --border: #dce3e8;
+  --border: #c5d0d8;
   --hero-glow: #e9eef3;
   --wa: #4f9a6c;
   --wa-dark: #3f7d58;
@@ -78,7 +78,7 @@ a {
 }
 
 .site-shell {
-  background: linear-gradient(180deg, #f7f8fa 0%, var(--background) 48%);
+  background: linear-gradient(180deg, #eef2f5 0%, var(--background) 42%);
   overflow-x: clip;
   max-width: 100%;
 }
@@ -147,13 +147,16 @@ a {
 }
 
 .project-card {
+  border: 1px solid #b8c4cc;
   border-radius: 0;
-  overflow: visible;
-  box-shadow: none;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 1px 0 rgba(27, 36, 48, 0.04);
 }
 
 .project-card:hover {
-  background: #fbfcfc;
+  border-color: var(--primary);
+  background: #fff;
 }
 
 .fade-up {
@@ -235,17 +238,18 @@ a {
   gap: 0.35rem;
   flex: 0 0 auto;
   width: 8.25rem;
-  padding: 0.65rem 0.85rem;
-  border: 1px solid var(--border);
+  padding: 0.5rem 0.65rem;
+  border: none;
   border-radius: var(--radius);
-  background: #fff;
-  transition: border-color 0.2s ease, background 0.2s ease;
+  background: transparent;
+  transition: opacity 0.2s ease;
   cursor: default;
 }
 
 .partner-marquee-item:hover {
-  border-color: var(--primary);
-  background: var(--primary-soft);
+  border-color: transparent;
+  background: transparent;
+  opacity: 0.85;
   z-index: 2;
 }
 

@@ -3,6 +3,7 @@ import { maturityLabel } from "@/lib/projects";
 import { statusLabel } from "@/lib/data";
 
 export type ProjectMuralItem = {
+  id?: string;
   slug: string;
   name: string;
   area: string;
@@ -15,7 +16,7 @@ export type ProjectMuralItem = {
   logoUrl: string | null;
   coverUrl: string | null;
   lookingFor?: string | null;
-  fundingEdition?: { name: string; year: number } | null;
+  fundingEdition?: { name: string; year: number; slug?: string } | null;
 };
 
 export function ProjectMuralCard({ project }: { project: ProjectMuralItem }) {
@@ -24,33 +25,33 @@ export function ProjectMuralCard({ project }: { project: ProjectMuralItem }) {
   return (
     <Link
       href={`/projectos/${project.slug}`}
-      className="project-card group flex h-full flex-col border border-border bg-white text-foreground transition hover:border-primary"
+      className="project-card group flex h-full flex-col bg-white text-foreground transition hover:border-primary"
     >
-      <div className="relative aspect-[16/10] overflow-hidden bg-[#e8eeec]">
+      <div className="relative aspect-[16/10] overflow-hidden bg-[#d9e2e0]">
         {project.coverUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={project.coverUrl}
             alt=""
-            className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+            className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
           />
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-[#d7e3e0] via-[#e8eeec] to-[#dfe6ea]" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#c5d4cf] via-[#d9e2e0] to-[#cfd7dc]" />
         )}
-        <div className="absolute inset-0 bg-[#1b2430]/18" />
+        <div className="absolute inset-0 bg-[#1b2430]/12" />
         {project.logoUrl && (
-          <div className="absolute bottom-0 left-4 z-[1] translate-y-1/2 border border-border bg-white p-2 shadow-sm">
+          <div className="absolute bottom-3 left-4 z-[1]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={project.logoUrl}
               alt=""
-              className="h-11 w-11 object-contain"
+              className="h-12 w-12 object-contain drop-shadow-none"
             />
           </div>
         )}
       </div>
 
-      <div className={`flex flex-1 flex-col px-5 pb-5 ${project.logoUrl ? "pt-10" : "pt-5"}`}>
+      <div className="flex flex-1 flex-col border-t border-[#d0d8de] px-5 py-5">
         <p className="text-[11px] font-bold tracking-[0.14em] text-primary uppercase">
           {project.area}
           {project.cohortYear ? ` · ${project.cohortYear}` : ""}
@@ -63,14 +64,14 @@ export function ProjectMuralCard({ project }: { project: ProjectMuralItem }) {
           <p className="mt-2 text-xs text-muted">{project.fundingEdition.name}</p>
         )}
         <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-semibold">
-          <span className="border border-border bg-[#f3f6f5] px-2.5 py-1 text-primary">
+          <span className="border border-[#d0d8de] bg-[#eef3f1] px-2.5 py-1 text-primary">
             {statusLabel(project.status)}
           </span>
-          <span className="border border-border bg-[#f3f5f7] px-2.5 py-1 text-ul-blue">
+          <span className="border border-[#d0d8de] bg-[#eef2f5] px-2.5 py-1 text-ul-blue">
             {maturityLabel(project.maturity)}
           </span>
           {project.lifecycle === "ALUMNI" && (
-            <span className="border border-border bg-[#f5f4f2] px-2.5 py-1 text-ul-brown">
+            <span className="border border-[#d0d8de] bg-[#f3f0ec] px-2.5 py-1 text-ul-brown">
               Alumni
             </span>
           )}

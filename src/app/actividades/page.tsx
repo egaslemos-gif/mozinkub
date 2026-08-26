@@ -3,7 +3,7 @@ import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
 import { getPublishedTimeline, getSiteConfig } from "@/lib/data";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
 
 export default async function ActividadesPage() {
   const [config, timeline] = await Promise.all([getSiteConfig(), getPublishedTimeline()]);

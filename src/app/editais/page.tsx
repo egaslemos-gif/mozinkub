@@ -4,7 +4,7 @@ import { WhatsAppFab } from "@/components/WhatsAppFab";
 import { getPublishedFundingCalls, getSiteConfig, statusLabel } from "@/lib/data";
 import { isCallOpen } from "@/lib/funding";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
 
 export default async function EditaisPage() {
   const [config, calls] = await Promise.all([getSiteConfig(), getPublishedFundingCalls()]);

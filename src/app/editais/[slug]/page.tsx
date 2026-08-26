@@ -3,11 +3,21 @@ import { notFound } from "next/navigation";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { CallApplicationForm } from "@/components/CallApplicationForm";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
-import { getFundingCallBySlug, getSiteConfig, statusLabel } from "@/lib/data";
+import {
+  getFundingCallBySlug,
+  getPublishedFundingCallSlugs,
+  getSiteConfig,
+  statusLabel,
+} from "@/lib/data";
 import { isCallOpen } from "@/lib/funding";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
+export const dynamicParams = false;
 
+export async function generateStaticParams() {
+  const slugs = await getPublishedFundingCallSlugs();
+  return slugs.map((slug) => ({ slug }));
+}
 export default async function EditalDetailPage({
   params,
 }: {

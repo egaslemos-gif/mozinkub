@@ -109,22 +109,24 @@ export default async function HomePage() {
           />
         </section>
 
-        <section className="mx-auto max-w-6xl px-4 pb-16 md:px-6">
-          <div className="mb-6 flex items-end justify-between gap-4">
-            <div>
-              <p className="text-xs font-bold tracking-[0.16em] text-primary uppercase">
-                Destaques
-              </p>
-              <h2 className="font-display mt-2 text-3xl font-semibold">Projectos incubados</h2>
+        <section className="border-y border-border bg-[#dde5ea] py-14 md:py-16">
+          <div className="mx-auto max-w-6xl px-4 md:px-6">
+            <div className="mb-6 flex items-end justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold tracking-[0.16em] text-primary uppercase">
+                  Destaques
+                </p>
+                <h2 className="font-display mt-2 text-3xl font-semibold">Projectos incubados</h2>
+              </div>
+              <Link href="/projectos" className="text-sm font-semibold text-primary">
+                Ver mural →
+              </Link>
             </div>
-            <Link href="/projectos" className="text-sm font-semibold text-primary">
-              Ver mural →
-            </Link>
-          </div>
-          <div className="grid gap-5 md:grid-cols-3">
-            {mural.map((p) => (
-              <ProjectMuralCard key={p.id} project={p} />
-            ))}
+            <div className="grid gap-5 md:grid-cols-3">
+              {mural.map((p) => (
+                <ProjectMuralCard key={p.id} project={p} />
+              ))}
+            </div>
           </div>
         </section>
 

@@ -3,10 +3,15 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
-import { getSiteConfig, getTimelineBySlug } from "@/lib/data";
+import { getPublishedTimelineSlugs, getSiteConfig, getTimelineBySlug } from "@/lib/data";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
+export const dynamicParams = false;
 
+export async function generateStaticParams() {
+  const slugs = await getPublishedTimelineSlugs();
+  return slugs.map((slug) => ({ slug }));
+}
 export default async function ActividadeDetailPage({
   params,
 }: {
