@@ -1,4 +1,5 @@
 import { AdminShell } from "@/components/AdminShell";
+import { FormWithFeedback } from "@/components/FormWithFeedback";
 import { GalleryMediaForm } from "@/components/GalleryMediaForm";
 import {
   createGalleryAlbum,
@@ -21,7 +22,12 @@ export default async function AdminGaleriaPage() {
         Crie álbuns e carregue fotografias para a página pública /galeria.
       </p>
 
-      <form action={createGalleryAlbum} className="card-surface mb-6 grid gap-3 p-5">
+      <FormWithFeedback
+        action={createGalleryAlbum}
+        className="card-surface mb-6 grid gap-3 p-5"
+        successMessage="Álbum criado."
+        resetOnSuccess
+      >
         <h2 className="font-display text-xl font-semibold">Novo álbum</h2>
         <input className="admin-input" name="title" placeholder="Título do álbum" required />
         <textarea className="admin-input" name="description" placeholder="Descrição (opcional)" />
@@ -29,7 +35,7 @@ export default async function AdminGaleriaPage() {
           <input type="checkbox" name="published" defaultChecked /> Publicado
         </label>
         <button className="btn-primary">Criar álbum</button>
-      </form>
+      </FormWithFeedback>
 
       <div className="space-y-4">
         {albums.length === 0 && (
@@ -45,10 +51,10 @@ export default async function AdminGaleriaPage() {
                   {album.media.length} foto(s) · /galeria
                 </p>
               </div>
-              <form action={deleteGalleryAlbum}>
+              <FormWithFeedback action={deleteGalleryAlbum} successMessage="Álbum removido.">
                 <input type="hidden" name="id" value={album.id} />
                 <button className="btn-ghost !py-2 text-sm">Remover álbum</button>
-              </form>
+              </FormWithFeedback>
             </div>
 
             <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
@@ -58,10 +64,10 @@ export default async function AdminGaleriaPage() {
                   <img src={m.url} alt={m.title || ""} className="h-24 w-full object-cover" />
                   <div className="flex items-center justify-between gap-1 p-2">
                     <p className="truncate text-[10px] text-muted">{m.title || "Foto"}</p>
-                    <form action={deleteGalleryMedia}>
+                    <FormWithFeedback action={deleteGalleryMedia} successMessage="Foto removida.">
                       <input type="hidden" name="id" value={m.id} />
                       <button className="text-[10px] font-semibold text-red-700">X</button>
-                    </form>
+                    </FormWithFeedback>
                   </div>
                 </div>
               ))}

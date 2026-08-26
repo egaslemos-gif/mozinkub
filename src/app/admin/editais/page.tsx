@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AdminShell } from "@/components/AdminShell";
 import { DocumentUploadField } from "@/components/DocumentUploadField";
+import { FormWithFeedback } from "@/components/FormWithFeedback";
 import {
   createFundingCall,
   createFundingEdition,
@@ -29,7 +30,12 @@ export default async function AdminEditaisPage() {
         PDF na página pública do edital.
       </p>
 
-      <form action={createFundingEdition} className="card-surface mb-6 grid gap-3 p-5 md:grid-cols-2">
+      <FormWithFeedback
+        action={createFundingEdition}
+        className="card-surface mb-6 grid gap-3 p-5 md:grid-cols-2"
+        successMessage="Edição criada com sucesso."
+        resetOnSuccess
+      >
         <h2 className="font-display text-xl font-semibold md:col-span-2">Nova edição de financiamento</h2>
         <input className="admin-input" name="name" placeholder="Nome (ex: MozInkub N+1 — 2026)" required />
         <input className="admin-input" name="year" type="number" placeholder="Ano" defaultValue={2026} required />
@@ -39,7 +45,7 @@ export default async function AdminEditaisPage() {
           <input type="checkbox" name="published" defaultChecked /> Publicado
         </label>
         <button className="btn-primary md:col-span-2">Criar edição</button>
-      </form>
+      </FormWithFeedback>
 
       {editions.length > 0 && (
         <div className="mb-8 space-y-2">
@@ -51,19 +57,20 @@ export default async function AdminEditaisPage() {
                 </p>
                 <p className="text-sm text-muted">{e.funder || "—"}</p>
               </div>
-              <form action={deleteFundingEdition}>
+              <FormWithFeedback action={deleteFundingEdition} successMessage="Edição removida.">
                 <input type="hidden" name="id" value={e.id} />
                 <button className="btn-ghost !py-2 text-sm">Remover</button>
-              </form>
+              </FormWithFeedback>
             </div>
           ))}
         </div>
       )}
 
-      <form
+      <FormWithFeedback
         id="novo-edital"
         action={createFundingCall}
         className="card-surface mb-6 scroll-mt-24 grid gap-3 p-5 md:grid-cols-2"
+        successMessage="Edital criado. A redireccionar…"
       >
         <h2 className="font-display text-xl font-semibold md:col-span-2">Novo edital / concurso</h2>
         <p className="text-sm text-muted md:col-span-2">
@@ -115,7 +122,7 @@ export default async function AdminEditaisPage() {
           <input type="checkbox" name="published" defaultChecked /> Publicado
         </label>
         <button className="btn-primary md:col-span-2">Criar e gerir candidaturas</button>
-      </form>
+      </FormWithFeedback>
 
       <div className="space-y-3">
         {calls.map((c) => (
@@ -132,10 +139,10 @@ export default async function AdminEditaisPage() {
               <Link href={`/admin/editais/${c.id}`} className="btn-primary !px-3 !py-2 text-sm">
                 Gerir
               </Link>
-              <form action={deleteFundingCall}>
+              <FormWithFeedback action={deleteFundingCall} successMessage="Edital removido.">
                 <input type="hidden" name="id" value={c.id} />
                 <button className="btn-ghost !py-2 text-sm">Remover</button>
-              </form>
+              </FormWithFeedback>
             </div>
           </div>
         ))}

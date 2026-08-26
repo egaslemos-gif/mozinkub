@@ -1,4 +1,5 @@
 import { AdminShell } from "@/components/AdminShell";
+import { FormWithFeedback } from "@/components/FormWithFeedback";
 import { createTimelineItem, deleteTimelineItem } from "@/app/admin/actions";
 import { prisma } from "@/lib/prisma";
 
@@ -9,7 +10,12 @@ export default async function AdminActividadesPage() {
 
   return (
     <AdminShell title="Actividades / Timeline">
-      <form action={createTimelineItem} className="card-surface mb-6 grid gap-3 p-5">
+      <FormWithFeedback
+        action={createTimelineItem}
+        className="card-surface mb-6 grid gap-3 p-5"
+        successMessage="Actividade adicionada."
+        resetOnSuccess
+      >
         <h2 className="font-display text-xl font-semibold">Nova actividade</h2>
         <input className="admin-input" name="title" placeholder="Título" required />
         <textarea className="admin-input" name="description" placeholder="Resumo curto" required />
@@ -34,7 +40,7 @@ export default async function AdminActividadesPage() {
           <input type="checkbox" name="published" defaultChecked /> Publicado
         </label>
         <button className="btn-primary">Adicionar</button>
-      </form>
+      </FormWithFeedback>
 
       <div className="space-y-3">
         {items.map((item) => (
@@ -47,10 +53,10 @@ export default async function AdminActividadesPage() {
               <p className="mt-1 text-sm text-muted">{item.description}</p>
               <p className="mt-1 text-xs text-ul-blue">/{`actividades/${item.slug}`}</p>
             </div>
-            <form action={deleteTimelineItem}>
+            <FormWithFeedback action={deleteTimelineItem} successMessage="Actividade removida.">
               <input type="hidden" name="id" value={item.id} />
               <button className="btn-ghost !py-2 text-sm">Remover</button>
-            </form>
+            </FormWithFeedback>
           </div>
         ))}
       </div>

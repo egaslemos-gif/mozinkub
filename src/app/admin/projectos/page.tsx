@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AdminShell } from "@/components/AdminShell";
+import { FormWithFeedback } from "@/components/FormWithFeedback";
 import { ProjectForm } from "@/components/ProjectForm";
 import { createProject, deleteProject } from "@/app/admin/actions";
 import { auth } from "@/lib/auth";
@@ -72,10 +73,10 @@ export default async function AdminProjectosPage() {
               Abrir
             </Link>
             {canArchive && (
-              <form action={deleteProject}>
+              <FormWithFeedback action={deleteProject} successMessage="Projecto removido.">
                 <input type="hidden" name="id" value={p.id} />
                 <button className="btn-ghost !py-2 text-sm">Remover</button>
-              </form>
+              </FormWithFeedback>
             )}
           </div>
         ))}

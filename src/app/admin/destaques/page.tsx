@@ -1,4 +1,5 @@
 import { AdminShell } from "@/components/AdminShell";
+import { FormWithFeedback } from "@/components/FormWithFeedback";
 import { SlideUploadForm } from "@/components/SlideUploadForm";
 import { deleteHeroSlide } from "@/app/admin/actions";
 import { prisma } from "@/lib/prisma";
@@ -26,10 +27,10 @@ export default async function AdminDestaquesPage() {
               {s.subtitle && <p className="mt-1 text-sm text-muted">{s.subtitle}</p>}
               <p className="mt-1 text-xs text-primary">Ordem {s.order}</p>
             </div>
-            <form action={deleteHeroSlide}>
+            <FormWithFeedback action={deleteHeroSlide} successMessage="Slide removido.">
               <input type="hidden" name="id" value={s.id} />
               <button className="btn-ghost !py-2 text-sm">Remover</button>
-            </form>
+            </FormWithFeedback>
           </div>
         ))}
       </div>

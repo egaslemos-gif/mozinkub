@@ -1,5 +1,6 @@
 "use client";
 
+import { FormWithFeedback } from "@/components/FormWithFeedback";
 import { ImageUploadField } from "@/components/ImageUploadField";
 import { LIFECYCLE_OPTIONS } from "@/lib/funding";
 import { MATURITY_OPTIONS, STATUS_OPTIONS } from "@/lib/projects";
@@ -42,13 +43,17 @@ export function ProjectForm({
   submitLabel,
   editions = [],
 }: {
-  action: (formData: FormData) => Promise<void>;
+  action: (formData: FormData) => Promise<unknown>;
   project?: ProjectFormValues;
   submitLabel: string;
   editions?: { id: string; name: string; year: number }[];
 }) {
   return (
-    <form action={action} className="card-surface grid gap-3 p-5 md:grid-cols-2">
+    <FormWithFeedback
+      action={action}
+      className="card-surface grid gap-3 p-5 md:grid-cols-2"
+      successMessage="Ficha guardada com sucesso."
+    >
       {project?.id && <input type="hidden" name="id" value={project.id} />}
 
       <h2 className="font-display text-xl font-semibold md:col-span-2">
@@ -243,7 +248,9 @@ export function ProjectForm({
           Publicado
         </label>
       </div>
-      <button className="btn-primary md:col-span-2">{submitLabel}</button>
-    </form>
+      <button type="submit" className="btn-primary md:col-span-2">
+        {submitLabel}
+      </button>
+    </FormWithFeedback>
   );
 }

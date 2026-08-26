@@ -1,4 +1,5 @@
 import { AdminShell } from "@/components/AdminShell";
+import { FormWithFeedback } from "@/components/FormWithFeedback";
 import { createUserAccount, updateUserAccount } from "@/app/admin/actions";
 import { auth } from "@/lib/auth";
 import { can, ROLE_CODES, ROLE_META, sessionToAuthUser } from "@/lib/rbac";
@@ -30,7 +31,12 @@ export default async function AdminUtilizadoresPage() {
       </p>
 
       {canCreate && (
-        <form action={createUserAccount} className="card-surface mb-6 grid gap-3 p-5 md:grid-cols-2">
+        <FormWithFeedback
+          action={createUserAccount}
+          className="card-surface mb-6 grid gap-3 p-5 md:grid-cols-2"
+          successMessage="Utilizador criado com sucesso."
+          resetOnSuccess
+        >
           <h2 className="font-display text-xl font-semibold md:col-span-2">Novo utilizador</h2>
           <input className="admin-input" name="name" placeholder="Nome" required />
           <input className="admin-input" name="email" type="email" placeholder="Email" required />
@@ -50,7 +56,7 @@ export default async function AdminUtilizadoresPage() {
             ))}
           </select>
           <button className="btn-primary md:col-span-2">Criar utilizador</button>
-        </form>
+        </FormWithFeedback>
       )}
 
       <div className="space-y-3">
@@ -66,7 +72,11 @@ export default async function AdminUtilizadoresPage() {
               </div>
             </div>
             {canUpdate && (
-              <form action={updateUserAccount} className="mt-4 grid gap-2 border-t border-border pt-3 md:grid-cols-4">
+              <FormWithFeedback
+                action={updateUserAccount}
+                className="mt-4 grid gap-2 border-t border-border pt-3 md:grid-cols-4"
+                successMessage="Utilizador actualizado."
+              >
                 <input type="hidden" name="id" value={u.id} />
                 <input className="admin-input" name="name" defaultValue={u.name} required />
                 <select className="admin-input" name="role" defaultValue={u.role}>
@@ -83,7 +93,7 @@ export default async function AdminUtilizadoresPage() {
                   <option value="DISABLED">DISABLED</option>
                 </select>
                 <button className="btn-primary !py-2 text-sm">Guardar</button>
-              </form>
+              </FormWithFeedback>
             )}
           </article>
         ))}

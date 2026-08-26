@@ -1,4 +1,5 @@
 import { AdminShell } from "@/components/AdminShell";
+import { FormWithFeedback } from "@/components/FormWithFeedback";
 import { updateSiteConfig } from "@/app/admin/actions";
 import { getSiteConfig, parseValues } from "@/lib/data";
 
@@ -18,7 +19,11 @@ export default async function IdentidadePage() {
 
   return (
     <AdminShell title="Identidade institucional">
-      <form action={updateSiteConfig} className="card-surface space-y-4 p-6">
+      <FormWithFeedback
+        action={updateSiteConfig}
+        className="card-surface space-y-4 p-6"
+        successMessage="Identidade guardada com sucesso."
+      >
         {(
           [
             ["brandName", "Nome da marca", config.brandName],
@@ -57,8 +62,10 @@ export default async function IdentidadePage() {
           <label className="admin-label">Valores (um por linha)</label>
           <textarea className="admin-input min-h-28" name="values" defaultValue={values} />
         </div>
-        <button className="btn-primary">Guardar alterações</button>
-      </form>
+        <button type="submit" className="btn-primary">
+          Guardar alterações
+        </button>
+      </FormWithFeedback>
     </AdminShell>
   );
 }

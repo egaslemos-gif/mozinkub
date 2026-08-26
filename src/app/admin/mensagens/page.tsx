@@ -1,4 +1,5 @@
 import { AdminShell } from "@/components/AdminShell";
+import { FormWithFeedback } from "@/components/FormWithFeedback";
 import { markContactMessageRead } from "@/app/admin/actions";
 import { prisma } from "@/lib/prisma";
 
@@ -36,13 +37,16 @@ export default async function AdminMensagensPage() {
                   {m.phone ? ` · ${m.phone}` : ""}
                 </p>
               </div>
-              <form action={markContactMessageRead}>
+              <FormWithFeedback
+                action={markContactMessageRead}
+                successMessage={m.read ? "Marcada como por ler." : "Marcada como lida."}
+              >
                 <input type="hidden" name="id" value={m.id} />
                 <input type="hidden" name="read" value={m.read ? "false" : "true"} />
                 <button className="btn-ghost !py-2 text-sm">
                   {m.read ? "Marcar por ler" : "Marcar como lida"}
                 </button>
-              </form>
+              </FormWithFeedback>
             </div>
             <p className="mt-3 whitespace-pre-line text-sm leading-relaxed">{m.message}</p>
           </article>

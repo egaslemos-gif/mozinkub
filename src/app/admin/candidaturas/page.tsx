@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AdminShell } from "@/components/AdminShell";
+import { FormWithFeedback } from "@/components/FormWithFeedback";
 import { updateCallApplication } from "@/app/admin/actions";
 import { prisma } from "@/lib/prisma";
 import { APPLICATION_STATUS_OPTIONS } from "@/lib/funding";
@@ -94,9 +95,10 @@ export default async function AdminCandidaturasPage() {
             </div>
             <p className="mt-3 text-sm leading-relaxed text-muted">{a.summary}</p>
             {a.team && <p className="mt-2 text-xs text-muted">Equipa: {a.team}</p>}
-            <form
+            <FormWithFeedback
               action={updateCallApplication}
               className="mt-4 grid gap-2 md:grid-cols-[1fr_1fr_auto]"
+              successMessage="Candidatura actualizada."
             >
               <input type="hidden" name="id" value={a.id} />
               <input type="hidden" name="callId" value={a.call.id} />
@@ -114,7 +116,7 @@ export default async function AdminCandidaturasPage() {
                 defaultValue={a.adminNotes || ""}
               />
               <button className="btn-primary !py-2 text-sm">Actualizar</button>
-            </form>
+            </FormWithFeedback>
           </article>
         ))}
       </div>

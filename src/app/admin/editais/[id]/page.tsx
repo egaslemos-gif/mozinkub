@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdminShell } from "@/components/AdminShell";
 import { DocumentUploadField } from "@/components/DocumentUploadField";
+import { FormWithFeedback } from "@/components/FormWithFeedback";
 import { updateCallApplication, updateFundingCall } from "@/app/admin/actions";
 import { prisma } from "@/lib/prisma";
 import { APPLICATION_STATUS_OPTIONS, CALL_STATUS_OPTIONS } from "@/lib/funding";
@@ -39,7 +40,11 @@ export default async function AdminEditalDetailPage({
       </Link>
       <p className="mb-4 text-xs text-ul-blue">Página pública: /editais/{call.slug}</p>
 
-      <form action={updateFundingCall} className="card-surface mb-8 grid gap-3 p-5 md:grid-cols-2">
+      <FormWithFeedback
+        action={updateFundingCall}
+        className="card-surface mb-8 grid gap-3 p-5 md:grid-cols-2"
+        successMessage="Edital guardado com sucesso."
+      >
         <input type="hidden" name="id" value={call.id} />
         <h2 className="font-display text-xl font-semibold md:col-span-2">Dados do edital</h2>
         <input className="admin-input md:col-span-2" name="title" defaultValue={call.title} required />
@@ -94,7 +99,7 @@ export default async function AdminEditalDetailPage({
           <input type="checkbox" name="published" defaultChecked={call.published} /> Publicado
         </label>
         <button className="btn-primary md:col-span-2">Guardar edital</button>
-      </form>
+      </FormWithFeedback>
 
       <h2 className="font-display text-2xl font-semibold">
         Candidaturas ({call.applications.length})
@@ -127,7 +132,11 @@ export default async function AdminEditalDetailPage({
             </div>
             <p className="mt-3 text-sm leading-relaxed text-muted">{a.summary}</p>
             {a.team && <p className="mt-2 text-xs text-muted">Equipa: {a.team}</p>}
-            <form action={updateCallApplication} className="mt-4 grid gap-2 md:grid-cols-[1fr_1fr_auto]">
+            <FormWithFeedback
+              action={updateCallApplication}
+              className="mt-4 grid gap-2 md:grid-cols-[1fr_1fr_auto]"
+              successMessage="Candidatura actualizada."
+            >
               <input type="hidden" name="id" value={a.id} />
               <input type="hidden" name="callId" value={call.id} />
               <select className="admin-input" name="status" defaultValue={a.status}>
@@ -144,7 +153,7 @@ export default async function AdminEditalDetailPage({
                 defaultValue={a.adminNotes || ""}
               />
               <button className="btn-primary !py-2 text-sm">Actualizar</button>
-            </form>
+            </FormWithFeedback>
           </article>
         ))}
       </div>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AdminShell } from "@/components/AdminShell";
 import { EventForm } from "@/components/EventForm";
+import { FormWithFeedback } from "@/components/FormWithFeedback";
 import { createEvent, deleteEvent, updateEvent } from "@/app/admin/actions";
 import { prisma } from "@/lib/prisma";
 import { eventCategoryLabel } from "@/lib/calendar";
@@ -48,10 +49,10 @@ export default async function AdminEventosPage() {
               <span>
                 {eventCategoryLabel(e.category)} · /eventos/{e.slug}
               </span>
-              <form action={deleteEvent}>
+              <FormWithFeedback action={deleteEvent} successMessage="Evento removido.">
                 <input type="hidden" name="id" value={e.id} />
                 <button className="font-semibold text-red-700">Remover</button>
-              </form>
+              </FormWithFeedback>
             </div>
           </div>
         ))}

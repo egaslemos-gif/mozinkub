@@ -1,5 +1,6 @@
 "use client";
 
+import { FormWithFeedback } from "@/components/FormWithFeedback";
 import { ImageUploadField } from "@/components/ImageUploadField";
 import { EVENT_CATEGORIES } from "@/lib/calendar";
 
@@ -29,12 +30,16 @@ export function EventForm({
   event,
   submitLabel,
 }: {
-  action: (formData: FormData) => Promise<void>;
+  action: (formData: FormData) => Promise<unknown>;
   event?: EventFormValues;
   submitLabel: string;
 }) {
   return (
-    <form action={action} className="card-surface grid gap-3 p-5 md:grid-cols-2">
+    <FormWithFeedback
+      action={action}
+      className="card-surface grid gap-3 p-5 md:grid-cols-2"
+      successMessage="Agenda guardada com sucesso."
+    >
       {event?.id && <input type="hidden" name="id" value={event.id} />}
       <h2 className="font-display text-xl font-semibold md:col-span-2">
         {event ? "Editar evento / agenda" : "Agendar no calendário"}
@@ -103,7 +108,9 @@ export function EventForm({
         <input type="checkbox" name="published" defaultChecked={event?.published ?? true} />{" "}
         Publicado no calendário público
       </label>
-      <button className="btn-primary md:col-span-2">{submitLabel}</button>
-    </form>
+      <button type="submit" className="btn-primary md:col-span-2">
+        {submitLabel}
+      </button>
+    </FormWithFeedback>
   );
 }

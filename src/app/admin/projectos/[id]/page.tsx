@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { AdminShell } from "@/components/AdminShell";
+import { FormWithFeedback } from "@/components/FormWithFeedback";
 import { ProjectForm } from "@/components/ProjectForm";
 import { ProjectGalleryForm } from "@/components/ProjectGalleryForm";
 import {
@@ -146,7 +147,11 @@ export default async function AdminProjectoEditPage({
             </p>
           ))}
           {canAssignCoach && (
-            <form action={assignProjectCoach} className="grid gap-2 border-t border-border pt-3">
+            <FormWithFeedback
+              action={assignProjectCoach}
+              className="grid gap-2 border-t border-border pt-3"
+              successMessage="Coach atribuído com sucesso."
+            >
               <input type="hidden" name="projectId" value={project.id} />
               <select className="admin-input" name="coachId" required>
                 <option value="">Seleccionar coach…</option>
@@ -156,8 +161,10 @@ export default async function AdminProjectoEditPage({
                   </option>
                 ))}
               </select>
-              <button className="btn-primary !py-2 text-sm">Atribuir coach</button>
-            </form>
+              <button type="submit" className="btn-primary !py-2 text-sm">
+                Atribuir coach
+              </button>
+            </FormWithFeedback>
           )}
         </div>
 
@@ -172,7 +179,11 @@ export default async function AdminProjectoEditPage({
             </p>
           ))}
           {canManageTeam && (
-            <form action={addProjectMember} className="grid gap-2 border-t border-border pt-3">
+            <FormWithFeedback
+              action={addProjectMember}
+              className="grid gap-2 border-t border-border pt-3"
+              successMessage="Membro adicionado à equipa."
+            >
               <input type="hidden" name="projectId" value={project.id} />
               <select className="admin-input" name="userId" required>
                 <option value="">Seleccionar utilizador…</option>
@@ -188,8 +199,10 @@ export default async function AdminProjectoEditPage({
                 <option value="PROJECT_MANAGER">PROJECT_MANAGER</option>
                 <option value="TEAM_MEMBER">TEAM_MEMBER</option>
               </select>
-              <button className="btn-primary !py-2 text-sm">Adicionar à equipa</button>
-            </form>
+              <button type="submit" className="btn-primary !py-2 text-sm">
+                Adicionar à equipa
+              </button>
+            </FormWithFeedback>
           )}
         </div>
       </div>
@@ -200,11 +213,18 @@ export default async function AdminProjectoEditPage({
           <p className="mt-1 text-xs text-muted">
             Visíveis apenas a coaches (escopo) e coordenação — não ao gestor/equipa do projecto.
           </p>
-          <form action={createCoachPrivateNote} className="mt-3 grid gap-2">
+          <FormWithFeedback
+            action={createCoachPrivateNote}
+            className="mt-3 grid gap-2"
+            successMessage="Nota privada guardada."
+            resetOnSuccess
+          >
             <input type="hidden" name="projectId" value={project.id} />
             <textarea className="admin-input" name="content" placeholder="Nota privada…" required />
-            <button className="btn-primary !py-2 text-sm">Guardar nota privada</button>
-          </form>
+            <button type="submit" className="btn-primary !py-2 text-sm">
+              Guardar nota privada
+            </button>
+          </FormWithFeedback>
           <div className="mt-3 space-y-2">
             {privateNotes.map((n) => (
               <div key={n.id} className="rounded-lg bg-primary-soft/40 p-3 text-sm">
@@ -221,7 +241,12 @@ export default async function AdminProjectoEditPage({
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <div>
           {canUpdate && (
-            <form action={createProjectMilestone} className="card-surface grid gap-3 p-5">
+            <FormWithFeedback
+              action={createProjectMilestone}
+              className="card-surface grid gap-3 p-5"
+              successMessage="Marco adicionado com sucesso."
+              resetOnSuccess
+            >
               <h2 className="font-display text-xl font-semibold">Linha do tempo</h2>
               <input type="hidden" name="projectId" value={project.id} />
               <input
@@ -244,8 +269,10 @@ export default async function AdminProjectoEditPage({
                 <option value="PRODUTO">Produto</option>
                 <option value="PARCERIA">Parceria</option>
               </select>
-              <button className="btn-primary">Adicionar marco</button>
-            </form>
+              <button type="submit" className="btn-primary">
+                Adicionar marco
+              </button>
+            </FormWithFeedback>
           )}
           <div className="mt-3 space-y-2">
             {project.milestones.map((m) => (
@@ -258,10 +285,10 @@ export default async function AdminProjectoEditPage({
                   <p className="mt-1 text-sm text-muted">{m.description}</p>
                 </div>
                 {canUpdate && (
-                  <form action={deleteProjectMilestone}>
+                  <FormWithFeedback action={deleteProjectMilestone} successMessage="Marco removido.">
                     <input type="hidden" name="id" value={m.id} />
                     <button className="btn-ghost !py-2 text-sm">Remover</button>
-                  </form>
+                  </FormWithFeedback>
                 )}
               </div>
             ))}
@@ -278,10 +305,10 @@ export default async function AdminProjectoEditPage({
                 <div className="flex items-center justify-between gap-2 p-3">
                   <p className="truncate text-xs text-muted">{g.title || "Fotografia"}</p>
                   {canUpdate && (
-                    <form action={deleteProjectMedia}>
+                    <FormWithFeedback action={deleteProjectMedia} successMessage="Fotografia removida.">
                       <input type="hidden" name="id" value={g.id} />
                       <button className="text-xs font-semibold text-red-700">Remover</button>
-                    </form>
+                    </FormWithFeedback>
                   )}
                 </div>
               </div>
