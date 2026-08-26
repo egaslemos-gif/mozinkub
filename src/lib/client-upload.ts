@@ -1,6 +1,7 @@
 "use client";
 
 import { upload } from "@vercel/blob/client";
+import { blobUploadErrorMessage } from "@/lib/blob-errors";
 import { toAppMediaUrl } from "@/lib/media-url";
 
 const MAX_BYTES = 12 * 1024 * 1024;
@@ -38,12 +39,16 @@ export async function uploadAdminFile(
         handleUploadUrl: "/api/admin/blob",
         contentType: file.type || undefined,
       });
-    } catch {
-      blob = await upload(pathname, file, {
-        access: "private",
-        handleUploadUrl: "/api/admin/blob",
-        contentType: file.type || undefined,
-      });
+    } catch (publicErr) {
+      try {
+        blob = await upload(pathname, file, {
+          access: "private",
+          handleUploadUrl: "/api/admin/blob",
+          contentType: file.type || undefined,
+        });
+      } catch (privateErr) {
+        throw privateErr || publicErr;
+      }
     }
     return { ok: true, url: toAppMediaUrl(blob.url) };
   } catch (err) {
@@ -62,16 +67,17 @@ export async function uploadAdminFile(
       if (res.ok && data && data.ok) {
         return { ok: true, url: toAppMediaUrl(data.url) };
       }
+      const serverError =
+        (data && "error" in data && data.error) ||
+        (err instanceof Error ? err.message : `Falha no upload (${res.status}).`);
       return {
         ok: false,
-        error:
-          (data && "error" in data && data.error) ||
-          (err instanceof Error ? err.message : `Falha no upload (${res.status}).`),
+        error: blobUploadErrorMessage(serverError, serverError),
       };
     } catch {
       return {
         ok: false,
-        error: err instanceof Error ? err.message : "Falha no upload. Tente novamente.",
+        error: blobUploadErrorMessage(err, "Falha no upload. Tente novamente."),
       };
     }
   }

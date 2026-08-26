@@ -1,5 +1,6 @@
 import "server-only";
 import { put } from "@vercel/blob";
+import { blobUploadErrorMessage } from "@/lib/blob-errors";
 import { toAppMediaUrl } from "@/lib/media-url";
 
 const ALLOWED = new Set([
@@ -82,7 +83,10 @@ export async function storeUploadedFile(file: File): Promise<
       if (process.env.VERCEL) {
         return {
           ok: false,
-          error: "Falha no armazenamento de imagens (Vercel Blob). Tente novamente.",
+          error: blobUploadErrorMessage(
+            err,
+            "Falha no armazenamento de imagens (Vercel Blob). Tente novamente.",
+          ),
         };
       }
     }
