@@ -1,10 +1,11 @@
 import "server-only";
-import { put, list } from "@vercel/blob";
+import { put, list, del } from "@vercel/blob";
 import fs from "fs";
 import path from "path";
 
 /** Single durable SQLite snapshot in Vercel Blob (survives cold starts / new instances). */
 export const DURABLE_DB_PATHNAME = "durable/ieul.db";
+const WRITE_LOCK_PATHNAME = "durable/ieul.write.lock";
 
 const TMP_DB = "/tmp/ieul.db";
 
@@ -40,6 +41,23 @@ function isProductionBuild(): boolean {
   return process.env.NEXT_PHASE === "phase-production-build";
 }
 
+function unlinkSqliteSidecars(dest: string) {
+  for (const suffix of ["-wal", "-shm", "-journal"]) {
+    try {
+      fs.unlinkSync(/*turbopackIgnore: true*/ `${dest}${suffix}`);
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
+function writeDbBytes(dest: string, buf: Buffer) {
+  unlinkSqliteSidecars(dest);
+  const partial = `${dest}.partial`;
+  fs.writeFileSync(/*turbopackIgnore: true*/ partial, buf);
+  fs.renameSync(/*turbopackIgnore: true*/ partial, /*turbopackIgnore: true*/ dest);
+}
+
 async function restoreFromBlob(dest: string): Promise<"ok" | "missing" | "error"> {
   if (!process.env.BLOB_READ_WRITE_TOKEN) return "missing";
 
@@ -67,9 +85,7 @@ async function restoreFromBlob(dest: string): Promise<"ok" | "missing" | "error"
         continue;
       }
 
-      const partial = `${dest}.partial`;
-      fs.writeFileSync(/*turbopackIgnore: true*/ partial, buf);
-      fs.renameSync(/*turbopackIgnore: true*/ partial, /*turbopackIgnore: true*/ dest);
+      writeDbBytes(dest, buf);
       console.info("[durable-db] restored from Blob", buf.length, "bytes");
       return "ok";
     } catch (err) {
@@ -131,6 +147,7 @@ export async function ensureDurableSqlite(): Promise<string> {
       // Blob truly missing: first boot → copy build seed (never persist during build).
       for (const src of seedCandidates()) {
         if (fs.existsSync(/*turbopackIgnore: true*/ src)) {
+          unlinkSqliteSidecars(dest);
           fs.copyFileSync(
             /*turbopackIgnore: true*/ src,
             /*turbopackIgnore: true*/ dest,
@@ -155,6 +172,97 @@ export async function ensureDurableSqlite(): Promise<string> {
 
   if (dbReady(dest)) return dest;
   throw new Error("[durable-db] timed out waiting for SQLite restore");
+}
+
+/**
+ * Force re-download of the latest Blob snapshot (caller must disconnect Prisma first).
+ * Prevents stale serverless instances from overwriting other projects' media.
+ */
+export async function refreshDurableSqliteFromBlob(): Promise<void> {
+  if (!process.env.VERCEL || !process.env.BLOB_READ_WRITE_TOKEN) return;
+  if (isProductionBuild()) return;
+
+  const dest = getRuntimeDbPath();
+  const status = await restoreFromBlob(dest);
+  if (status === "error") {
+    throw new Error("Falha ao sincronizar a base de dados antes de gravar.");
+  }
+  if (status === "missing" && !dbReady(dest)) {
+    await ensureDurableSqlite();
+  }
+}
+
+const lockOwner = `${process.pid}-${Math.random().toString(36).slice(2, 10)}`;
+
+async function readWriteLock(): Promise<{ owner: string; until: number } | null> {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) return null;
+  try {
+    const { blobs } = await list({
+      prefix: WRITE_LOCK_PATHNAME,
+      limit: 3,
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    });
+    const hit = blobs.find((b) => b.pathname === WRITE_LOCK_PATHNAME) || blobs[0];
+    if (!hit?.url) return null;
+    const res = await fetch(hit.url, { cache: "no-store" });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { owner?: string; until?: number };
+    if (!data.owner || typeof data.until !== "number") return null;
+    return { owner: data.owner, until: data.until };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Cross-instance write lock via Blob so two lambdas cannot clobber each other's DB snapshot.
+ */
+export async function acquireDurableWriteLock(): Promise<void> {
+  if (!process.env.VERCEL || !process.env.BLOB_READ_WRITE_TOKEN) return;
+  if (isProductionBuild()) return;
+
+  const deadline = Date.now() + 25_000;
+  while (Date.now() < deadline) {
+    const existing = await readWriteLock();
+    if (existing && existing.until > Date.now() && existing.owner !== lockOwner) {
+      await sleep(120);
+      continue;
+    }
+
+    const until = Date.now() + 20_000;
+    await put(
+      WRITE_LOCK_PATHNAME,
+      JSON.stringify({ owner: lockOwner, until }),
+      {
+        access: "public",
+        contentType: "application/json",
+        addRandomSuffix: false,
+        allowOverwrite: true,
+        token: process.env.BLOB_READ_WRITE_TOKEN,
+      },
+    );
+    await sleep(60);
+    const check = await readWriteLock();
+    if (check?.owner === lockOwner && check.until > Date.now()) {
+      return;
+    }
+    await sleep(100);
+  }
+
+  throw new Error("Timeout ao obter bloqueio de escrita da base de dados.");
+}
+
+export async function releaseDurableWriteLock(): Promise<void> {
+  if (!process.env.VERCEL || !process.env.BLOB_READ_WRITE_TOKEN) return;
+  try {
+    const existing = await readWriteLock();
+    if (existing && existing.owner !== lockOwner && existing.until > Date.now()) {
+      return;
+    }
+    await del(WRITE_LOCK_PATHNAME, { token: process.env.BLOB_READ_WRITE_TOKEN });
+  } catch (err) {
+    console.warn("[durable-db] release write lock failed:", err);
+  }
 }
 
 let persistQueue: Promise<void> = Promise.resolve();

@@ -134,6 +134,10 @@ export async function updateProject(formData: FormData) {
     const id = String(formData.get("id") || "");
     await requireAdmin("projects.update", { projectId: id });
     const data = projectPayload(formData);
+    const existing = await prisma.project.findUnique({ where: { id } });
+    // Empty upload fields must not wipe logo/cover of this (or appear to affect other) projects.
+    if (!data.logoUrl && existing?.logoUrl) data.logoUrl = existing.logoUrl;
+    if (!data.coverUrl && existing?.coverUrl) data.coverUrl = existing.coverUrl;
     const updated = await prisma.project.update({
       where: { id },
       data,
@@ -699,6 +703,36 @@ export async function createHeroSlide(formData: FormData) {
     return {
       ok: false as const,
       error: err instanceof Error ? err.message : "Não foi possível publicar o slide.",
+    };
+  }
+}
+
+export async function updateHeroSlide(formData: FormData) {
+  try {
+    await requireAdmin("settings.update");
+    const id = String(formData.get("id") || "");
+    if (!id) return { ok: false as const, error: "Slide inválido." };
+    const imageUrl = String(formData.get("imageUrl") || "").trim();
+    if (!imageUrl) return { ok: false as const, error: "Imagem obrigatória." };
+    await prisma.heroSlide.update({
+      where: { id },
+      data: {
+        title: String(formData.get("title") || ""),
+        subtitle: String(formData.get("subtitle") || "") || null,
+        imageUrl,
+        linkUrl: String(formData.get("linkUrl") || "") || null,
+        order: Number(formData.get("order") || 0),
+        published: formData.get("published") === "on",
+      },
+    });
+    revalidatePath("/");
+    revalidatePath("/admin/destaques");
+    return { ok: true as const, message: "Slide actualizado." };
+  } catch (err) {
+    console.error("[updateHeroSlide]", err);
+    return {
+      ok: false as const,
+      error: err instanceof Error ? err.message : "Não foi possível actualizar o slide.",
     };
   }
 }
