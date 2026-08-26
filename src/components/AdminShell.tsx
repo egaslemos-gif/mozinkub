@@ -78,13 +78,6 @@ export async function AdminShell({
           </div>
         </div>
 
-        <div className="hidden border-b border-border px-4 py-2.5 md:block">
-          <p className="truncate text-xs text-muted">{session.user?.email}</p>
-          <p className="mt-0.5 text-[10px] font-semibold tracking-wide text-primary uppercase">
-            {roleLabel}
-          </p>
-        </div>
-
         <nav className="flex gap-1 overflow-x-auto px-2 py-2 text-sm md:flex-1 md:flex-col md:gap-0.5 md:overflow-y-auto md:px-2 md:py-3">
           {visibleNav.map((item) => (
             <Link
@@ -138,8 +131,18 @@ export async function AdminShell({
 
       {/* Coluna principal: cabeçalho fixo + área com scroll */}
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-        <header className="z-20 shrink-0 border-b border-border bg-white/95 px-4 py-3 backdrop-blur sm:px-6">
-          <h1 className="font-display text-xl font-semibold break-words sm:text-2xl">{title}</h1>
+        <header className="z-20 flex shrink-0 items-center justify-between gap-4 border-b border-border bg-white/95 px-4 py-3 backdrop-blur sm:px-6">
+          <h1 className="font-display min-w-0 text-xl font-semibold break-words sm:text-2xl">
+            {title}
+          </h1>
+          <div className="shrink-0 text-right">
+            <p className="max-w-[14rem] truncate text-xs text-muted sm:max-w-xs sm:text-sm">
+              {session.user?.email}
+            </p>
+            <p className="mt-0.5 text-[10px] font-semibold tracking-wide text-primary uppercase">
+              {roleLabel}
+            </p>
+          </div>
         </header>
         <main className="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6">
           <div className="mx-auto max-w-5xl pb-10">{children}</div>
