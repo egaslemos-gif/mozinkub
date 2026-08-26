@@ -16,6 +16,7 @@ import {
   getSiteConfig,
   parseValues,
 } from "@/lib/data";
+import { whatsappHref } from "@/lib/projects";
 
 export const dynamic = "force-dynamic";
 
@@ -246,39 +247,87 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section id="contactos" className="section bg-white">
+        <section id="contactos" className="section bg-section-alt">
           <div className="section-inner">
             <p className="section-kicker">Contactos</p>
             <h2 className="section-title">Fale com a Antena da Beira</h2>
-            <div className="mt-6 grid gap-5 lg:grid-cols-2">
-              <div className="card-surface p-5">
-                <dl className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <dt className="text-xs font-bold tracking-wide text-primary uppercase">
+            <p className="section-lead">
+              Esclareça dúvidas sobre incubação, editais ou projectos — a coordenação responde por
+              email, telefone ou WhatsApp.
+            </p>
+
+            <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
+              <aside className="border border-border bg-white p-5 sm:p-6">
+                {config.campus && (
+                  <p className="border-b border-border pb-4 text-sm font-semibold text-ul-blue">
+                    {config.campus}
+                  </p>
+                )}
+
+                <ul className="mt-1 divide-y divide-border">
+                  <li className="py-4">
+                    <p className="text-[0.65rem] font-bold tracking-[0.14em] text-primary uppercase">
                       Morada
-                    </dt>
-                    <dd className="mt-1 text-sm leading-relaxed text-muted">{config.address}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs font-bold tracking-wide text-primary uppercase">
+                    </p>
+                    <p className="mt-1.5 text-sm leading-relaxed text-foreground">{config.address}</p>
+                  </li>
+                  <li className="py-4">
+                    <p className="text-[0.65rem] font-bold tracking-[0.14em] text-primary uppercase">
                       Telefone
-                    </dt>
-                    <dd className="mt-1 text-sm text-muted">{config.phone}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs font-bold tracking-wide text-primary uppercase">
+                    </p>
+                    <a
+                      href={`tel:${config.phone.replace(/[^\d+/]/g, "")}`}
+                      className="mt-1.5 inline-block text-sm font-medium text-foreground underline-offset-2 hover:text-primary hover:underline"
+                    >
+                      {config.phone}
+                    </a>
+                  </li>
+                  <li className="py-4">
+                    <p className="text-[0.65rem] font-bold tracking-[0.14em] text-primary uppercase">
                       Email
-                    </dt>
-                    <dd className="mt-1 break-all text-sm text-muted">{config.email}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs font-bold tracking-wide text-primary uppercase">
-                      WhatsApp
-                    </dt>
-                    <dd className="mt-1 text-sm text-muted">{config.whatsapp}</dd>
-                  </div>
-                </dl>
-              </div>
+                    </p>
+                    <a
+                      href={`mailto:${config.email}`}
+                      className="mt-1.5 inline-block break-all text-sm font-medium text-foreground underline-offset-2 hover:text-primary hover:underline"
+                    >
+                      {config.email}
+                    </a>
+                  </li>
+                  {config.whatsapp && (
+                    <li className="py-4">
+                      <p className="text-[0.65rem] font-bold tracking-[0.14em] text-primary uppercase">
+                        WhatsApp
+                      </p>
+                      <a
+                        href={whatsappHref(
+                          config.whatsapp,
+                          "Olá! Contacto a partir do site MozInkub / IEUL.",
+                        )}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-1.5 inline-block text-sm font-medium text-foreground underline-offset-2 hover:text-primary hover:underline"
+                      >
+                        {config.whatsapp}
+                      </a>
+                    </li>
+                  )}
+                </ul>
+
+                {config.whatsapp && (
+                  <a
+                    href={whatsappHref(
+                      config.whatsapp,
+                      "Olá! Contacto a partir do site MozInkub / IEUL.",
+                    )}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn-primary mt-2 inline-flex w-full justify-center"
+                  >
+                    Abrir WhatsApp
+                  </a>
+                )}
+              </aside>
+
               <ContactForm />
             </div>
           </div>
