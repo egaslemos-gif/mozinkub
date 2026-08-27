@@ -62,8 +62,8 @@ export default async function AdminActualizacoesPage() {
         <h2 className="font-display text-lg font-semibold">Inscrições recentes</h2>
         <p className="mt-1 text-sm text-muted">
           Guardadas na base de dados. Notificação automática para o destino configurado
-          (teste: egaslemos@gmail.com; Resend se <code className="text-xs">RESEND_API_KEY</code>{" "}
-          existir, senão FormSubmit).
+          (oficial: elemos@unilicungo.ac.mz; Resend se{" "}
+          <code className="text-xs">RESEND_API_KEY</code> existir, senão FormSubmit).
         </p>
         <div className="mt-4 overflow-x-auto border border-border bg-white">
           <table className="min-w-full text-left text-sm">

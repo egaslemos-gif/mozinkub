@@ -101,6 +101,7 @@ async function main() {
     where: { id: "main" },
     update: {
       whatsapp: "84305623",
+      email: "elemos@unilicungo.ac.mz",
     },
     create: {
       id: "main",
@@ -120,7 +121,7 @@ async function main() {
       address: "Rua D. Francisco de Almeida 737/751 — Beira, C.Postal 2100",
       phone: "82/84305623",
       whatsapp: "84305623",
-      email: "incubadora@ul.ac.mz",
+      email: "elemos@unilicungo.ac.mz",
       campus: "Campus da Ponta-Gêa, Beira — Moçambique",
       aboutText:
         "A Incubadora de Empresas da Universidade Licungo (IEUL), no âmbito do Projecto MozInkub N+1, acompanha projectos incubados nas áreas de Tecnologia Digital, Ambiente e Biodiversidade, Agricultura e outros sectores, com apoio da Embaixada de França em Moçambique e Eswatini.",

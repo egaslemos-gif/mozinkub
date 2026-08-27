@@ -1,11 +1,8 @@
 /**
  * Destino de emails de inscrição / candidaturas / contacto.
- * Ordem: override → REGISTRATION_EMAIL → INQUIRY_EMAIL → SiteConfig.email → TEST_INBOX
- *
- * TEST_INBOX é temporário (egaslemos@gmail.com) até definirem o email real
- * via REGISTRATION_EMAIL em produção.
+ * Ordem: override → REGISTRATION_EMAIL → INQUIRY_EMAIL → SiteConfig.email → DEFAULT_INBOX
  */
-export const TEST_INBOX = "egaslemos@gmail.com";
+export const DEFAULT_INBOX = "elemos@unilicungo.ac.mz";
 
 export function resolveRegistrationInbox(
   override?: string | null,
@@ -16,13 +13,13 @@ export function resolveRegistrationInbox(
     process.env.REGISTRATION_EMAIL,
     process.env.INQUIRY_EMAIL,
     siteEmail,
-    TEST_INBOX,
+    DEFAULT_INBOX,
   ];
   for (const c of candidates) {
     const v = c?.trim();
     if (v && v.includes("@")) return v;
   }
-  return TEST_INBOX;
+  return DEFAULT_INBOX;
 }
 
 export type OutboundMail = {
