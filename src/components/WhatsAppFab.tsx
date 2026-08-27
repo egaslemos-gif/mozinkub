@@ -30,15 +30,12 @@ export function WhatsAppFab({ phone }: { phone: string }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Falar connosco no WhatsApp"
-      className="wa-fab group fixed right-4 bottom-20 z-50 md:right-6 md:bottom-24"
+      title="WhatsApp"
+      className="wa-fab fixed right-4 bottom-20 z-50 md:right-6 md:bottom-24"
     >
       <span className="wa-fab__pulse" aria-hidden />
       <span className="wa-fab__btn">
-        <WhatsAppIcon className="h-6 w-6 shrink-0 sm:h-[1.35rem] sm:w-[1.35rem]" />
-        <span className="wa-fab__label">
-          <span className="wa-fab__eyebrow">Fale connosco</span>
-          <span className="wa-fab__title">WhatsApp</span>
-        </span>
+        <WhatsAppIcon className="h-7 w-7" />
       </span>
     </a>
   );

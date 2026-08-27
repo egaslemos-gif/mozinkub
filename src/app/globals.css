@@ -237,11 +237,10 @@ a.btn-primary:hover {
 .wa-fab__btn {
   position: relative;
   z-index: 1;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.7rem;
-  min-height: 3.35rem;
-  padding: 0.65rem 0.85rem 0.65rem 0.75rem;
+  display: grid;
+  place-items: center;
+  width: 3.4rem;
+  height: 3.4rem;
   border: 1px solid rgba(255, 255, 255, 0.18);
   background: linear-gradient(145deg, #25d366 0%, #1ebe57 55%, #128c7e 100%);
   box-shadow:
@@ -251,12 +250,6 @@ a.btn-primary:hover {
     transform 0.2s ease,
     box-shadow 0.2s ease,
     filter 0.2s ease;
-}
-
-@media (min-width: 640px) {
-  .wa-fab__btn {
-    padding-right: 1.05rem;
-  }
 }
 
 .wa-fab:hover .wa-fab__btn {
@@ -270,32 +263,6 @@ a.btn-primary:hover {
 .wa-fab:focus-visible {
   outline: 2px solid #25d366;
   outline-offset: 4px;
-}
-
-.wa-fab__label {
-  display: none;
-  flex-direction: column;
-  line-height: 1.15;
-}
-
-@media (min-width: 640px) {
-  .wa-fab__label {
-    display: flex;
-  }
-}
-
-.wa-fab__eyebrow {
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.82);
-}
-
-.wa-fab__title {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #ffffff;
 }
 
 .wa-fab__pulse {
