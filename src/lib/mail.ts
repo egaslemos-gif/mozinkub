@@ -4,6 +4,9 @@
  */
 export const DEFAULT_INBOX = "elemos@unilicungo.ac.mz";
 
+/** Access key pública Web3Forms (pode sobrescrever com WEB3FORMS_ACCESS_KEY). */
+const DEFAULT_WEB3FORMS_KEY = "2b13d06d-3b42-494a-9a82-84ca416fdeb3";
+
 export function resolveRegistrationInbox(
   override?: string | null,
   siteEmail?: string | null,
@@ -82,46 +85,57 @@ async function sendViaResend(
 }
 
 /**
- * Fallback sem API key — FormSubmit.co.
- * Na 1.ª utilização o destino recebe um email de activação; depois funciona.
+ * Web3Forms — envia para o email ligado à access key no dashboard.
+ * Docs: https://docs.web3forms.com/
  */
-async function sendViaFormSubmit(
+async function sendViaWeb3Forms(
   mail: OutboundMail,
+  accessKey: string,
 ): Promise<{ sent: boolean; reason?: string }> {
+  const replyTo = mail.replyTo?.includes("@") ? mail.replyTo.trim() : undefined;
+
   try {
-    const res = await fetch(
-      `https://formsubmit.co/ajax/${encodeURIComponent(mail.to)}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          _subject: mail.subject,
-          _template: "table",
-          _replyto: mail.replyTo || undefined,
-          message: mail.text,
-          from_app: "MozInkub IEUL",
-        }),
+    const res = await fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
       },
-    );
-    if (!res.ok) {
-      const body = await res.text().catch(() => "");
-      console.error("[mail] FormSubmit failed:", res.status, body);
-      return { sent: false, reason: `FormSubmit ${res.status}` };
+      body: JSON.stringify({
+        access_key: accessKey,
+        subject: mail.subject,
+        from_name: "MozInkub IEUL",
+        name: replyTo ? `Candidato (${replyTo})` : "MozInkub IEUL",
+        email: replyTo || mail.to,
+        replyto: replyTo,
+        message: mail.text,
+        to: mail.to,
+      }),
+    });
+
+    const data = (await res.json().catch(() => null)) as {
+      success?: boolean;
+      message?: string;
+    } | null;
+
+    if (!res.ok || data?.success === false) {
+      console.error("[mail] Web3Forms failed:", res.status, data);
+      return {
+        sent: false,
+        reason: data?.message || `Web3Forms ${res.status}`,
+      };
     }
     return { sent: true };
   } catch (err) {
-    console.error("[mail] FormSubmit error:", err);
+    console.error("[mail] Web3Forms error:", err);
     return { sent: false, reason: "network" };
   }
 }
 
 /**
  * Envio de email:
- * 1) Resend se RESEND_API_KEY existir (recomendado em produção)
- * 2) FormSubmit como fallback de teste (activa o destino na 1.ª vez)
+ * 1) Resend se RESEND_API_KEY existir
+ * 2) Web3Forms (access key) — fluxo actual
  * A candidatura / mensagem fica sempre na base de dados independentemente do email.
  */
 export async function sendOutboundMail(
@@ -138,20 +152,19 @@ export async function sendOutboundMail(
     return { ...result, provider: "resend" };
   }
 
-  const allowFallback =
-    process.env.MAIL_FORMSUBMIT_FALLBACK !== "0" &&
-    process.env.MAIL_FORMSUBMIT_FALLBACK !== "false";
+  const web3Key =
+    process.env.WEB3FORMS_ACCESS_KEY?.trim() || DEFAULT_WEB3FORMS_KEY;
 
-  if (allowFallback) {
-    const result = await sendViaFormSubmit(mail);
+  if (web3Key) {
+    const result = await sendViaWeb3Forms(mail, web3Key);
     if (result.sent) {
-      console.info("[mail] enviado via FormSubmit →", mail.to);
+      console.info("[mail] enviado via Web3Forms →", mail.to);
     }
-    return { ...result, provider: "formsubmit" };
+    return { ...result, provider: "web3forms" };
   }
 
   console.info(
-    "[mail] email não enviado (configure RESEND_API_KEY). Destino:",
+    "[mail] email não enviado (configure WEB3FORMS_ACCESS_KEY ou RESEND_API_KEY). Destino:",
     mail.to,
     "|",
     mail.subject,

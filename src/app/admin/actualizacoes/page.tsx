@@ -61,9 +61,9 @@ export default async function AdminActualizacoesPage() {
       <section className="mt-10">
         <h2 className="font-display text-lg font-semibold">Inscrições recentes</h2>
         <p className="mt-1 text-sm text-muted">
-          Guardadas na base de dados. Notificação automática para o destino configurado
-          (oficial: elemos@unilicungo.ac.mz; Resend se{" "}
-          <code className="text-xs">RESEND_API_KEY</code> existir, senão FormSubmit).
+          Guardadas na base de dados. Notificação automática via Web3Forms para{" "}
+          elemos@unilicungo.ac.mz (ou Resend se{" "}
+          <code className="text-xs">RESEND_API_KEY</code> estiver definido).
         </p>
         <div className="mt-4 overflow-x-auto border border-border bg-white">
           <table className="min-w-full text-left text-sm">

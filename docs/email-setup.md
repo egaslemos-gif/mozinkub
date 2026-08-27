@@ -2,38 +2,21 @@
 
 ## Destino oficial
 
-Notificações vão para **elemos@unilicungo.ac.mz** (`DEFAULT_INBOX` em `src/lib/mail.ts` e `REGISTRATION_EMAIL`).
+Notificações vão para **elemos@unilicungo.ac.mz** (`DEFAULT_INBOX` / `REGISTRATION_EMAIL`).
 
-Para alterar:
-
-```bash
-# Local (.env.local)
-REGISTRATION_EMAIL="elemos@unilicungo.ac.mz"
-
-# Vercel
-npx vercel env add REGISTRATION_EMAIL production
-```
-
-Ordem de resolução: campo da actualização → `REGISTRATION_EMAIL` → `INQUIRY_EMAIL` → email da Identidade do site → `DEFAULT_INBOX`.
+O Web3Forms entrega no email com que criou a access key no dashboard — confirme que é o mesmo endereço.
 
 ## Envio
 
-### Opção A — Resend (produção)
+### Web3Forms (activo)
 
-1. Conta em [resend.com](https://resend.com).
-2. Criar API key → `RESEND_API_KEY` no Vercel (Production + Preview).
-3. Com domínio verificado: `MAIL_FROM="IEUL MozInkub <noreply@seudominio.com>"`.
-4. Sem domínio: o remetente `onboarding@resend.dev` só entrega ao email da conta Resend.
+Access key: `WEB3FORMS_ACCESS_KEY` (ou a key por omissão no código).
 
-### Opção B — FormSubmit (sem API key)
+As server actions enviam `POST` para `https://api.web3forms.com/submit` com assunto, mensagem e Reply-To do candidato.
 
-Sem `RESEND_API_KEY`, o app usa [FormSubmit](https://formsubmit.co):
+### Resend (opcional)
 
-1. Faça uma inscrição / contacto de teste no site.
-2. Abra **elemos@unilicungo.ac.mz** e clique no link de **activação** do FormSubmit (só na 1.ª vez).
-3. As seguintes notificações chegam automaticamente.
-
-Desactivar: `MAIL_FORMSUBMIT_FALLBACK=0`.
+Se existir `RESEND_API_KEY`, tem prioridade sobre Web3Forms.
 
 ## O que dispara email
 
@@ -43,4 +26,4 @@ Desactivar: `MAIL_FORMSUBMIT_FALLBACK=0`.
 | Formulário de contacto | `[IEUL] Contacto: …` |
 | Candidatura a edital | `[IEUL] Candidatura edital: …` |
 
-Reply-To = email do candidato (pode responder directamente). Os registos ficam sempre na base de dados do admin.
+Os registos ficam sempre na base de dados do admin.
