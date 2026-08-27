@@ -78,6 +78,13 @@ a {
   text-decoration: none;
 }
 
+/* Links com fundo colorido: `a { color: inherit }` não deve anular o branco */
+a.btn-primary,
+a.btn-primary:visited,
+a.btn-primary:hover {
+  color: #ffffff;
+}
+
 .site-shell {
   background: var(--background);
   overflow-x: clip;
@@ -183,7 +190,7 @@ a {
   gap: 0.5rem;
   border-radius: var(--radius);
   background: var(--primary);
-  color: white;
+  color: #ffffff;
   font-weight: 600;
   font-size: 0.925rem;
   padding: 0.75rem 1.25rem;
@@ -193,6 +200,7 @@ a {
 
 .btn-primary:hover {
   background: var(--primary-dark);
+  color: #ffffff;
 }
 
 .btn-ghost {
@@ -213,6 +221,18 @@ a {
 .btn-ghost:hover {
   border-color: var(--primary);
   background: var(--primary-soft);
+}
+
+.wa-fab,
+.wa-fab:visited,
+.wa-fab:hover {
+  color: #ffffff;
+}
+
+.developer-cta,
+.developer-cta:visited,
+.developer-cta:hover {
+  color: #ffffff;
 }
 
 .card-surface {

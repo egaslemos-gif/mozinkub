@@ -72,7 +72,7 @@ export function HeroSlider({
                 {current.linkUrl && (
                   <Link
                     href={current.linkUrl}
-                    className="mt-4 inline-flex w-fit items-center bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark"
+                    className="btn-primary mt-4 !px-4 !py-2.5 text-sm"
                   >
                     Saber mais →
                   </Link>

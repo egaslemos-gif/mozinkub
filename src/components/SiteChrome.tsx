@@ -110,7 +110,7 @@ export function SiteFooter({
             href={CYBERCODE.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex shrink-0 items-center justify-center gap-2 border border-[#4a8f88] bg-[#3f7872] px-5 py-2.5 text-sm font-semibold text-white transition hover:border-[#6ab0a8] hover:bg-[#4a8f88]"
+            className="developer-cta group inline-flex shrink-0 items-center justify-center gap-2 border border-[#4a8f88] bg-[#3f7872] px-5 py-2.5 text-sm font-semibold text-white transition hover:border-[#6ab0a8] hover:bg-[#4a8f88]"
             title={`${CYBERCODE.cta} — ${CYBERCODE.name}`}
           >
             <span>{CYBERCODE.cta}</span>
