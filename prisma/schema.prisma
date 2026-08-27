@@ -166,6 +166,25 @@ model HeroSlide {
   updatedAt   DateTime @updatedAt
 }
 
+/// Notícias / avisos / cartazes (ex.: hackathon) — secção Actualizações
+model Announcement {
+  id          String    @id @default(cuid())
+  title       String
+  summary     String
+  /// NOTICIA | EVENTO | AVISO | CONVOCATORIA
+  type        String    @default("NOTICIA")
+  imageUrl    String
+  linkUrl     String?
+  linkLabel   String?
+  featured    Boolean   @default(false)
+  published   Boolean   @default(true)
+  order       Int       @default(0)
+  startsAt    DateTime?
+  endsAt      DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
 model ContactMessage {
   id          String   @id @default(cuid())
   name        String

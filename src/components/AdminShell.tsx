@@ -17,6 +17,7 @@ const nav: { href: string; label: string; permission?: PermissionCode }[] = [
   { href: "/admin/utilizadores", label: "Utilizadores", permission: "users.read" },
   { href: "/admin/identidade", label: "Identidade", permission: "settings.read" },
   { href: "/admin/destaques", label: "Destaques / Slider", permission: "settings.update" },
+  { href: "/admin/actualizacoes", label: "Actualizações", permission: "settings.update" },
   { href: "/admin/projectos", label: "Projectos", permission: "projects.read" },
   { href: "/admin/eventos", label: "Agendas / Calendário", permission: "events.read" },
   { href: "/admin/editais", label: "Editais", permission: "applications.read" },

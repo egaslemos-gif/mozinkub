@@ -213,6 +213,22 @@ export async function getPublishedHeroSlides() {
   });
 }
 
+export async function getPublishedAnnouncements(limit?: number) {
+  const now = new Date();
+  const items = await prisma.announcement.findMany({
+    where: {
+      published: true,
+      AND: [
+        { OR: [{ startsAt: null }, { startsAt: { lte: now } }] },
+        { OR: [{ endsAt: null }, { endsAt: { gte: now } }] },
+      ],
+    },
+    orderBy: [{ featured: "desc" }, { order: "asc" }, { createdAt: "desc" }],
+    ...(limit ? { take: limit } : {}),
+  });
+  return items;
+}
+
 export async function getPublishedAlbums() {
   return prisma.galleryAlbum.findMany({
     where: { published: true },

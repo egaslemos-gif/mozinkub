@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AnnouncementCard } from "@/components/AnnouncementCard";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { HeroSlider } from "@/components/HeroSlider";
 import { ContactForm } from "@/components/ContactForm";
@@ -8,6 +9,7 @@ import { MonthCalendar } from "@/components/MonthCalendar";
 import {
   getCalendarEntries,
   getHighlightEvent,
+  getPublishedAnnouncements,
   getPublishedEvents,
   getPublishedFundingCalls,
   getPublishedHeroSlides,
@@ -21,17 +23,27 @@ import { whatsappHref } from "@/lib/projects";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [config, projects, events, funding, timeline, slides, calendarEntries, highlightEvent] =
-    await Promise.all([
-      getSiteConfig(),
-      getPublishedProjects({ lifecycle: "ATIVO" }),
-      getPublishedEvents(),
-      getPublishedFundingCalls(),
-      getPublishedTimeline(),
-      getPublishedHeroSlides(),
-      getCalendarEntries(),
-      getHighlightEvent(),
-    ]);
+  const [
+    config,
+    projects,
+    events,
+    funding,
+    timeline,
+    slides,
+    calendarEntries,
+    highlightEvent,
+    announcements,
+  ] = await Promise.all([
+    getSiteConfig(),
+    getPublishedProjects({ lifecycle: "ATIVO" }),
+    getPublishedEvents(),
+    getPublishedFundingCalls(),
+    getPublishedTimeline(),
+    getPublishedHeroSlides(),
+    getCalendarEntries(),
+    getHighlightEvent(),
+    getPublishedAnnouncements(4),
+  ]);
 
   if (!config) {
     return (
@@ -49,6 +61,11 @@ export default async function HomePage() {
   const mural = (featured.length ? featured : projects).slice(0, 3);
   const nextEvent = highlightEvent;
   const openCall = funding.find((f) => f.status === "ABERTO");
+  const featuredAnnouncement =
+    announcements.find((a) => a.featured) || announcements[0] || null;
+  const announcementCards = announcements.filter(
+    (a) => a.id !== featuredAnnouncement?.id,
+  );
 
   const projectSlides = mural
     .filter((p) => p.coverUrl)
@@ -110,6 +127,35 @@ export default async function HomePage() {
             />
           </div>
         </section>
+
+        {announcements.length > 0 && (
+          <section id="actualizacoes" className="section bg-white">
+            <div className="section-inner">
+              <div className="section-head">
+                <div>
+                  <p className="section-kicker">Em destaque</p>
+                  <h2 className="section-title">Actualizações</h2>
+                  <p className="section-lead">
+                    Notícias, avisos e cartazes das actividades da incubadora.
+                  </p>
+                </div>
+                <Link href="/actualizacoes" className="section-link">
+                  Ver todas →
+                </Link>
+              </div>
+              {featuredAnnouncement && (
+                <AnnouncementCard item={featuredAnnouncement} large />
+              )}
+              {announcementCards.length > 0 && (
+                <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {announcementCards.map((item) => (
+                    <AnnouncementCard key={item.id} item={item} />
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        )}
 
         <section className="section bg-section-alt">
           <div className="section-inner">

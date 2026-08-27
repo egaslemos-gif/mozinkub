@@ -794,6 +794,85 @@ export async function deleteHeroSlide(formData: FormData) {
   }
 }
 
+function parseAnnouncementData(formData: FormData) {
+  const imageUrl = String(formData.get("imageUrl") || "").trim();
+  const title = String(formData.get("title") || "").trim();
+  const summary = String(formData.get("summary") || "").trim();
+  if (!title) return { error: "Título obrigatório." } as const;
+  if (!summary) return { error: "Resumo obrigatório." } as const;
+  if (!imageUrl) return { error: "Imagem obrigatória." } as const;
+  return {
+    data: {
+      title,
+      summary,
+      type: String(formData.get("type") || "NOTICIA").trim() || "NOTICIA",
+      imageUrl,
+      linkUrl: String(formData.get("linkUrl") || "").trim() || null,
+      linkLabel: String(formData.get("linkLabel") || "").trim() || null,
+      featured: formData.get("featured") === "on",
+      published: formData.get("published") === "on",
+      order: Number(formData.get("order") || 0),
+    },
+  } as const;
+}
+
+export async function createAnnouncement(formData: FormData) {
+  try {
+    await requireAdmin("settings.update");
+    const parsed = parseAnnouncementData(formData);
+    if ("error" in parsed) return { ok: false as const, error: parsed.error };
+    await prisma.announcement.create({ data: parsed.data });
+    revalidatePath("/");
+    revalidatePath("/actualizacoes");
+    revalidatePath("/admin/actualizacoes");
+    return { ok: true as const, message: "Actualização publicada." };
+  } catch (err) {
+    console.error("[createAnnouncement]", err);
+    return {
+      ok: false as const,
+      error: err instanceof Error ? err.message : "Não foi possível publicar.",
+    };
+  }
+}
+
+export async function updateAnnouncement(formData: FormData) {
+  try {
+    await requireAdmin("settings.update");
+    const id = String(formData.get("id") || "");
+    if (!id) return { ok: false as const, error: "Actualização inválida." };
+    const parsed = parseAnnouncementData(formData);
+    if ("error" in parsed) return { ok: false as const, error: parsed.error };
+    await prisma.announcement.update({ where: { id }, data: parsed.data });
+    revalidatePath("/");
+    revalidatePath("/actualizacoes");
+    revalidatePath("/admin/actualizacoes");
+    return { ok: true as const, message: "Actualização guardada." };
+  } catch (err) {
+    console.error("[updateAnnouncement]", err);
+    return {
+      ok: false as const,
+      error: err instanceof Error ? err.message : "Não foi possível actualizar.",
+    };
+  }
+}
+
+export async function deleteAnnouncement(formData: FormData) {
+  try {
+    await requireAdmin("settings.update");
+    await prisma.announcement.delete({ where: { id: String(formData.get("id") || "") } });
+    revalidatePath("/");
+    revalidatePath("/actualizacoes");
+    revalidatePath("/admin/actualizacoes");
+    return { ok: true as const, message: "Actualização removida." };
+  } catch (err) {
+    console.error("[deleteAnnouncement]", err);
+    return {
+      ok: false as const,
+      error: err instanceof Error ? err.message : "Não foi possível remover.",
+    };
+  }
+}
+
 export async function uploadMedia(formData: FormData) {
   try {
     await requireAdmin("documents.upload");
