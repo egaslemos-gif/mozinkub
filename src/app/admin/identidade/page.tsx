@@ -33,7 +33,7 @@ export default async function IdentidadePage() {
             ["campus", "Campus", config.campus],
             ["address", "Morada", config.address],
             ["phone", "Telefone", config.phone],
-            ["whatsapp", "WhatsApp (só dígitos, ex: 84305623)", config.whatsapp || ""],
+            ["whatsapp", "WhatsApp (só dígitos, ex: 834610931)", config.whatsapp || ""],
             ["email", "Email", config.email],
           ] as const
         ).map(([name, label, value]) => (

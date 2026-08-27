@@ -100,7 +100,7 @@ async function main() {
   await prisma.siteConfig.upsert({
     where: { id: "main" },
     update: {
-      whatsapp: "84305623",
+      whatsapp: "834610931",
       email: "elemos@unilicungo.ac.mz",
     },
     create: {
@@ -120,7 +120,7 @@ async function main() {
       ]),
       address: "Rua D. Francisco de Almeida 737/751 — Beira, C.Postal 2100",
       phone: "82/84305623",
-      whatsapp: "84305623",
+      whatsapp: "834610931",
       email: "elemos@unilicungo.ac.mz",
       campus: "Campus da Ponta-Gêa, Beira — Moçambique",
       aboutText:
