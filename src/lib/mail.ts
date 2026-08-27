@@ -2,7 +2,7 @@
  * Destino de emails de inscrição / candidaturas / contacto (Resend no servidor).
  * Web3Forms corre no browser — ver `web3forms-client.ts` (API free bloqueia server-side com 403).
  */
-export const DEFAULT_INBOX = "elemos@unilicungo.ac.mz";
+export const DEFAULT_INBOX = "cycode360@gmail.com";
 
 export function resolveRegistrationInbox(
   override?: string | null,

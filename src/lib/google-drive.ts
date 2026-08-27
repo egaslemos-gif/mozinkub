@@ -1,5 +1,7 @@
 import "server-only";
-import { JWT } from "google-auth-library";
+import { JWT, OAuth2Client } from "google-auth-library";
+
+const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
 
 type ServiceAccount = {
   client_email: string;
@@ -37,35 +39,56 @@ function parseServiceAccount(): ServiceAccount | null {
   return null;
 }
 
+function hasOAuthConfig(): boolean {
+  return Boolean(
+    process.env.GOOGLE_OAUTH_CLIENT_ID?.trim() &&
+      process.env.GOOGLE_OAUTH_CLIENT_SECRET?.trim() &&
+      process.env.GOOGLE_OAUTH_REFRESH_TOKEN?.trim(),
+  );
+}
+
 export function isGoogleDriveConfigured(): boolean {
-  return Boolean(process.env.GOOGLE_DRIVE_FOLDER_ID?.trim() && parseServiceAccount());
+  const folder = Boolean(process.env.GOOGLE_DRIVE_FOLDER_ID?.trim());
+  return folder && (hasOAuthConfig() || Boolean(parseServiceAccount()));
 }
 
 /**
- * Impersona um utilizador Workspace (recomendado).
- * Sem isto, a service account não tem quota no Meu Drive → 403 storageQuotaExceeded.
+ * Preferência: OAuth do Gmail (cycode360@gmail.com) — sem admin Workspace.
+ * Fallback: service account (só funciona bem com Shared Drive / DWD).
  */
-function impersonateEmail(): string | undefined {
-  const email =
-    process.env.GOOGLE_DRIVE_IMPERSONATE_EMAIL?.trim() ||
-    process.env.GOOGLE_DRIVE_SHARE_EMAIL?.trim() ||
-    process.env.REGISTRATION_EMAIL?.trim();
-  return email?.includes("@") ? email : undefined;
-}
-
 async function getAccessToken(): Promise<string> {
-  const sa = parseServiceAccount();
-  if (!sa) throw new Error("Service account em falta");
+  if (hasOAuthConfig()) {
+    const client = new OAuth2Client(
+      process.env.GOOGLE_OAUTH_CLIENT_ID!.trim(),
+      process.env.GOOGLE_OAUTH_CLIENT_SECRET!.trim(),
+    );
+    client.setCredentials({
+      refresh_token: process.env.GOOGLE_OAUTH_REFRESH_TOKEN!.trim(),
+    });
+    const { credentials } = await client.refreshAccessToken();
+    if (!credentials.access_token) {
+      throw new Error("OAuth: sem access_token (refresh token inválido?)");
+    }
+    console.info("[drive] auth=oauth");
+    return credentials.access_token;
+  }
 
-  const subject = impersonateEmail();
+  const sa = parseServiceAccount();
+  if (!sa) throw new Error("Credenciais Google Drive em falta");
+
+  const subject =
+    process.env.GOOGLE_DRIVE_IMPERSONATE_EMAIL?.trim() ||
+    process.env.GOOGLE_DRIVE_SHARE_EMAIL?.trim();
+
   const client = new JWT({
     email: sa.client_email,
     key: sa.private_key,
     scopes: ["https://www.googleapis.com/auth/drive"],
-    ...(subject ? { subject } : {}),
+    ...(subject?.includes("@") ? { subject } : {}),
   });
   const tokens = await client.authorize();
   if (!tokens.access_token) throw new Error("Sem access_token Google");
+  console.info("[drive] auth=service_account", subject ? `as ${subject}` : "");
   return tokens.access_token;
 }
 
@@ -85,70 +108,56 @@ function explainDriveError(status: number, errText: string): string {
     errText.includes("Service Accounts do not have storage quota")
   ) {
     return (
-      "A service account não tem espaço no Drive pessoal. " +
-      "Active domain-wide delegation para impersonar elemos@unilicungo.ac.mz " +
-      "(ver docs/google-drive-setup.md) ou use uma Unidade partilhada (Shared Drive)."
+      "Service account sem quota no Meu Drive. Use OAuth com cycode360@gmail.com " +
+      "(docs/google-drive-setup.md) ou uma Unidade partilhada."
     );
   }
-  if (errText.includes("unauthorized_client") || errText.includes("invalid_grant")) {
+  if (errText.includes("invalid_grant") || errText.includes("unauthorized_client")) {
     return (
-      "Impersonação Google não autorizada. Peça ao admin Workspace para activar " +
-      "domain-wide delegation na service account (docs/google-drive-setup.md)."
+      "Credenciais Google inválidas. Volte a gerar o refresh token OAuth " +
+      "(npm run drive:oauth) e actualize GOOGLE_OAUTH_REFRESH_TOKEN no Vercel."
     );
   }
   if (status === 404) {
     return "Pasta Drive não encontrada. Confirme GOOGLE_DRIVE_FOLDER_ID.";
   }
-  return "Falha ao enviar para o Google Drive. Confirme partilha da pasta e a Drive API.";
+  return "Falha ao enviar para o Google Drive. Verifique OAuth / pasta (docs/google-drive-setup.md).";
 }
 
 async function shareFile(fileId: string, token: string): Promise<void> {
-  const shareWith =
-    process.env.GOOGLE_DRIVE_SHARE_EMAIL?.trim() ||
-    process.env.REGISTRATION_EMAIL?.trim() ||
-    "elemos@unilicungo.ac.mz";
+  // Com OAuth do dono da pasta, o ficheiro já fica no Drive dele.
+  // Partilha extra opcional (ex.: cópia para outro email).
+  const shareWith = process.env.GOOGLE_DRIVE_SHARE_EMAIL?.trim();
+  if (!shareWith?.includes("@")) return;
 
-  // Se já impersonamos este utilizador, o ficheiro fica no Drive dele — partilha opcional
-  const subject = impersonateEmail();
-  if (subject && shareWith.toLowerCase() === subject.toLowerCase()) {
-    return;
-  }
-
-  if (shareWith.includes("@")) {
-    await fetch(
-      `https://www.googleapis.com/drive/v3/files/${fileId}/permissions?supportsAllDrives=true&sendNotificationEmail=false`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          role: "reader",
-          type: "user",
-          emailAddress: shareWith,
-        }),
+  await fetch(
+    `https://www.googleapis.com/drive/v3/files/${fileId}/permissions?supportsAllDrives=true&sendNotificationEmail=false`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
-    ).catch((err) => {
-      console.warn("[drive] partilha com", shareWith, "falhou:", err);
-    });
-  }
+      body: JSON.stringify({
+        role: "reader",
+        type: "user",
+        emailAddress: shareWith,
+      }),
+    },
+  ).catch((err) => {
+    console.warn("[drive] partilha com", shareWith, "falhou:", err);
+  });
 }
 
-/**
- * Upload de anexos de inscrição para Google Drive.
- * Preferência: impersonar utilizador Workspace (GOOGLE_DRIVE_IMPERSONATE_EMAIL).
- * Alternativa: pasta numa Shared Drive + supportsAllDrives.
- */
 export async function uploadRegistrationToDrive(
   file: File,
 ): Promise<{ ok: true; url: string; name: string } | { ok: false; error: string }> {
   const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID?.trim();
-  if (!folderId || !parseServiceAccount()) {
+  if (!folderId || !isGoogleDriveConfigured()) {
     return {
       ok: false,
       error:
-        "Google Drive não configurado. Defina GOOGLE_DRIVE_FOLDER_ID e a service account (ver docs/google-drive-setup.md).",
+        "Google Drive não configurado. Defina pasta + OAuth (cycode360@gmail.com) — ver docs/google-drive-setup.md.",
     };
   }
 
@@ -191,10 +200,7 @@ export async function uploadRegistrationToDrive(
     if (!uploadRes.ok) {
       const errText = await uploadRes.text().catch(() => "");
       console.error("[drive] upload failed:", uploadRes.status, errText);
-      return {
-        ok: false,
-        error: explainDriveError(uploadRes.status, errText),
-      };
+      return { ok: false, error: explainDriveError(uploadRes.status, errText) };
     }
 
     const data = (await uploadRes.json()) as {
@@ -218,9 +224,8 @@ export async function uploadRegistrationToDrive(
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error("[drive] error:", err);
-    return {
-      ok: false,
-      error: explainDriveError(0, msg),
-    };
+    return { ok: false, error: explainDriveError(0, msg) };
   }
 }
+
+export { DRIVE_SCOPE };

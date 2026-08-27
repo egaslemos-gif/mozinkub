@@ -15,7 +15,8 @@
     "test:authz": "tsx scripts/test-authz.ts",
     "db:backup": "tsx scripts/sqlite-backup.ts",
     "db:restore": "tsx scripts/sqlite-restore.ts",
-    "db:backup:schedule": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/windows-install-daily-backup-task.ps1"
+    "db:backup:schedule": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/windows-install-daily-backup-task.ps1",
+    "drive:oauth": "node scripts/google-drive-oauth-setup.js"
   },
   "dependencies": {
     "@libsql/client": "^0.8.1",

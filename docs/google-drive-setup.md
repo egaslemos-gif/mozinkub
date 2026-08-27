@@ -1,70 +1,63 @@
-# Google Drive — anexos de inscrição
+# Google Drive — anexos via Gmail (cycode360@gmail.com)
 
-Os anexos vão para o **Google Drive** (não Cloudinary). Cloudinary fica para media pública do site.
+Sem acesso ao admin UniLicungo, usamos **OAuth** da conta Gmail `cycode360@gmail.com`.  
+Os ficheiros ficam no Drive dessa conta (tem quota). Service account sozinha no Meu Drive **não funciona**.
 
-## Problema comum (403 storageQuotaExceeded)
+## Passo 1 — Pasta no Drive
 
-Contas de serviço **não têm espaço** no «Meu Drive». Por isso partilhar uma pasta pessoal com a SA **não chega**.
+1. Entre em [drive.google.com](https://drive.google.com) com **cycode360@gmail.com**.
+2. Crie a pasta `IEUL-Inscricoes` (ou use uma existente).
+3. Copie o ID do URL → `GOOGLE_DRIVE_FOLDER_ID`.
 
-Use **uma** destas soluções:
+## Passo 2 — Google Cloud (mesmo projecto ou outro)
 
----
+1. Active **Google Drive API**.
+2. **Google Auth Platform → Clientes → Criar cliente**:
+   - Tipo: **Aplicação da Web**
+   - Nome: `mozinkub-drive-oauth`
+   - URI de redirecionamento: `http://localhost:3456/oauth2callback`
+3. Copie **ID do cliente** e **Segredo do cliente**.
 
-## Solução A — Domain-wide delegation (recomendada)
+## Passo 3 — Gerar refresh token (local)
 
-O app age **como** `elemos@unilicungo.ac.mz` e grava na pasta `Inscricoes` desse utilizador.
+Em `ieul-web/.env.local`:
 
-### 1. Já feito
-- Service account `mozinkub-drive@….iam.gserviceaccount.com`
-- JSON no Vercel (`GOOGLE_SERVICE_ACCOUNT_JSON`)
-- Pasta `Inscricoes` + `GOOGLE_DRIVE_FOLDER_ID`
-
-### 2. Admin Google Workspace (UniLicungo)
-
-1. [Admin Console](https://admin.google.com) → **Segurança** → **Controlos de API** → **Delegação em todo o domínio**.
-2. **Adicionar novo**:
-   - **ID do cliente** = `client_id` numérico do JSON da service account  
-     (ex.: `116507920895482497361`)
-   - **Scopes** (colar exactamente):
-     ```
-     https://www.googleapis.com/auth/drive
-     ```
-3. Guardar.
-
-### 3. Variáveis Vercel
-
-```bash
-GOOGLE_DRIVE_FOLDER_ID="1bShsg_EDyv9Gq18_OD2B1fn-SuPX2QCB"
-GOOGLE_SERVICE_ACCOUNT_JSON='{...}'
-GOOGLE_DRIVE_IMPERSONATE_EMAIL="elemos@unilicungo.ac.mz"
-GOOGLE_DRIVE_SHARE_EMAIL="elemos@unilicungo.ac.mz"
+```env
+GOOGLE_OAUTH_CLIENT_ID="….apps.googleusercontent.com"
+GOOGLE_OAUTH_CLIENT_SECRET="…"
 ```
 
-`GOOGLE_DRIVE_IMPERSONATE_EMAIL` (ou `GOOGLE_DRIVE_SHARE_EMAIL`) activa a impersonação no código.
+Depois:
 
-Redeploy após alterar vars / após o admin activar a delegação.
+```bash
+npm run drive:oauth
+```
 
----
+Inicie sessão com **cycode360@gmail.com**, aceite as permissões.  
+O terminal mostra `GOOGLE_OAUTH_REFRESH_TOKEN=...`.
 
-## Solução B — Unidade partilhada (Shared Drive)
+## Passo 4 — Vercel
 
-Se não puder activar domain-wide delegation:
+```bash
+GOOGLE_DRIVE_FOLDER_ID="id_da_pasta_no_drive_cycode360"
+GOOGLE_OAUTH_CLIENT_ID="…"
+GOOGLE_OAUTH_CLIENT_SECRET="…"
+GOOGLE_OAUTH_REFRESH_TOKEN="…"
+GOOGLE_DRIVE_SHARE_EMAIL="cycode360@gmail.com"
+REGISTRATION_EMAIL="cycode360@gmail.com"
+```
 
-1. No Drive: **Novo** → **Unidade partilhada** (ex.: `IEUL Inscrições`).
-2. Adicione `mozinkub-drive@…` como **Gestor de conteúdo**.
-3. Crie pasta dentro da unidade, copie o novo ID → `GOOGLE_DRIVE_FOLDER_ID`.
-4. Redeploy.
+Redeploy. Teste uma inscrição com anexo.
 
----
+## Web3Forms
 
-## Checklist rápido
+No dashboard Web3Forms, mude o **Recipient** para `cycode360@gmail.com` (se quiser notificações no mesmo sítio).
 
-| Item | Estado |
-|------|--------|
-| Drive API activa no projecto GCP | ☐ |
-| JSON + folder ID no Vercel | ☐ |
-| Domain-wide delegation **ou** Shared Drive | ☐ |
-| Redeploy | ☐ |
-| Teste inscrição com anexo | ☐ |
+## Notas
 
-Links no email / admin: `https://drive.google.com/file/d/…`
+| Método | Quando usar |
+|--------|-------------|
+| **OAuth Gmail** (este guia) | Sem admin Workspace — caminho actual |
+| Service account + Shared Drive / DWD | Só com Google Workspace admin |
+
+Revogar acesso da app: https://myaccount.google.com/permissions
