@@ -21,11 +21,11 @@ async function applySchemaToTurso(url: string, authToken: string) {
   );
 
   const client = createClient({ url, authToken });
-  // Split on statement boundaries; ignore empty chunks.
+  // Split on statement boundaries; strip Prisma comment lines (e.g. "-- CreateTable").
   const statements = sql
-    .split(/;\s*\n/)
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0 && !s.startsWith("--"));
+    .split(/;\s*(?:\r?\n|$)/)
+    .map((s) => s.replace(/^\s*--[^\r\n]*[\r\n]*/gm, "").trim())
+    .filter((s) => s.length > 0);
 
   for (const statement of statements) {
     try {
