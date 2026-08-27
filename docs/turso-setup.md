@@ -1,6 +1,6 @@
 # Turso (libSQL) — base persistente na Vercel
 
-Substitui o SQLite no Blob (`durable/ieul.db`) por uma base Turso. As **imagens** continuam no Vercel Blob (ainda bloqueado no Hobby até upgrade/reset).
+Substitui o SQLite no Blob (`durable/ieul.db`) por uma base Turso. As **imagens** usam **Cloudinary** (recomendado) ou Vercel Blob — ver `docs/cloudinary-setup.md`.
 
 ## 1) Completar a integração no Vercel
 
@@ -36,4 +36,4 @@ Ou **Redeploy** no dashboard Vercel.
 
 ## Nota sobre imagens
 
-Uploads de media ainda dependem do Blob. Enquanto *Advanced Operations* estiver no limite Hobby, faça upgrade a Pro ou espere o reset (25/09/2026).
+Configure **Cloudinary** (`docs/cloudinary-setup.md`) para uploads sem depender do Blob Hobby.
