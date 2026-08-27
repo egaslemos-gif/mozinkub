@@ -1,4 +1,6 @@
 import { PrismaClient } from "@prisma/client";
+import { PrismaLibSQL } from "@prisma/adapter-libsql";
+import { createClient } from "@libsql/client";
 import "server-only";
 import {
   acquireDurableWriteLock,
@@ -9,20 +11,7 @@ import {
   releaseDurableWriteLock,
 } from "@/lib/durable-db";
 import { applySqliteSchemaPatches } from "@/lib/schema-patches";
-
-/**
- * SQLite MVP:
- * - Local: DATABASE_URL=file:./dev.db
- * - Vercel: restore durable snapshot from Blob into /tmp (writable), else seed from build.
- *   Writes: lock → refresh latest Blob → mutate → persist (avoids cross-project media loss).
- *   Schema patches run after restore so Blob DBs pick up new columns (e.g. GalleryMedia.description).
- */
-await ensureDurableSqlite();
-
-const dbUrl =
-  process.env.VERCEL || (process.env.DATABASE_URL || "").startsWith("file:")
-    ? `file:${getRuntimeDbPath()}`
-    : process.env.DATABASE_URL || `file:${getRuntimeDbPath()}`;
+import { getTursoConfig, isTursoConfigured } from "@/lib/turso";
 
 const WRITE_OPS = new Set([
   "create",
@@ -40,10 +29,28 @@ const globalForPrisma = globalThis as unknown as {
   schemaPatched: boolean | undefined;
 };
 
+const useTurso = isTursoConfigured();
+
+/**
+ * Prefer Turso (persistent libSQL) when env is present.
+ * Fallback: local SQLite / Vercel Blob durable snapshot (legacy Hobby workaround).
+ */
+async function prepareLocalSqliteIfNeeded() {
+  if (useTurso) return;
+  await ensureDurableSqlite();
+}
+
+await prepareLocalSqliteIfNeeded();
+
+const localDbUrl =
+  process.env.VERCEL || (process.env.DATABASE_URL || "").startsWith("file:")
+    ? `file:${getRuntimeDbPath()}`
+    : process.env.DATABASE_URL || `file:${getRuntimeDbPath()}`;
+
 async function patchSchema(base: PrismaClient) {
   const changed = await applySqliteSchemaPatches(base);
   globalForPrisma.schemaPatched = true;
-  if (changed && process.env.VERCEL) {
+  if (changed && process.env.VERCEL && !useTurso) {
     try {
       await persistDurableSqlite();
       console.info("[durable-db] persisted schema-patched snapshot");
@@ -53,11 +60,31 @@ async function patchSchema(base: PrismaClient) {
   }
 }
 
-function createPrisma() {
-  const base = new PrismaClient({
-    datasources: { db: { url: dbUrl } },
+function createBaseClient(): PrismaClient {
+  if (useTurso) {
+    const cfg = getTursoConfig()!;
+    const libsql = createClient({
+      url: cfg.url,
+      authToken: cfg.authToken,
+    });
+    const adapter = new PrismaLibSQL(libsql);
+    console.info("[prisma] using Turso libSQL", cfg.url.replace(/\/\/.*@/, "//***@"));
+    return new PrismaClient({ adapter });
+  }
+
+  return new PrismaClient({
+    datasources: { db: { url: localDbUrl } },
   });
+}
+
+function createPrisma() {
+  const base = createBaseClient();
   globalForPrisma.prismaBase = base;
+
+  // Turso is already durable — no Blob lock/persist middleware.
+  if (useTurso) {
+    return base;
+  }
 
   return base.$extends({
     query: {
@@ -97,7 +124,6 @@ function createPrisma() {
 
 const prismaClient = globalForPrisma.prisma || createPrisma();
 
-// Ensure schema matches code before first query (cold start / Blob restore).
 if (!globalForPrisma.schemaPatched) {
   await patchSchema(globalForPrisma.prismaBase!);
 }

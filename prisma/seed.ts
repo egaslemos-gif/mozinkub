@@ -1,8 +1,30 @@
 import { PrismaClient } from "@prisma/client";
+import { PrismaLibSQL } from "@prisma/adapter-libsql";
+import { createClient } from "@libsql/client";
 import bcrypt from "bcryptjs";
 import { seedRbac } from "./seed-rbac";
 
-const prisma = new PrismaClient();
+function createSeedPrisma() {
+  const url =
+    process.env.TURSO_DATABASE_URL ||
+    process.env.LIBSQL_URL ||
+    process.env.TURSO_URL ||
+    "";
+  const authToken =
+    process.env.TURSO_AUTH_TOKEN ||
+    process.env.LIBSQL_AUTH_TOKEN ||
+    process.env.TURSO_TOKEN ||
+    "";
+
+  if ((url.startsWith("libsql://") || url.startsWith("https://")) && authToken) {
+    const libsql = createClient({ url, authToken });
+    return new PrismaClient({ adapter: new PrismaLibSQL(libsql) });
+  }
+
+  return new PrismaClient();
+}
+
+const prisma = createSeedPrisma();
 
 async function main() {
   const passwordHash = await bcrypt.hash("ieul2026", 10);
