@@ -28,3 +28,7 @@ Se existir `RESEND_API_KEY`, o servidor também tenta enviar (além do Web3Forms
 | Edital | `[IEUL] Candidatura edital: …` |
 
 Se o email não chegar: verifique spam e, no Web3Forms, **Spam & Security** (domínio `mozinkub.vercel.app` permitido).
+
+## Anexos
+
+Anexos de inscrição → **Google Drive** (`docs/google-drive-setup.md`). Cloudinary fica só para media pública do site.

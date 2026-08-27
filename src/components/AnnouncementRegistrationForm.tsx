@@ -206,7 +206,8 @@ export function AnnouncementRegistrationForm({
           <label className="admin-label">Anexos (opcional)</label>
           <p className="mb-2 text-xs text-muted">
             PDF, DOC, DOCX ou imagem — até {MAX_FILES} ficheiros, máx. 8 MB cada. Ex.: CV,
-            carta de motivação, comprovativo.
+            carta de motivação, comprovativo. Os anexos são guardados no Google Drive da
+            incubadora.
           </p>
           <FilePicker
             accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp,application/pdf,image/*"

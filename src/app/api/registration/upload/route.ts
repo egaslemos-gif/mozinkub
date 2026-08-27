@@ -1,4 +1,8 @@
 import { NextResponse } from "next/server";
+import {
+  isGoogleDriveConfigured,
+  uploadRegistrationToDrive,
+} from "@/lib/google-drive";
 import { storeUploadedFile } from "@/lib/upload";
 
 export const runtime = "nodejs";
@@ -15,7 +19,8 @@ const ALLOWED_MIME = new Set([
 const ALLOWED_EXT = new Set(["pdf", "doc", "docx", "jpg", "jpeg", "png", "webp"]);
 
 /**
- * Upload público só para anexos de inscrição (tipos e tamanho limitados).
+ * Upload público só para anexos de inscrição.
+ * Prioridade: Google Drive (economiza Cloudinary) → fallback Cloudinary/Blob se Drive não estiver configurado.
  */
 export async function POST(request: Request) {
   try {
@@ -44,6 +49,22 @@ export async function POST(request: Request) {
       );
     }
 
+    if (isGoogleDriveConfigured()) {
+      const result = await uploadRegistrationToDrive(file);
+      if (!result.ok) {
+        return NextResponse.json(result, { status: 400 });
+      }
+      return NextResponse.json({
+        ok: true as const,
+        url: result.url,
+        name: result.name,
+        storage: "google_drive" as const,
+      });
+    }
+
+    console.warn(
+      "[api/registration/upload] Google Drive não configurado — a usar Cloudinary/Blob (temporário)",
+    );
     const result = await storeUploadedFile(file);
     if (!result.ok) {
       return NextResponse.json(result, { status: 400 });
@@ -52,6 +73,7 @@ export async function POST(request: Request) {
       ok: true as const,
       url: result.url,
       name: file.name.slice(0, 120),
+      storage: "legacy" as const,
     });
   } catch (err) {
     console.error("[api/registration/upload]", err);
