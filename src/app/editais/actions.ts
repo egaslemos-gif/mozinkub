@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { isCallOpen } from "@/lib/funding";
+import { resolveRegistrationInbox, sendOutboundMail } from "@/lib/mail";
 import { storeUploadedFile } from "@/lib/upload";
 
 const DOC_EXTS = ["pdf", "doc", "docx"];
@@ -46,7 +47,7 @@ export async function submitCallApplication(formData: FormData) {
   const saved = await saveDocument(file);
   if (!saved.ok) return saved;
 
-  await prisma.callApplication.create({
+  const application = await prisma.callApplication.create({
     data: {
       callId: call.id,
       projectTitle,
@@ -59,6 +60,33 @@ export async function submitCallApplication(formData: FormData) {
       documentUrl: saved.url,
       status: "RECEBIDA",
     },
+  });
+
+  const site = await prisma.siteConfig.findUnique({ where: { id: "main" } });
+  const inbox = resolveRegistrationInbox(null, site?.email);
+
+  await sendOutboundMail({
+    to: inbox,
+    replyTo: email,
+    subject: `[IEUL] Candidatura edital: ${call.title} — ${projectTitle}`,
+    text: [
+      `Nova candidatura ao edital: ${call.title}`,
+      `Slug: ${call.slug}`,
+      ``,
+      `Projecto: ${projectTitle}`,
+      `Área: ${area}`,
+      `Líder: ${leaderName}`,
+      `Email: ${email}`,
+      `Telefone: ${phone || "—"}`,
+      `Equipa: ${team || "—"}`,
+      ``,
+      `Resumo:`,
+      summary,
+      ``,
+      `Documento: ${saved.url}`,
+      `ID: ${application.id}`,
+      `Recebida em: ${application.createdAt.toISOString()}`,
+    ].join("\n"),
   });
 
   revalidatePath(`/editais/${call.slug}`);

@@ -79,33 +79,32 @@ export async function submitAnnouncementRegistration(formData: FormData) {
     site?.email,
   );
 
-  if (inbox) {
-    const attachmentLines =
-      attachments.length > 0
-        ? attachments.map((a, i) => `Anexo ${i + 1}: ${a.name} — ${a.url}`)
-        : ["Anexos: —"];
+  const attachmentLines =
+    attachments.length > 0
+      ? attachments.map((a, i) => `Anexo ${i + 1}: ${a.name} — ${a.url}`)
+      : ["Anexos: —"];
 
-    await sendOutboundMail({
-      to: inbox,
-      subject: `[IEUL] Inscrição: ${announcement.title} — ${name}`,
-      text: [
-        `Nova inscrição em: ${announcement.title}`,
-        `Slug: ${announcement.slug}`,
-        ``,
-        `Nome: ${name}`,
-        `Email: ${email}`,
-        `Telefone: ${phone || "—"}`,
-        `Instituição: ${organization || "—"}`,
-        `Perfil: ${profile || "—"}`,
-        `Mensagem: ${message || "—"}`,
-        ``,
-        ...attachmentLines,
-        ``,
-        `ID candidatura: ${application.id}`,
-        `Recebida em: ${application.createdAt.toISOString()}`,
-      ].join("\n"),
-    });
-  }
+  await sendOutboundMail({
+    to: inbox,
+    replyTo: email,
+    subject: `[IEUL] Inscrição: ${announcement.title} — ${name}`,
+    text: [
+      `Nova inscrição em: ${announcement.title}`,
+      `Slug: ${announcement.slug}`,
+      ``,
+      `Nome: ${name}`,
+      `Email: ${email}`,
+      `Telefone: ${phone || "—"}`,
+      `Instituição: ${organization || "—"}`,
+      `Perfil: ${profile || "—"}`,
+      `Mensagem: ${message || "—"}`,
+      ``,
+      ...attachmentLines,
+      ``,
+      `ID candidatura: ${application.id}`,
+      `Recebida em: ${application.createdAt.toISOString()}`,
+    ].join("\n"),
+  });
 
   return {
     ok: true as const,

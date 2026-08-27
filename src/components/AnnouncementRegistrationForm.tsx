@@ -122,8 +122,8 @@ export function AnnouncementRegistrationForm({
     >
       <h3 className="font-display text-xl font-semibold">Inscrever-se</h3>
       <p className="mt-1.5 text-sm leading-relaxed text-muted">
-        Candidate-se a «{title}». Os dados ficam registados na incubadora; quando o email
-        destino estiver configurado, a coordenação também recebe notificação.
+        Candidate-se a «{title}». Os dados ficam registados na incubadora e a coordenação
+        recebe notificação por email.
       </p>
       <input type="hidden" name="announcementId" value={announcementId} />
 
