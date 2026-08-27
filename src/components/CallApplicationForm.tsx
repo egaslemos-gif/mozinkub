@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { submitCallApplication } from "@/app/editais/actions";
+import { submitWeb3Forms } from "@/lib/web3forms-client";
 
 export function CallApplicationForm({
   callId,
@@ -19,6 +20,14 @@ export function CallApplicationForm({
     setError("");
     const form = e.currentTarget;
     const fd = new FormData(form);
+    const projectTitle = String(fd.get("projectTitle") || "").trim();
+    const area = String(fd.get("area") || "").trim();
+    const leaderName = String(fd.get("leaderName") || "").trim();
+    const email = String(fd.get("email") || "").trim();
+    const phone = String(fd.get("phone") || "").trim();
+    const team = String(fd.get("team") || "").trim();
+    const summary = String(fd.get("summary") || "").trim();
+
     try {
       const res = await submitCallApplication(fd);
       if (!res.ok) {
@@ -26,6 +35,26 @@ export function CallApplicationForm({
         setError(res.error);
         return;
       }
+
+      await submitWeb3Forms({
+        subject: `[IEUL] Candidatura edital: ${callTitle} — ${projectTitle}`,
+        name: leaderName,
+        email,
+        message: [
+          `Nova candidatura ao edital: ${callTitle}`,
+          ``,
+          `Projecto: ${projectTitle}`,
+          `Área: ${area}`,
+          `Líder: ${leaderName}`,
+          `Email: ${email}`,
+          `Telefone: ${phone || "—"}`,
+          `Equipa: ${team || "—"}`,
+          ``,
+          `Resumo:`,
+          summary,
+        ].join("\n"),
+      });
+
       setStatus("ok");
       form.reset();
     } catch {

@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { submitAnnouncementRegistration } from "@/app/announcement-actions";
+import { submitWeb3Forms } from "@/lib/web3forms-client";
 
 type Attachment = { url: string; name: string };
 
@@ -97,6 +98,14 @@ export function AnnouncementRegistrationForm({
     const form = e.currentTarget;
     const fd = new FormData(form);
     fd.set("attachmentsJson", JSON.stringify(attachments));
+
+    const name = String(fd.get("name") || "").trim();
+    const email = String(fd.get("email") || "").trim();
+    const phone = String(fd.get("phone") || "").trim();
+    const organization = String(fd.get("organization") || "").trim();
+    const profile = String(fd.get("profile") || "").trim();
+    const message = String(fd.get("message") || "").trim();
+
     try {
       const res = await submitAnnouncementRegistration(fd);
       if (!res.ok) {
@@ -104,6 +113,30 @@ export function AnnouncementRegistrationForm({
         setError(res.error);
         return;
       }
+
+      const attachmentLines =
+        attachments.length > 0
+          ? attachments.map((a, i) => `Anexo ${i + 1}: ${a.name} — ${a.url}`)
+          : ["Anexos: —"];
+
+      await submitWeb3Forms({
+        subject: `[IEUL] Inscrição: ${title} — ${name}`,
+        name,
+        email,
+        message: [
+          `Nova inscrição em: ${title}`,
+          ``,
+          `Nome: ${name}`,
+          `Email: ${email}`,
+          `Telefone: ${phone || "—"}`,
+          `Instituição: ${organization || "—"}`,
+          `Perfil: ${profile || "—"}`,
+          `Mensagem: ${message || "—"}`,
+          ``,
+          ...attachmentLines,
+        ].join("\n"),
+      });
+
       setStatus("ok");
       setAttachments([]);
       form.reset();

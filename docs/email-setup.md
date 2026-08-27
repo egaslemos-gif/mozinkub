@@ -2,28 +2,29 @@
 
 ## Destino oficial
 
-Notificações vão para **elemos@unilicungo.ac.mz** (`DEFAULT_INBOX` / `REGISTRATION_EMAIL`).
+Notificações: **elemos@unilicungo.ac.mz** (configurado no dashboard Web3Forms + `REGISTRATION_EMAIL`).
 
-O Web3Forms entrega no email com que criou a access key no dashboard — confirme que é o mesmo endereço.
+## Envio — Web3Forms (browser)
 
-## Envio
+Web3Forms **só funciona no cliente** no plano gratuito. Chamadas a partir do servidor Vercel devolvem **403**.
 
-### Web3Forms (activo)
+O fluxo correcto:
 
-Access key: `WEB3FORMS_ACCESS_KEY` (ou a key por omissão no código).
+1. O formulário grava na base de dados (server action).
+2. Em seguida o browser envia para `https://api.web3forms.com/submit` (`src/lib/web3forms-client.ts`).
 
-As server actions enviam `POST` para `https://api.web3forms.com/submit` com assunto, mensagem e Reply-To do candidato.
+Variável opcional: `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` (a key é pública por desenho).
 
-### Resend (opcional)
+## Resend (opcional, servidor)
 
-Se existir `RESEND_API_KEY`, tem prioridade sobre Web3Forms.
+Se existir `RESEND_API_KEY`, o servidor também tenta enviar (além do Web3Forms no browser).
 
-## O que dispara email
+## Formulários
 
 | Origem | Assunto |
 |--------|---------|
-| Inscrição em Actualização | `[IEUL] Inscrição: …` |
-| Formulário de contacto | `[IEUL] Contacto: …` |
-| Candidatura a edital | `[IEUL] Candidatura edital: …` |
+| Contacto | `[IEUL] Contacto: …` |
+| Actualização / inscrição | `[IEUL] Inscrição: …` |
+| Edital | `[IEUL] Candidatura edital: …` |
 
-Os registos ficam sempre na base de dados do admin.
+Se o email não chegar: verifique spam e, no Web3Forms, **Spam & Security** (domínio `mozinkub.vercel.app` permitido).

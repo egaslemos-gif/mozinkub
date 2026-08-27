@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { submitContactMessage } from "@/app/contact-actions";
+import { submitWeb3Forms } from "@/lib/web3forms-client";
 
 export function ContactForm({
   projectSlug,
@@ -23,6 +24,12 @@ export function ContactForm({
     setError("");
     const form = e.currentTarget;
     const fd = new FormData(form);
+    const name = String(fd.get("name") || "").trim();
+    const email = String(fd.get("email") || "").trim();
+    const phone = String(fd.get("phone") || "").trim();
+    const subject = String(fd.get("subject") || "").trim();
+    const message = String(fd.get("message") || "").trim();
+
     try {
       const res = await submitContactMessage(fd);
       if (!res.ok) {
@@ -30,6 +37,27 @@ export function ContactForm({
         setError(res.error || "Não foi possível enviar.");
         return;
       }
+
+      await submitWeb3Forms({
+        subject: `[IEUL] Contacto: ${subject} — ${name}`,
+        name,
+        email,
+        message: [
+          `Nova mensagem de contacto`,
+          ``,
+          `Nome: ${name}`,
+          `Email: ${email}`,
+          `Telefone: ${phone || "—"}`,
+          `Assunto: ${subject}`,
+          projectSlug ? `Projecto: ${projectSlug}` : null,
+          ``,
+          `Mensagem:`,
+          message,
+        ]
+          .filter(Boolean)
+          .join("\n"),
+      });
+
       setStatus("ok");
       form.reset();
     } catch {
