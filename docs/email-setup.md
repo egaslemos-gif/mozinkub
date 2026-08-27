@@ -2,7 +2,7 @@
 
 ## Destino oficial
 
-Notificações: **elemos@unilicungo.ac.mz** (configurado no dashboard Web3Forms + `REGISTRATION_EMAIL`).
+Notificações: **cycode360@gmail.com** (`REGISTRATION_EMAIL` + Web3Forms Recipient).
 
 ## Envio — Web3Forms (browser)
 

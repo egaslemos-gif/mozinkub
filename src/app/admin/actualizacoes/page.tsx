@@ -62,7 +62,7 @@ export default async function AdminActualizacoesPage() {
         <h2 className="font-display text-lg font-semibold">Inscrições recentes</h2>
         <p className="mt-1 text-sm text-muted">
           Guardadas na base de dados. Notificação por email via Web3Forms no browser
-          para elemos@unilicungo.ac.mz.
+          para cycode360@gmail.com (Google Drive / Web3Forms).
         </p>
         <div className="mt-4 overflow-x-auto border border-border bg-white">
           <table className="min-w-full text-left text-sm">
