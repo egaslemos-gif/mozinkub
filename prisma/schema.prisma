@@ -193,18 +193,20 @@ model Announcement {
 }
 
 model AnnouncementApplication {
-  id             String       @id @default(cuid())
-  announcementId String
-  announcement   Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
-  name           String
-  email          String
-  phone          String?
-  organization   String?
-  profile        String?
-  message        String?
-  status         String       @default("RECEBIDA")
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  id              String       @id @default(cuid())
+  announcementId  String
+  announcement    Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  name            String
+  email           String
+  phone           String?
+  organization    String?
+  profile         String?
+  message         String?
+  /// JSON: [{ "url": "...", "name": "..." }]
+  attachmentsJson String       @default("[]")
+  status          String       @default("RECEBIDA")
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
 }
 
 model ContactMessage {

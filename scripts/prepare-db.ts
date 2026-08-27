@@ -76,6 +76,7 @@ async function patchTursoSchema(client: Client) {
     `ALTER TABLE "Announcement" ADD COLUMN "acceptRegistrations" BOOLEAN NOT NULL DEFAULT 0`,
     `ALTER TABLE "Announcement" ADD COLUMN "registrationEmail" TEXT`,
     `ALTER TABLE "Announcement" ADD COLUMN "registrationClosesAt" DATETIME`,
+    `ALTER TABLE "AnnouncementApplication" ADD COLUMN "attachmentsJson" TEXT NOT NULL DEFAULT '[]'`,
   ];
   for (const statement of patches) {
     try {

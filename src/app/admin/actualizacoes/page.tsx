@@ -73,10 +73,19 @@ export default async function AdminActualizacoesPage() {
                 <th className="px-3 py-2">Nome</th>
                 <th className="px-3 py-2">Contacto</th>
                 <th className="px-3 py-2">Perfil</th>
+                <th className="px-3 py-2">Anexos</th>
               </tr>
             </thead>
             <tbody>
-              {applications.map((a) => (
+              {applications.map((a) => {
+                let files: { url: string; name: string }[] = [];
+                try {
+                  const parsed = JSON.parse(a.attachmentsJson || "[]");
+                  if (Array.isArray(parsed)) files = parsed;
+                } catch {
+                  files = [];
+                }
+                return (
                 <tr key={a.id} className="border-b border-border align-top">
                   <td className="px-3 py-2 whitespace-nowrap text-xs text-muted">
                     {a.createdAt.toLocaleString("pt-MZ")}
@@ -102,11 +111,32 @@ export default async function AdminActualizacoesPage() {
                     {a.phone && <p className="text-xs text-muted">{a.phone}</p>}
                   </td>
                   <td className="px-3 py-2 text-muted">{a.profile || "—"}</td>
+                  <td className="px-3 py-2">
+                    {files.length === 0 ? (
+                      <span className="text-muted">—</span>
+                    ) : (
+                      <ul className="space-y-1">
+                        {files.map((f) => (
+                          <li key={f.url}>
+                            <a
+                              href={f.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-primary hover:underline"
+                            >
+                              {f.name || "Anexo"}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </td>
                 </tr>
-              ))}
+                );
+              })}
               {applications.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-3 py-6 text-center text-muted">
+                  <td colSpan={6} className="px-3 py-6 text-center text-muted">
                     Ainda sem inscrições.
                   </td>
                 </tr>

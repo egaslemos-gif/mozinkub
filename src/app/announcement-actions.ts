@@ -3,6 +3,28 @@
 import { prisma } from "@/lib/prisma";
 import { resolveRegistrationInbox, sendOutboundMail } from "@/lib/mail";
 
+type Attachment = { url: string; name: string };
+
+function parseAttachments(raw: string): Attachment[] {
+  try {
+    const parsed = JSON.parse(raw || "[]");
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter(
+        (a): a is Attachment =>
+          a &&
+          typeof a === "object" &&
+          typeof a.url === "string" &&
+          (a.url.startsWith("http") || a.url.startsWith("/")) &&
+          typeof a.name === "string",
+      )
+      .slice(0, 3)
+      .map((a) => ({ url: a.url.trim(), name: a.name.trim().slice(0, 120) || "anexo" }));
+  } catch {
+    return [];
+  }
+}
+
 export async function submitAnnouncementRegistration(formData: FormData) {
   const announcementId = String(formData.get("announcementId") || "").trim();
   const name = String(formData.get("name") || "").trim();
@@ -11,6 +33,7 @@ export async function submitAnnouncementRegistration(formData: FormData) {
   const organization = String(formData.get("organization") || "").trim();
   const profile = String(formData.get("profile") || "").trim();
   const message = String(formData.get("message") || "").trim();
+  const attachments = parseAttachments(String(formData.get("attachmentsJson") || "[]"));
 
   if (!announcementId || !name || !email) {
     return { ok: false as const, error: "Preencha nome e email." };
@@ -45,6 +68,7 @@ export async function submitAnnouncementRegistration(formData: FormData) {
       organization: organization || null,
       profile: profile || null,
       message: message || null,
+      attachmentsJson: JSON.stringify(attachments),
       status: "RECEBIDA",
     },
   });
@@ -56,6 +80,11 @@ export async function submitAnnouncementRegistration(formData: FormData) {
   );
 
   if (inbox) {
+    const attachmentLines =
+      attachments.length > 0
+        ? attachments.map((a, i) => `Anexo ${i + 1}: ${a.name} — ${a.url}`)
+        : ["Anexos: —"];
+
     await sendOutboundMail({
       to: inbox,
       subject: `[IEUL] Inscrição: ${announcement.title} — ${name}`,
@@ -69,6 +98,8 @@ export async function submitAnnouncementRegistration(formData: FormData) {
         `Instituição: ${organization || "—"}`,
         `Perfil: ${profile || "—"}`,
         `Mensagem: ${message || "—"}`,
+        ``,
+        ...attachmentLines,
         ``,
         `ID candidatura: ${application.id}`,
         `Recebida em: ${application.createdAt.toISOString()}`,
