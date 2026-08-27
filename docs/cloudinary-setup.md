@@ -12,15 +12,23 @@ Substitui (ou complementa) o Vercel Blob para uploads de media. URLs públicas v
 
 ## 2) Variáveis no Vercel (projecto `mozinkub`)
 
-**Settings → Environment Variables** — adicionar em Production + Preview:
+**Settings → Environment Variables** — adicionar em Production + Preview.
 
-| Variável | Exemplo |
-|----------|---------|
-| `CLOUDINARY_CLOUD_NAME` | `dxxxxxx` |
-| `CLOUDINARY_API_KEY` | `123456789012345` |
-| `CLOUDINARY_API_SECRET` | `xxxxxxxxxxxxxxxx` |
+**Opção A — três variáveis:**
 
-Localmente, adicione ao `.env.local` (não commitar).
+| Variável | Valor (dashboard Cloudinary) |
+|----------|------------------------------|
+| `CLOUDINARY_CLOUD_NAME` | Cloud name |
+| `CLOUDINARY_API_KEY` | API Key |
+| `CLOUDINARY_API_SECRET` | API Secret |
+
+**Opção B — uma variável (copiar do quickstart):**
+
+| Variável | Valor |
+|----------|-------|
+| `CLOUDINARY_URL` | `cloudinary://API_KEY:API_SECRET@CLOUD_NAME` |
+
+⚠️ **Não troque** API Key com API Secret. Se vir *Invalid Signature*, o Secret está errado — copie de novo em **View API Keys** e faça **Redeploy**.
 
 ## 3) Redeploy
 
