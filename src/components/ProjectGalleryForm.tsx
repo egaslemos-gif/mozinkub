@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createProjectMedia } from "@/app/admin/actions";
 import { isActionResult } from "@/lib/action-result";
+import { FilePicker } from "@/components/FilePicker";
 import { uploadAdminFile } from "@/lib/client-upload";
 
 export function ProjectGalleryForm({ projectId }: { projectId: string }) {
@@ -82,7 +83,12 @@ export function ProjectGalleryForm({ projectId }: { projectId: string }) {
       <input className="admin-input" name="title" placeholder="Legenda (opcional)" />
       <div>
         <label className="admin-label">Fotografia</label>
-        <input type="file" accept="image/*" onChange={onFileChange} disabled={uploading} />
+        <FilePicker
+          accept="image/*"
+          onChange={onFileChange}
+          disabled={uploading}
+          buttonLabel="Escolher fotografia"
+        />
         {url && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={url} alt="" className="mt-2 max-h-24 w-auto object-cover" />

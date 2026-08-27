@@ -8,6 +8,7 @@ import {
 } from "@/app/admin/actions";
 import { isActionResult } from "@/lib/action-result";
 import { ANNOUNCEMENT_TYPES } from "@/lib/announcements";
+import { FilePicker } from "@/components/FilePicker";
 import { uploadAdminFile } from "@/lib/client-upload";
 import { toAppMediaUrl } from "@/lib/media-url";
 
@@ -178,7 +179,12 @@ export function AnnouncementForm({
       </div>
       <div>
         <p className="mb-1 text-sm text-muted">Cartaz / imagem (JPG, PNG, WEBP — máx. 12 MB)</p>
-        <input type="file" accept="image/*" onChange={onFileChange} disabled={uploading} />
+        <FilePicker
+          accept="image/*"
+          onChange={onFileChange}
+          disabled={uploading}
+          buttonLabel="Escolher cartaz / imagem"
+        />
         {imageUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img

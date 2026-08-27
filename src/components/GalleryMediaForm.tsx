@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createGalleryMedia, updateGalleryMedia } from "@/app/admin/actions";
 import { isActionResult } from "@/lib/action-result";
+import { FilePicker } from "@/components/FilePicker";
 import { uploadAdminFile } from "@/lib/client-upload";
 import { galleryMediaKind } from "@/lib/gallery";
 
@@ -133,11 +134,11 @@ export function GalleryMediaForm({
       {!editing && (
         <div>
           <label className="admin-label">Fotografia ou vídeo</label>
-          <input
-            type="file"
+          <FilePicker
             accept="image/*,video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov"
             onChange={onFileChange}
             disabled={uploading}
+            buttonLabel="Escolher fotografia ou vídeo"
           />
           {url && (
             <p className="mt-1 truncate text-[10px] text-primary">{url}</p>

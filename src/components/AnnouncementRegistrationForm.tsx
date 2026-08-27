@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { submitAnnouncementRegistration } from "@/app/announcement-actions";
+import { FilePicker } from "@/components/FilePicker";
 import { submitWeb3Forms } from "@/lib/web3forms-client";
 
 type Attachment = { url: string; name: string };
@@ -207,12 +208,17 @@ export function AnnouncementRegistrationForm({
             PDF, DOC, DOCX ou imagem — até {MAX_FILES} ficheiros, máx. 8 MB cada. Ex.: CV,
             carta de motivação, comprovativo.
           </p>
-          <input
-            type="file"
+          <FilePicker
             accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp,application/pdf,image/*"
             multiple
             disabled={uploading || attachments.length >= MAX_FILES}
             onChange={onFilesSelected}
+            buttonLabel="Escolher anexos"
+            hint={
+              attachments.length >= MAX_FILES
+                ? `Limite de ${MAX_FILES} anexos atingido.`
+                : undefined
+            }
           />
           {uploading && <p className="mt-1 text-xs text-muted">A carregar anexo…</p>}
           {attachments.length > 0 && (

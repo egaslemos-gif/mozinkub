@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { submitCallApplication } from "@/app/editais/actions";
+import { FilePicker } from "@/components/FilePicker";
 import { submitWeb3Forms } from "@/lib/web3forms-client";
 
 export function CallApplicationForm({
@@ -85,12 +86,13 @@ export function CallApplicationForm({
       />
       <div>
         <label className="admin-label">Proposta / formulário (PDF)</label>
-        <input
-          className="admin-input"
-          type="file"
+        <FilePicker
           name="document"
           accept=".pdf,.doc,.docx,application/pdf"
           required
+          onChange={() => {}}
+          buttonLabel="Escolher proposta (PDF)"
+          hint="PDF, DOC ou DOCX · máx. 12 MB"
         />
       </div>
       {status === "ok" && (

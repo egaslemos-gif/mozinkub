@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createHeroSlide, updateHeroSlide } from "@/app/admin/actions";
 import { isActionResult } from "@/lib/action-result";
+import { FilePicker } from "@/components/FilePicker";
 import { uploadAdminFile } from "@/lib/client-upload";
 import { toAppMediaUrl } from "@/lib/media-url";
 
@@ -146,7 +147,12 @@ export function SlideUploadForm({
       />
       <div>
         <label className="admin-label">Fotografia</label>
-        <input type="file" accept="image/*" onChange={onFileChange} disabled={uploading} />
+        <FilePicker
+          accept="image/*"
+          onChange={onFileChange}
+          disabled={uploading}
+          buttonLabel="Escolher fotografia"
+        />
         {imageUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img

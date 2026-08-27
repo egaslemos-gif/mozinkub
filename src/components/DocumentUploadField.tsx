@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { FilePicker } from "@/components/FilePicker";
 import { uploadAdminFile } from "@/lib/client-upload";
 import { toAppMediaUrl } from "@/lib/media-url";
 
@@ -59,11 +60,11 @@ export function DocumentUploadField({
         {hint || "PDF ou imagem (JPG/PNG) do edital oficial · máx. 10 MB"}
       </p>
       <input type="hidden" name={name} value={url} />
-      <input
-        type="file"
+      <FilePicker
         accept=".pdf,.doc,.docx,application/pdf,image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png"
         onChange={onFileChange}
         disabled={uploading}
+        buttonLabel="Escolher documento"
       />
       {uploading && <p className="mt-1 text-xs text-muted">A carregar…</p>}
       {msg && <p className="mt-1 text-xs text-primary">{msg}</p>}

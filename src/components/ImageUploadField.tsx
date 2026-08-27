@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { FilePicker } from "@/components/FilePicker";
 import { uploadAdminFile } from "@/lib/client-upload";
 import { toAppMediaUrl } from "@/lib/media-url";
 
@@ -52,7 +53,12 @@ export function ImageUploadField({
       {hint && <p className="mb-2 text-xs text-muted">{hint}</p>}
       <p className="mb-2 text-xs text-muted">Formatos: JPG, PNG, WEBP, SVG · máx. 10 MB</p>
       <input type="hidden" name={name} value={url} />
-      <input type="file" accept="image/*,.svg" onChange={onFileChange} disabled={uploading} />
+      <FilePicker
+        accept="image/*,.svg"
+        onChange={onFileChange}
+        disabled={uploading}
+        buttonLabel="Escolher imagem"
+      />
       {uploading && <p className="mt-1 text-xs text-muted">A carregar…</p>}
       {msg && <p className="mt-1 text-xs text-primary">{msg}</p>}
       {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
