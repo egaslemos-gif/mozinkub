@@ -168,21 +168,43 @@ model HeroSlide {
 
 /// Notícias / avisos / cartazes (ex.: hackathon) — secção Actualizações
 model Announcement {
-  id          String    @id @default(cuid())
-  title       String
-  summary     String
+  id                    String                     @id @default(cuid())
+  slug                  String                     @unique
+  title                 String
+  summary               String
   /// NOTICIA | EVENTO | AVISO | CONVOCATORIA
-  type        String    @default("NOTICIA")
-  imageUrl    String
-  linkUrl     String?
-  linkLabel   String?
-  featured    Boolean   @default(false)
-  published   Boolean   @default(true)
-  order       Int       @default(0)
-  startsAt    DateTime?
-  endsAt      DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  type                  String                     @default("NOTICIA")
+  imageUrl              String
+  linkUrl               String?
+  linkLabel             String?
+  featured              Boolean                    @default(false)
+  published             Boolean                    @default(true)
+  /// Aceita candidaturas / inscrições pelo formulário do site
+  acceptRegistrations   Boolean                    @default(false)
+  /// Destino opcional (senão: REGISTRATION_EMAIL ou email da SiteConfig)
+  registrationEmail     String?
+  registrationClosesAt  DateTime?
+  order                 Int                        @default(0)
+  startsAt              DateTime?
+  endsAt                DateTime?
+  createdAt             DateTime                   @default(now())
+  updatedAt             DateTime                   @updatedAt
+  applications          AnnouncementApplication[]
+}
+
+model AnnouncementApplication {
+  id             String       @id @default(cuid())
+  announcementId String
+  announcement   Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  name           String
+  email          String
+  phone          String?
+  organization   String?
+  profile        String?
+  message        String?
+  status         String       @default("RECEBIDA")
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 }
 
 model ContactMessage {

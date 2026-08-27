@@ -47,6 +47,51 @@ async function applySchemaToTurso(url: string, authToken: string) {
   console.info("[prepare-db] Turso schema applied (", statements.length, "statements)");
 }
 
+/** Idempotent ALTERs when table already existed from an older schema. */
+async function patchTursoSchema(url: string, authToken: string) {
+  const client = createClient({ url, authToken });
+  const patches = [
+    `ALTER TABLE "Announcement" ADD COLUMN "slug" TEXT`,
+    `ALTER TABLE "Announcement" ADD COLUMN "acceptRegistrations" BOOLEAN NOT NULL DEFAULT 0`,
+    `ALTER TABLE "Announcement" ADD COLUMN "registrationEmail" TEXT`,
+    `ALTER TABLE "Announcement" ADD COLUMN "registrationClosesAt" DATETIME`,
+  ];
+  for (const statement of patches) {
+    try {
+      await client.execute(statement);
+      console.info("[prepare-db] patch ok:", statement.slice(0, 60));
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (
+        msg.includes("duplicate column") ||
+        msg.includes("already exists") ||
+        /duplicate/i.test(msg)
+      ) {
+        continue;
+      }
+      // Table may not exist yet (fresh DB) — CREATE from migrate-diff covers it.
+      if (msg.includes("no such table")) continue;
+      console.warn("[prepare-db] patch skipped:", msg);
+    }
+  }
+
+  try {
+    await client.execute(
+      `UPDATE "Announcement" SET "slug" = "id" WHERE "slug" IS NULL OR "slug" = ''`,
+    );
+  } catch {
+    /* ignore */
+  }
+
+  try {
+    await client.execute(
+      `CREATE UNIQUE INDEX IF NOT EXISTS "Announcement_slug_key" ON "Announcement"("slug")`,
+    );
+  } catch {
+    /* ignore */
+  }
+}
+
 async function seedTurso(url: string, authToken: string) {
   const libsql = createClient({ url, authToken });
   const adapter = new PrismaLibSQL(libsql);
@@ -74,6 +119,7 @@ async function main() {
     console.info("[prepare-db] Turso detected — syncing remote database");
     run("npx prisma generate");
     await applySchemaToTurso(turso.url, turso.authToken);
+    await patchTursoSchema(turso.url, turso.authToken);
     await seedTurso(turso.url, turso.authToken);
     return;
   }

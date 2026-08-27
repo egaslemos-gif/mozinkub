@@ -21,8 +21,19 @@ type Fields = {
   linkLabel?: string | null;
   featured?: boolean;
   published?: boolean;
+  acceptRegistrations?: boolean;
+  registrationEmail?: string | null;
+  registrationClosesAt?: string | Date | null;
   order?: number;
 };
+
+function toDatetimeLocalValue(value?: string | Date | null) {
+  if (!value) return "";
+  const d = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
 
 export function AnnouncementForm({
   item,
@@ -155,7 +166,7 @@ export function AnnouncementForm({
         <input
           name="linkUrl"
           defaultValue={item?.linkUrl || ""}
-          placeholder="Link (inscrição, evento, PDF…)"
+          placeholder="Link externo opcional (PDF, página…)"
           className="w-full border border-border bg-white px-3 py-2 text-sm"
         />
         <input
@@ -177,6 +188,35 @@ export function AnnouncementForm({
           />
         )}
       </div>
+
+      <fieldset className="grid gap-3 border border-border bg-[#f8faf9] p-3">
+        <legend className="px-1 text-sm font-semibold">Inscrições / candidaturas</legend>
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            name="acceptRegistrations"
+            defaultChecked={item?.acceptRegistrations ?? false}
+          />
+          Aceitar inscrições pelo formulário do site
+        </label>
+        <input
+          name="registrationEmail"
+          type="email"
+          defaultValue={item?.registrationEmail || ""}
+          placeholder="Email destino (opcional — senão usa REGISTRATION_EMAIL / SiteConfig)"
+          className="w-full border border-border bg-white px-3 py-2 text-sm"
+        />
+        <label className="text-sm">
+          Prazo de inscrição (opcional)
+          <input
+            name="registrationClosesAt"
+            type="datetime-local"
+            defaultValue={toDatetimeLocalValue(item?.registrationClosesAt)}
+            className="mt-1 w-full border border-border bg-white px-3 py-2"
+          />
+        </label>
+      </fieldset>
+
       <div className="flex flex-wrap gap-4 text-sm">
         <label className="flex items-center gap-2">
           <input type="checkbox" name="featured" defaultChecked={item?.featured ?? false} />

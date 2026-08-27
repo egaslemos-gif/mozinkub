@@ -229,6 +229,20 @@ export async function getPublishedAnnouncements(limit?: number) {
   return items;
 }
 
+export async function getAnnouncementBySlug(slug: string) {
+  const now = new Date();
+  return prisma.announcement.findFirst({
+    where: {
+      slug,
+      published: true,
+      AND: [
+        { OR: [{ startsAt: null }, { startsAt: { lte: now } }] },
+        { OR: [{ endsAt: null }, { endsAt: { gte: now } }] },
+      ],
+    },
+  });
+}
+
 export async function getPublishedAlbums() {
   return prisma.galleryAlbum.findMany({
     where: { published: true },

@@ -801,6 +801,17 @@ function parseAnnouncementData(formData: FormData) {
   if (!title) return { error: "Título obrigatório." } as const;
   if (!summary) return { error: "Resumo obrigatório." } as const;
   if (!imageUrl) return { error: "Imagem obrigatória." } as const;
+
+  const closesRaw = String(formData.get("registrationClosesAt") || "").trim();
+  let registrationClosesAt: Date | null = null;
+  if (closesRaw) {
+    const d = new Date(closesRaw);
+    if (Number.isNaN(d.getTime())) {
+      return { error: "Data de fecho de inscrições inválida." } as const;
+    }
+    registrationClosesAt = d;
+  }
+
   return {
     data: {
       title,
@@ -811,9 +822,24 @@ function parseAnnouncementData(formData: FormData) {
       linkLabel: String(formData.get("linkLabel") || "").trim() || null,
       featured: formData.get("featured") === "on",
       published: formData.get("published") === "on",
+      acceptRegistrations: formData.get("acceptRegistrations") === "on",
+      registrationEmail:
+        String(formData.get("registrationEmail") || "").trim() || null,
+      registrationClosesAt,
       order: Number(formData.get("order") || 0),
     },
   } as const;
+}
+
+async function uniqueAnnouncementSlug(base: string, excludeId?: string) {
+  let slug = slugify(base) || `actualizacao-${Date.now()}`;
+  let n = 0;
+  while (true) {
+    const candidate = n === 0 ? slug : `${slug}-${n}`;
+    const hit = await prisma.announcement.findUnique({ where: { slug: candidate } });
+    if (!hit || hit.id === excludeId) return candidate;
+    n += 1;
+  }
 }
 
 export async function createAnnouncement(formData: FormData) {
@@ -821,9 +847,11 @@ export async function createAnnouncement(formData: FormData) {
     await requireAdmin("settings.update");
     const parsed = parseAnnouncementData(formData);
     if ("error" in parsed) return { ok: false as const, error: parsed.error };
-    await prisma.announcement.create({ data: parsed.data });
+    const slug = await uniqueAnnouncementSlug(parsed.data.title);
+    await prisma.announcement.create({ data: { ...parsed.data, slug } });
     revalidatePath("/");
     revalidatePath("/actualizacoes");
+    revalidatePath(`/actualizacoes/${slug}`);
     revalidatePath("/admin/actualizacoes");
     return { ok: true as const, message: "Actualização publicada." };
   } catch (err) {
@@ -842,9 +870,17 @@ export async function updateAnnouncement(formData: FormData) {
     if (!id) return { ok: false as const, error: "Actualização inválida." };
     const parsed = parseAnnouncementData(formData);
     if ("error" in parsed) return { ok: false as const, error: parsed.error };
-    await prisma.announcement.update({ where: { id }, data: parsed.data });
+    const existing = await prisma.announcement.findUnique({ where: { id } });
+    if (!existing) return { ok: false as const, error: "Actualização não encontrada." };
+    const slug =
+      existing.slug || (await uniqueAnnouncementSlug(parsed.data.title, id));
+    await prisma.announcement.update({
+      where: { id },
+      data: { ...parsed.data, slug },
+    });
     revalidatePath("/");
     revalidatePath("/actualizacoes");
+    revalidatePath(`/actualizacoes/${slug}`);
     revalidatePath("/admin/actualizacoes");
     return { ok: true as const, message: "Actualização guardada." };
   } catch (err) {

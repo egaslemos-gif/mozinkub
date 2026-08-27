@@ -4,6 +4,7 @@ import { toAppMediaUrl } from "@/lib/media-url";
 
 export type AnnouncementCardData = {
   id: string;
+  slug: string;
   title: string;
   summary: string;
   type: string;
@@ -11,6 +12,7 @@ export type AnnouncementCardData = {
   linkUrl: string | null;
   linkLabel: string | null;
   featured?: boolean;
+  acceptRegistrations?: boolean;
 };
 
 export function AnnouncementCard({
@@ -21,26 +23,35 @@ export function AnnouncementCard({
   large?: boolean;
 }) {
   const src = toAppMediaUrl(item.imageUrl) || item.imageUrl;
-  const href = item.linkUrl || "/actualizacoes";
-  const cta = item.linkLabel || (item.linkUrl ? "Saber mais" : "Ver actualizações");
+  const detailHref = `/actualizacoes/${item.slug}`;
+  const wantsSignup = Boolean(item.acceptRegistrations);
+  const href = wantsSignup
+    ? `${detailHref}#inscricao`
+    : item.linkUrl || detailHref;
+  const cta =
+    item.linkLabel ||
+    (wantsSignup ? "Inscrever-se" : item.linkUrl ? "Saber mais" : "Ver detalhes");
 
   return (
     <article
       className={
         large
-          ? "group grid overflow-hidden border border-border bg-white md:grid-cols-[1.15fr_1fr]"
-          : "group flex flex-col overflow-hidden border border-border bg-white"
+          ? "group grid border border-border bg-white md:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]"
+          : "group flex flex-col border border-border bg-white"
       }
     >
-      <Link href={href} className="relative block overflow-hidden bg-[#e8eeea]">
+      <Link
+        href={detailHref}
+        className="relative flex items-center justify-center bg-[#eef3f0] p-3 md:p-4"
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={src}
           alt={item.title}
           className={
             large
-              ? "aspect-[4/5] w-full object-cover transition duration-500 group-hover:scale-[1.02] md:aspect-[3/4] md:max-h-[420px]"
-              : "aspect-[4/3] w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+              ? "h-auto max-h-[min(72vh,720px)] w-full object-contain"
+              : "mx-auto h-auto max-h-72 w-full object-contain"
           }
         />
       </Link>
@@ -56,7 +67,9 @@ export function AnnouncementCard({
               : "font-display mt-2 text-lg font-semibold leading-snug"
           }
         >
-          {item.title}
+          <Link href={detailHref} className="hover:text-primary">
+            {item.title}
+          </Link>
         </h3>
         <p
           className={
@@ -67,12 +80,24 @@ export function AnnouncementCard({
         >
           {item.summary}
         </p>
-        <Link
-          href={href}
-          className="mt-4 inline-flex text-sm font-semibold text-primary hover:underline"
-        >
-          {cta} →
-        </Link>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Link
+            href={href}
+            className="inline-flex text-sm font-semibold text-primary hover:underline"
+          >
+            {cta} →
+          </Link>
+          {wantsSignup && item.linkUrl && (
+            <Link
+              href={item.linkUrl}
+              className="inline-flex text-sm font-medium text-muted hover:underline"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Mais informação
+            </Link>
+          )}
+        </div>
       </div>
     </article>
   );
