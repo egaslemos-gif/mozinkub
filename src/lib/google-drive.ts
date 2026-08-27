@@ -41,14 +41,28 @@ export function isGoogleDriveConfigured(): boolean {
   return Boolean(process.env.GOOGLE_DRIVE_FOLDER_ID?.trim() && parseServiceAccount());
 }
 
+/**
+ * Impersona um utilizador Workspace (recomendado).
+ * Sem isto, a service account não tem quota no Meu Drive → 403 storageQuotaExceeded.
+ */
+function impersonateEmail(): string | undefined {
+  const email =
+    process.env.GOOGLE_DRIVE_IMPERSONATE_EMAIL?.trim() ||
+    process.env.GOOGLE_DRIVE_SHARE_EMAIL?.trim() ||
+    process.env.REGISTRATION_EMAIL?.trim();
+  return email?.includes("@") ? email : undefined;
+}
+
 async function getAccessToken(): Promise<string> {
   const sa = parseServiceAccount();
   if (!sa) throw new Error("Service account em falta");
 
+  const subject = impersonateEmail();
   const client = new JWT({
     email: sa.client_email,
     key: sa.private_key,
-    scopes: ["https://www.googleapis.com/auth/drive.file"],
+    scopes: ["https://www.googleapis.com/auth/drive"],
+    ...(subject ? { subject } : {}),
   });
   const tokens = await client.authorize();
   if (!tokens.access_token) throw new Error("Sem access_token Google");
@@ -65,33 +79,44 @@ function safeFileName(name: string): string {
   return cleaned || `anexo-${Date.now()}`;
 }
 
-async function shareFile(
-  fileId: string,
-  token: string,
-): Promise<void> {
-  // Link público de leitura — quem recebe o email consegue abrir
-  await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      role: "reader",
-      type: "anyone",
-    }),
-  }).catch((err) => {
-    console.warn("[drive] permissão anyone falhou (política Workspace?):", err);
-  });
+function explainDriveError(status: number, errText: string): string {
+  if (
+    errText.includes("storageQuotaExceeded") ||
+    errText.includes("Service Accounts do not have storage quota")
+  ) {
+    return (
+      "A service account não tem espaço no Drive pessoal. " +
+      "Active domain-wide delegation para impersonar elemos@unilicungo.ac.mz " +
+      "(ver docs/google-drive-setup.md) ou use uma Unidade partilhada (Shared Drive)."
+    );
+  }
+  if (errText.includes("unauthorized_client") || errText.includes("invalid_grant")) {
+    return (
+      "Impersonação Google não autorizada. Peça ao admin Workspace para activar " +
+      "domain-wide delegation na service account (docs/google-drive-setup.md)."
+    );
+  }
+  if (status === 404) {
+    return "Pasta Drive não encontrada. Confirme GOOGLE_DRIVE_FOLDER_ID.";
+  }
+  return "Falha ao enviar para o Google Drive. Confirme partilha da pasta e a Drive API.";
+}
 
+async function shareFile(fileId: string, token: string): Promise<void> {
   const shareWith =
     process.env.GOOGLE_DRIVE_SHARE_EMAIL?.trim() ||
     process.env.REGISTRATION_EMAIL?.trim() ||
     "elemos@unilicungo.ac.mz";
 
+  // Se já impersonamos este utilizador, o ficheiro fica no Drive dele — partilha opcional
+  const subject = impersonateEmail();
+  if (subject && shareWith.toLowerCase() === subject.toLowerCase()) {
+    return;
+  }
+
   if (shareWith.includes("@")) {
     await fetch(
-      `https://www.googleapis.com/drive/v3/files/${fileId}/permissions?sendNotificationEmail=false`,
+      `https://www.googleapis.com/drive/v3/files/${fileId}/permissions?supportsAllDrives=true&sendNotificationEmail=false`,
       {
         method: "POST",
         headers: {
@@ -111,8 +136,9 @@ async function shareFile(
 }
 
 /**
- * Upload de anexos de inscrição para uma pasta Google Drive partilhada.
- * A pasta (GOOGLE_DRIVE_FOLDER_ID) deve estar partilhada com a service account (Editor).
+ * Upload de anexos de inscrição para Google Drive.
+ * Preferência: impersonar utilizador Workspace (GOOGLE_DRIVE_IMPERSONATE_EMAIL).
+ * Alternativa: pasta numa Shared Drive + supportsAllDrives.
  */
 export async function uploadRegistrationToDrive(
   file: File,
@@ -151,7 +177,7 @@ export async function uploadRegistrationToDrive(
     const body = Buffer.concat([preamble, bytes, epilogue]);
 
     const uploadRes = await fetch(
-      "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink",
+      "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true&fields=id,name,webViewLink",
       {
         method: "POST",
         headers: {
@@ -167,8 +193,7 @@ export async function uploadRegistrationToDrive(
       console.error("[drive] upload failed:", uploadRes.status, errText);
       return {
         ok: false,
-        error:
-          "Falha ao enviar para o Google Drive. Confirme a pasta partilhada com a service account.",
+        error: explainDriveError(uploadRes.status, errText),
       };
     }
 
@@ -191,10 +216,11 @@ export async function uploadRegistrationToDrive(
     console.info("[drive] uploaded", data.name || storedName, "→", url);
     return { ok: true, url, name: originalName.slice(0, 120) };
   } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
     console.error("[drive] error:", err);
     return {
       ok: false,
-      error: "Erro ao ligar ao Google Drive. Verifique as credenciais.",
+      error: explainDriveError(0, msg),
     };
   }
 }

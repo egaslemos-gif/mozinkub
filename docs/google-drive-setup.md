@@ -1,62 +1,70 @@
 # Google Drive — anexos de inscrição
 
-Os anexos de candidatura / inscrição vão para o **Google Drive** (não para o Cloudinary), para poupar espaço de media pública.
+Os anexos vão para o **Google Drive** (não Cloudinary). Cloudinary fica para media pública do site.
 
-O Cloudinary continua só para cartazes, galeria e imagens do site.
+## Problema comum (403 storageQuotaExceeded)
 
-## 1. Criar pasta no Drive
+Contas de serviço **não têm espaço** no «Meu Drive». Por isso partilhar uma pasta pessoal com a SA **não chega**.
 
-1. Com a conta **elemos@unilicungo.ac.mz** (ou a conta oficial), abra [Google Drive](https://drive.google.com).
-2. Crie uma pasta, por exemplo: `IEUL — Inscrições`.
-3. Abra a pasta → copie o **ID** do URL:
+Use **uma** destas soluções:
 
-```
-https://drive.google.com/drive/folders/XXXXXXXXXXXXXXXXXXXX
-                                  ^^^^^^^^^^^^^^^^^^^^
-                                  = GOOGLE_DRIVE_FOLDER_ID
-```
+---
 
-## 2. Service Account (Google Cloud)
+## Solução A — Domain-wide delegation (recomendada)
 
-1. Vá a [Google Cloud Console](https://console.cloud.google.com/) → projecto (ou crie um).
-2. Active **Google Drive API**.
-3. **IAM e administrador → Contas de serviço → Criar**.
-4. Crie a conta (ex.: `mozinkub-drive@….iam.gserviceaccount.com`).
-5. Em **Chaves → Adicionar chave → JSON** → descarregue o ficheiro.
-6. **Partilhe a pasta** do passo 1 com o email da service account, permissão **Editor**.
+O app age **como** `elemos@unilicungo.ac.mz` e grava na pasta `Inscricoes` desse utilizador.
 
-## 3. Variáveis no Vercel / `.env.local`
+### 1. Já feito
+- Service account `mozinkub-drive@….iam.gserviceaccount.com`
+- JSON no Vercel (`GOOGLE_SERVICE_ACCOUNT_JSON`)
+- Pasta `Inscricoes` + `GOOGLE_DRIVE_FOLDER_ID`
 
-Opção A — JSON completo (recomendado):
+### 2. Admin Google Workspace (UniLicungo)
+
+1. [Admin Console](https://admin.google.com) → **Segurança** → **Controlos de API** → **Delegação em todo o domínio**.
+2. **Adicionar novo**:
+   - **ID do cliente** = `client_id` numérico do JSON da service account  
+     (ex.: `116507920895482497361`)
+   - **Scopes** (colar exactamente):
+     ```
+     https://www.googleapis.com/auth/drive
+     ```
+3. Guardar.
+
+### 3. Variáveis Vercel
 
 ```bash
-GOOGLE_DRIVE_FOLDER_ID="id_da_pasta"
-GOOGLE_SERVICE_ACCOUNT_JSON='{"type":"service_account","client_email":"...","private_key":"-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",...}'
+GOOGLE_DRIVE_FOLDER_ID="1bShsg_EDyv9Gq18_OD2B1fn-SuPX2QCB"
+GOOGLE_SERVICE_ACCOUNT_JSON='{...}'
+GOOGLE_DRIVE_IMPERSONATE_EMAIL="elemos@unilicungo.ac.mz"
 GOOGLE_DRIVE_SHARE_EMAIL="elemos@unilicungo.ac.mz"
 ```
 
-Opção B — campos separados:
+`GOOGLE_DRIVE_IMPERSONATE_EMAIL` (ou `GOOGLE_DRIVE_SHARE_EMAIL`) activa a impersonação no código.
 
-```bash
-GOOGLE_DRIVE_FOLDER_ID="id_da_pasta"
-GOOGLE_SERVICE_ACCOUNT_EMAIL="mozinkub-drive@….iam.gserviceaccount.com"
-GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
-GOOGLE_DRIVE_SHARE_EMAIL="elemos@unilicungo.ac.mz"
-```
+Redeploy após alterar vars / após o admin activar a delegação.
 
-No Vercel: `vercel env add` para Production e Preview, depois redesploy.
+---
 
-## 4. Comportamento
+## Solução B — Unidade partilhada (Shared Drive)
 
-| Situação | Destino |
-|----------|---------|
-| Drive configurado | Pasta Google Drive + link no email / admin |
-| Drive em falta | Fallback temporário Cloudinary/Blob (com aviso nos logs) |
+Se não puder activar domain-wide delegation:
 
-Os ficheiros ficam com ligação de leitura (e partilha explícita com `GOOGLE_DRIVE_SHARE_EMAIL`).
+1. No Drive: **Novo** → **Unidade partilhada** (ex.: `IEUL Inscrições`).
+2. Adicione `mozinkub-drive@…` como **Gestor de conteúdo**.
+3. Crie pasta dentro da unidade, copie o novo ID → `GOOGLE_DRIVE_FOLDER_ID`.
+4. Redeploy.
 
-## 5. Teste
+---
 
-1. Faça uma inscrição com anexo em `/actualizacoes/...`.
-2. Confirme o ficheiro na pasta Drive.
-3. O email deve mostrar `https://drive.google.com/file/d/…` em vez de `res.cloudinary.com`.
+## Checklist rápido
+
+| Item | Estado |
+|------|--------|
+| Drive API activa no projecto GCP | ☐ |
+| JSON + folder ID no Vercel | ☐ |
+| Domain-wide delegation **ou** Shared Drive | ☐ |
+| Redeploy | ☐ |
+| Teste inscrição com anexo | ☐ |
+
+Links no email / admin: `https://drive.google.com/file/d/…`
