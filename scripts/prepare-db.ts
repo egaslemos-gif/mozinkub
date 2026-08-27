@@ -4,7 +4,7 @@
  * - Without: local prisma db push + seed (existing MVP path)
  */
 import { execSync } from "child_process";
-import { createClient } from "@libsql/client";
+import { createClient, type Client } from "@libsql/client";
 import { PrismaClient } from "@prisma/client";
 import { PrismaLibSQL } from "@prisma/adapter-libsql";
 import { getTursoConfig } from "../src/lib/turso";
@@ -14,6 +14,38 @@ function run(cmd: string) {
   execSync(cmd, { stdio: "inherit", env: process.env });
 }
 
+function isIgnorableSchemaError(msg: string) {
+  const m = msg.toLowerCase();
+  return (
+    m.includes("already exists") ||
+    m.includes("duplicate") ||
+    m.includes("unique constraint") ||
+    // Index before ALTER on existing tables — patched next.
+    m.includes("no such column") ||
+    m.includes("no such table")
+  );
+}
+
+async function executeStatements(client: Client, statements: string[], label: string) {
+  let ok = 0;
+  let skipped = 0;
+  for (const statement of statements) {
+    try {
+      await client.execute(statement.endsWith(";") ? statement : `${statement};`);
+      ok += 1;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (isIgnorableSchemaError(msg)) {
+        skipped += 1;
+        continue;
+      }
+      console.error(`[prepare-db] ${label} failed:`, statement.slice(0, 120));
+      throw err;
+    }
+  }
+  console.info(`[prepare-db] ${label}: ${ok} applied, ${skipped} skipped`);
+}
+
 async function applySchemaToTurso(url: string, authToken: string) {
   const sql = execSync(
     "npx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script",
@@ -21,35 +53,24 @@ async function applySchemaToTurso(url: string, authToken: string) {
   );
 
   const client = createClient({ url, authToken });
-  // Split on statement boundaries; strip Prisma comment lines (e.g. "-- CreateTable").
   const statements = sql
     .split(/;\s*(?:\r?\n|$)/)
     .map((s) => s.replace(/^\s*--[^\r\n]*[\r\n]*/gm, "").trim())
     .filter((s) => s.length > 0);
 
-  for (const statement of statements) {
-    try {
-      await client.execute(statement.endsWith(";") ? statement : `${statement};`);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      // Idempotent-ish: table/index already exists is OK on redeploy.
-      if (
-        msg.includes("already exists") ||
-        msg.includes("duplicate") ||
-        msg.toLowerCase().includes("unique constraint")
-      ) {
-        continue;
-      }
-      console.error("[prepare-db] schema statement failed:", statement.slice(0, 120));
-      throw err;
-    }
-  }
-  console.info("[prepare-db] Turso schema applied (", statements.length, "statements)");
+  const tables = statements.filter((s) => !/^\s*CREATE\s+(UNIQUE\s+)?INDEX\b/i.test(s));
+  const indexes = statements.filter((s) => /^\s*CREATE\s+(UNIQUE\s+)?INDEX\b/i.test(s));
+
+  // 1) CREATE TABLE (skip if already exists)
+  await executeStatements(client, tables, "tables");
+  // 2) ALTER existing tables for new columns
+  await patchTursoSchema(client);
+  // 3) CREATE INDEX (now columns exist)
+  await executeStatements(client, indexes, "indexes");
 }
 
 /** Idempotent ALTERs when table already existed from an older schema. */
-async function patchTursoSchema(url: string, authToken: string) {
-  const client = createClient({ url, authToken });
+async function patchTursoSchema(client: Client) {
   const patches = [
     `ALTER TABLE "Announcement" ADD COLUMN "slug" TEXT`,
     `ALTER TABLE "Announcement" ADD COLUMN "acceptRegistrations" BOOLEAN NOT NULL DEFAULT 0`,
@@ -62,15 +83,9 @@ async function patchTursoSchema(url: string, authToken: string) {
       console.info("[prepare-db] patch ok:", statement.slice(0, 60));
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      if (
-        msg.includes("duplicate column") ||
-        msg.includes("already exists") ||
-        /duplicate/i.test(msg)
-      ) {
+      if (isIgnorableSchemaError(msg) || /duplicate column/i.test(msg)) {
         continue;
       }
-      // Table may not exist yet (fresh DB) — CREATE from migrate-diff covers it.
-      if (msg.includes("no such table")) continue;
       console.warn("[prepare-db] patch skipped:", msg);
     }
   }
@@ -78,14 +93,6 @@ async function patchTursoSchema(url: string, authToken: string) {
   try {
     await client.execute(
       `UPDATE "Announcement" SET "slug" = "id" WHERE "slug" IS NULL OR "slug" = ''`,
-    );
-  } catch {
-    /* ignore */
-  }
-
-  try {
-    await client.execute(
-      `CREATE UNIQUE INDEX IF NOT EXISTS "Announcement_slug_key" ON "Announcement"("slug")`,
     );
   } catch {
     /* ignore */
@@ -119,7 +126,6 @@ async function main() {
     console.info("[prepare-db] Turso detected — syncing remote database");
     run("npx prisma generate");
     await applySchemaToTurso(turso.url, turso.authToken);
-    await patchTursoSchema(turso.url, turso.authToken);
     await seedTurso(turso.url, turso.authToken);
     return;
   }
